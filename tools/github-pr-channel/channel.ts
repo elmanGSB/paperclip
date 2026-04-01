@@ -1,10 +1,28 @@
 #!/usr/bin/env bun
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 const WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET ?? "";
-const PORT = parseInt(process.env.PORT ?? "8789");
+const PORT = parseInt(process.env.PORT ?? "8789", 10);
+
+/** Comma-separated GitHub logins (e.g. review bots) to accept when type is Bot. Empty = skip all bots. */
+const ALLOWED_BOT_LOGINS = new Set(
+  (process.env.GITHUB_ALLOWED_BOTS ?? "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+);
+
+function shouldDeliverComment(
+  user: Record<string, unknown> | undefined
+): boolean {
+  if (!user) return false;
+  const type = user.type as string | undefined;
+  const login = String(user.login ?? "").toLowerCase();
+  if (type !== "Bot") return true;
+  return ALLOWED_BOT_LOGINS.size > 0 && ALLOWED_BOT_LOGINS.has(login);
+}
 
 const mcp = new Server(
   { name: "github-pr-comments", version: "1.0.0" },
@@ -16,10 +34,10 @@ const mcp = new Server(
 
 When you receive a PR comment event:
 1. Read the comment carefully — it contains the file path, line number, diff hunk (code context), and the reviewer's message.
-2. Open the file mentioned in the "file" attribute.
-3. Implement the requested change. The branch name is in the "branch" attribute — you are already on that branch.
+2. Check out the PR head branch from the "branch" attribute if you are not already on it, then open the file in the "file" attribute.
+3. Implement the requested change.
 4. If the comment asks a question rather than requesting a change, note it for the user.
-5. After implementing, summarize what you changed.
+5. Commit, push to the PR branch, and summarize what you changed.
 
 Do not reply through this channel — it is one-way. Act on the feedback directly in the codebase.`,
   }
@@ -32,7 +50,14 @@ function verifySignature(payload: string, signature: string): boolean {
   const expected =
     "sha256=" +
     createHmac("sha256", WEBHOOK_SECRET).update(payload).digest("hex");
-  return signature === expected;
+  if (!signature.startsWith("sha256=") || signature.length !== expected.length) {
+    return false;
+  }
+  try {
+    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }
 
 Bun.serve({
@@ -80,9 +105,7 @@ Bun.serve({
       const prHead = pr.head as Record<string, unknown>;
       const commentUser = comment.user as Record<string, unknown>;
 
-      // Skip bot comments
-      if (commentUser.type === "Bot") return new Response("ok");
-      // Skip replies to existing comment threads unless they mention changes
+      if (!shouldDeliverComment(commentUser)) return new Response("ok");
       const commentBody = (comment.body as string) ?? "";
 
       const content = `PR inline review comment on ${repo.full_name} #${pr.number}: "${pr.title}"
@@ -121,8 +144,7 @@ URL: ${comment.html_url}`;
       const prHead = pr.head as Record<string, unknown>;
       const reviewUser = review.user as Record<string, unknown>;
 
-      // Skip bot reviews or reviews with no body
-      if (reviewUser.type === "Bot") return new Response("ok");
+      if (!shouldDeliverComment(reviewUser)) return new Response("ok");
       const reviewBody = (review.body as string | null) ?? "";
       if (!reviewBody.trim()) return new Response("ok");
 
