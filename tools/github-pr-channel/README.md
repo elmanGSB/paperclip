@@ -33,7 +33,7 @@ Point the server at this file inside your clone (adjust the path if your clone d
       "env": {
         "GITHUB_WEBHOOK_SECRET": "",
         "PORT": "8789",
-        "GITHUB_ALLOWED_BOTS": "coderabbitai[bot],github-code-quality[bot]"
+        "GITHUB_ALLOWED_BOTS": "coderabbitai[bot],your-review-bot[bot]"
       }
     }
   }
