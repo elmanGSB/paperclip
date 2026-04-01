@@ -32,7 +32,8 @@ Point the server at this file inside your clone (adjust the path if your clone d
       "args": ["/ABSOLUTE/PATH/TO/paperclip/tools/github-pr-channel/channel.ts"],
       "env": {
         "GITHUB_WEBHOOK_SECRET": "",
-        "PORT": "8789"
+        "PORT": "8789",
+        "GITHUB_ALLOWED_BOTS": "coderabbitai[bot],github-code-quality[bot]"
       }
     }
   }
@@ -40,6 +41,8 @@ Point the server at this file inside your clone (adjust the path if your clone d
 ```
 
 Set `GITHUB_WEBHOOK_SECRET` to match your GitHub webhook secret when not testing.
+
+**PR review bots** post as GitHub users with `type: Bot`. By default those events are **ignored** so random bots cannot spam your session. Set **`GITHUB_ALLOWED_BOTS`** to a comma-separated list of **login names** (lowercase; include `[bot]` suffix if GitHub shows it, e.g. `my-reviewer[bot]`). Example: `GITHUB_ALLOWED_BOTS=coderabbitai[bot]`. Leave empty to only accept human reviewers.
 
 ## Run Claude Code with the channel
 
