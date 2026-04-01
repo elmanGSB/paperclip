@@ -1,0 +1,16 @@
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# dotenv
+.env
+.env.*
+
+# caches
+*.tsbuildinfo
+
+.DS_Store
