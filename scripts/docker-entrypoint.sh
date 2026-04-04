@@ -26,4 +26,11 @@ if [ "$changed" = "1" ]; then
     chown -R node:node /paperclip
 fi
 
+# Ensure the cursor agent's state directory is always writable by node,
+# regardless of how files were created (e.g. root docker exec runs or
+# image build steps writing to the /paperclip volume).
+if [ -d /paperclip/.cursor ]; then
+    chown -R node:node /paperclip/.cursor
+fi
+
 exec gosu node "$@"

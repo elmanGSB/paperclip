@@ -60,12 +60,19 @@ export async function dbBackupCommand(opts: DbBackupOptions): Promise<void> {
     opts.retentionDays,
     config?.database.backup.retentionDays ?? 30,
   );
+  const retentionMaxFilesRaw = config?.database.backup.retentionMaxFiles;
+  const retentionMaxFiles =
+    typeof retentionMaxFilesRaw === "number" &&
+    Number.isInteger(retentionMaxFilesRaw) &&
+    retentionMaxFilesRaw >= 1
+      ? retentionMaxFilesRaw
+      : undefined;
   const filenamePrefix = opts.filenamePrefix?.trim() || "paperclip";
 
   p.log.message(pc.dim(`Config: ${configPath}`));
   p.log.message(pc.dim(`Connection source: ${connection.source}`));
   p.log.message(pc.dim(`Backup dir: ${backupDir}`));
-  p.log.message(pc.dim(`Retention: ${retentionDays} day(s)`));
+  p.log.message(pc.dim(`Retention: ${retentionDays} day(s)${retentionMaxFiles != null ? `, max ${retentionMaxFiles} file(s)` : ""}`));
 
   const spinner = p.spinner();
   spinner.start("Creating database backup...");
@@ -74,6 +81,7 @@ export async function dbBackupCommand(opts: DbBackupOptions): Promise<void> {
       connectionString: connection.value,
       backupDir,
       retentionDays,
+      ...(retentionMaxFiles != null ? { retentionMaxFiles } : {}),
       filenamePrefix,
     });
     spinner.stop(`Backup saved: ${formatDatabaseBackupResult(result)}`);
@@ -87,6 +95,7 @@ export async function dbBackupCommand(opts: DbBackupOptions): Promise<void> {
             prunedCount: result.prunedCount,
             backupDir,
             retentionDays,
+            retentionMaxFiles,
             connectionSource: connection.source,
           },
           null,

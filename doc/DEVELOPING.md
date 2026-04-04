@@ -328,6 +328,7 @@ Environment overrides:
 - `PAPERCLIP_DB_BACKUP_ENABLED=true|false`
 - `PAPERCLIP_DB_BACKUP_INTERVAL_MINUTES=<minutes>`
 - `PAPERCLIP_DB_BACKUP_RETENTION_DAYS=<days>`
+- `PAPERCLIP_DB_BACKUP_RETENTION_MAX_FILES=<n>` — after each backup, keep only the **n** newest `paperclip-*.sql` files (e.g. `1` for a single rolling file). Still runs age-based pruning from `RETENTION_DAYS` first.
 - `PAPERCLIP_DB_BACKUP_DIR=/absolute/or/~/path`
 
 ## Secrets in Dev

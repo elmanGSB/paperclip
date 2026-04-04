@@ -636,6 +636,9 @@ export async function startServer(): Promise<StartedServer> {
           connectionString: activeDatabaseConnectionString,
           backupDir: config.databaseBackupDir,
           retentionDays: config.databaseBackupRetentionDays,
+          ...(config.databaseBackupRetentionMaxFiles != null
+            ? { retentionMaxFiles: config.databaseBackupRetentionMaxFiles }
+            : {}),
           filenamePrefix: "paperclip",
         });
         logger.info(
@@ -645,6 +648,7 @@ export async function startServer(): Promise<StartedServer> {
             prunedCount: result.prunedCount,
             backupDir: config.databaseBackupDir,
             retentionDays: config.databaseBackupRetentionDays,
+            retentionMaxFiles: config.databaseBackupRetentionMaxFiles,
           },
           `Automatic database backup complete: ${formatDatabaseBackupResult(result)}`,
         );
@@ -659,6 +663,7 @@ export async function startServer(): Promise<StartedServer> {
       {
         intervalMinutes: config.databaseBackupIntervalMinutes,
         retentionDays: config.databaseBackupRetentionDays,
+        retentionMaxFiles: config.databaseBackupRetentionMaxFiles,
         backupDir: config.databaseBackupDir,
       },
       "Automatic database backups enabled",
@@ -705,6 +710,7 @@ export async function startServer(): Promise<StartedServer> {
         databaseBackupEnabled: config.databaseBackupEnabled,
         databaseBackupIntervalMinutes: config.databaseBackupIntervalMinutes,
         databaseBackupRetentionDays: config.databaseBackupRetentionDays,
+        databaseBackupRetentionMaxFiles: config.databaseBackupRetentionMaxFiles,
         databaseBackupDir: config.databaseBackupDir,
       });
 

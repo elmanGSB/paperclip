@@ -7,6 +7,8 @@ export type RunDatabaseBackupOptions = {
   connectionString: string;
   backupDir: string;
   retentionDays: number;
+  /** When set, delete older backups so at most this many timestamped files remain (newest kept). */
+  retentionMaxFiles?: number;
   filenamePrefix?: string;
   connectTimeoutSeconds?: number;
   includeMigrationJournal?: boolean;
@@ -86,6 +88,26 @@ function pruneOldBackups(backupDir: string, retentionDays: number, filenamePrefi
     }
   }
 
+  return pruned;
+}
+
+function pruneExcessBackupsByCount(backupDir: string, filenamePrefix: string, maxFiles: number): number {
+  if (!existsSync(backupDir)) return 0;
+  const safeMax = Math.max(1, Math.trunc(maxFiles));
+  const entries: { fullPath: string; mtimeMs: number }[] = [];
+  for (const name of readdirSync(backupDir)) {
+    if (!name.startsWith(`${filenamePrefix}-`) || !name.endsWith(".sql")) continue;
+    const fullPath = resolve(backupDir, name);
+    const stat = statSync(fullPath);
+    if (!stat.isFile()) continue;
+    entries.push({ fullPath, mtimeMs: stat.mtimeMs });
+  }
+  entries.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  let pruned = 0;
+  for (let i = safeMax; i < entries.length; i += 1) {
+    unlinkSync(entries[i]!.fullPath);
+    pruned += 1;
+  }
   return pruned;
 }
 
@@ -605,7 +627,12 @@ export async function runDatabaseBackup(opts: RunDatabaseBackupOptions): Promise
     await writer.close();
 
     const sizeBytes = statSync(backupFile).size;
-    const prunedCount = pruneOldBackups(opts.backupDir, retentionDays, filenamePrefix);
+    let prunedCount = pruneOldBackups(opts.backupDir, retentionDays, filenamePrefix);
+    const maxFilesRaw = opts.retentionMaxFiles;
+    if (maxFilesRaw != null && Number.isFinite(maxFilesRaw)) {
+      const maxFiles = Math.max(1, Math.trunc(maxFilesRaw));
+      prunedCount += pruneExcessBackupsByCount(opts.backupDir, filenamePrefix, maxFiles);
+    }
 
     return {
       backupFile,
