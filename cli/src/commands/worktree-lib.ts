@@ -200,11 +200,6 @@ export function buildWorktreeConfig(input: {
         enabled: source?.database.backup.enabled ?? true,
         intervalMinutes: source?.database.backup.intervalMinutes ?? 60,
         retentionDays: source?.database.backup.retentionDays ?? 30,
-        ...(typeof source?.database.backup.retentionMaxFiles === "number" &&
-        Number.isInteger(source.database.backup.retentionMaxFiles) &&
-        source.database.backup.retentionMaxFiles >= 1
-          ? { retentionMaxFiles: source.database.backup.retentionMaxFiles }
-          : {}),
         dir: paths.backupDir,
       },
     },

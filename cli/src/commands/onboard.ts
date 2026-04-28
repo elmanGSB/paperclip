@@ -209,13 +209,6 @@ function quickstartDefaultsFromEnv(opts?: { preferTrustedLocal?: boolean }): {
     1,
     parseNumberFromEnv(process.env.PAPERCLIP_DB_BACKUP_RETENTION_DAYS) ?? 30,
   );
-  const databaseBackupRetentionMaxFilesRaw = parseNumberFromEnv(process.env.PAPERCLIP_DB_BACKUP_RETENTION_MAX_FILES);
-  const databaseBackupRetentionMaxFiles =
-    databaseBackupRetentionMaxFilesRaw != null &&
-    Number.isInteger(databaseBackupRetentionMaxFilesRaw) &&
-    databaseBackupRetentionMaxFilesRaw >= 1
-      ? databaseBackupRetentionMaxFilesRaw
-      : undefined;
   const defaults: OnboardDefaults = {
     database: {
       mode: databaseUrl ? "postgres" : "embedded-postgres",
@@ -226,7 +219,6 @@ function quickstartDefaultsFromEnv(opts?: { preferTrustedLocal?: boolean }): {
         enabled: databaseBackupEnabled,
         intervalMinutes: databaseBackupIntervalMinutes,
         retentionDays: databaseBackupRetentionDays,
-        ...(databaseBackupRetentionMaxFiles != null ? { retentionMaxFiles: databaseBackupRetentionMaxFiles } : {}),
         dir: resolvePathFromEnv(process.env.PAPERCLIP_DB_BACKUP_DIR) ?? resolveDefaultBackupDir(instanceId),
       },
     },

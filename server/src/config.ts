@@ -68,8 +68,6 @@ export interface Config {
   databaseBackupEnabled: boolean;
   databaseBackupIntervalMinutes: number;
   databaseBackupRetentionDays: number;
-  /** When set, keep at most this many backup files (newest); older files removed after each backup. */
-  databaseBackupRetentionMaxFiles: number | undefined;
   databaseBackupDir: string;
   serveUi: boolean;
   uiDevMiddleware: boolean;
@@ -262,19 +260,6 @@ export function loadConfig(): Config {
       fileDatabaseBackup?.retentionDays ||
       7,
   );
-  const retentionMaxFilesEnv = process.env.PAPERCLIP_DB_BACKUP_RETENTION_MAX_FILES?.trim();
-  let databaseBackupRetentionMaxFiles: number | undefined;
-  if (retentionMaxFilesEnv !== undefined && retentionMaxFilesEnv.length > 0) {
-    const parsed = Number(retentionMaxFilesEnv);
-    if (Number.isInteger(parsed) && parsed >= 1) {
-      databaseBackupRetentionMaxFiles = parsed;
-    }
-  } else if (fileDatabaseBackup?.retentionMaxFiles != null) {
-    const parsed = Number(fileDatabaseBackup.retentionMaxFiles);
-    if (Number.isInteger(parsed) && parsed >= 1) {
-      databaseBackupRetentionMaxFiles = parsed;
-    }
-  }
   const databaseBackupDir = resolveHomeAwarePath(
     process.env.PAPERCLIP_DB_BACKUP_DIR ??
       fileDatabaseBackup?.dir ??
@@ -321,7 +306,6 @@ export function loadConfig(): Config {
     databaseBackupEnabled,
     databaseBackupIntervalMinutes,
     databaseBackupRetentionDays,
-    databaseBackupRetentionMaxFiles,
     databaseBackupDir,
     serveUi:
       process.env.SERVE_UI !== undefined
