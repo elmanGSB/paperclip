@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolvePaperclipConfigPath, resolvePaperclipEnvPath } from "./paths.js";
-import type { DeploymentExposure, DeploymentMode } from "@paperclipai/shared";
+import type { BindMode, DeploymentExposure, DeploymentMode } from "@paperclipai/shared";
 
 import { parse as parseEnvFileContents } from "dotenv";
 
@@ -18,6 +18,7 @@ type EmbeddedPostgresInfo = {
 };
 
 type StartupBannerOptions = {
+  bind: BindMode;
   host: string;
   deploymentMode: DeploymentMode;
   deploymentExposure: DeploymentExposure;
@@ -32,7 +33,6 @@ type StartupBannerOptions = {
   databaseBackupEnabled: boolean;
   databaseBackupIntervalMinutes: number;
   databaseBackupRetentionDays: number;
-  databaseBackupRetentionMaxFiles: number | undefined;
   databaseBackupDir: string;
 };
 
@@ -132,11 +132,7 @@ export function printStartupBanner(opts: StartupBannerOptions): void {
     : color("disabled", "yellow");
   const dbBackup = opts.databaseBackupEnabled
     ? `enabled ${color(
-        `(every ${opts.databaseBackupIntervalMinutes}m, keep ${opts.databaseBackupRetentionDays}d${
-          opts.databaseBackupRetentionMaxFiles != null
-            ? `, max ${opts.databaseBackupRetentionMaxFiles} file(s)`
-            : ""
-        })`,
+        `(every ${opts.databaseBackupIntervalMinutes}m, keep ${opts.databaseBackupRetentionDays}d)`,
         "dim",
       )}`
     : color("disabled", "yellow");
@@ -156,6 +152,7 @@ export function printStartupBanner(opts: StartupBannerOptions): void {
     color("  ───────────────────────────────────────────────────────", "blue"),
     row("Mode", `${dbMode}  |  ${uiMode}`),
     row("Deploy", `${opts.deploymentMode} (${opts.deploymentExposure})`),
+    row("Bind", `${opts.bind} ${color(`(${opts.host})`, "dim")}`),
     row("Auth", opts.authReady ? color("ready", "green") : color("not-ready", "yellow")),
     row("Server", portValue),
     row("API", `${apiUrl} ${color(`(health: ${apiUrl}/health)`, "dim")}`),
