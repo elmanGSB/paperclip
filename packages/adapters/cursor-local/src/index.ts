@@ -3,7 +3,6 @@ export const label = "Cursor CLI (local)";
 export const DEFAULT_CURSOR_LOCAL_MODEL = "auto";
 
 const CURSOR_MODEL_ALIASES: Record<string, string> = {
-  "composer-1": "composer-1.5",
   "gpt-5.1-codex-max": "gpt-5.1-codex-max-medium",
   "opus-4.6": "claude-4.6-opus-high",
   "opus-4.6-thinking": "claude-4.6-opus-high-thinking",

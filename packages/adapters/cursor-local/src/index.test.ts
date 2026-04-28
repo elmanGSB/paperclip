@@ -10,7 +10,6 @@ describe("cursor model normalization", () => {
   });
 
   it("maps other renamed model ids to currently available aliases", () => {
-    expect(normalizeCursorModelId("composer-1")).toBe("composer-1.5");
     expect(normalizeCursorModelId("gemini-3-pro")).toBe("gemini-3.1-pro");
     expect(normalizeCursorModelId("grok")).toBe("grok-4-20");
   });
