@@ -91,8 +91,17 @@ jobs:
               'bash -s' <<'REMOTE_SCRIPT'
           set -euo pipefail
           cd ~/paperclip
-          git fetch origin master
-          git reset --hard origin/master
+          # The VM may name the fork remote either "fork" or "origin" depending on
+          # how it was provisioned. Prefer "fork"; fall back to "origin".
+          if git remote get-url fork >/dev/null 2>&1; then
+            remote=fork
+          else
+            remote=origin
+          fi
+          git fetch "$remote" master
+          # Land on the deploy/vm branch, creating it from $remote/master if missing.
+          git checkout deploy/vm 2>/dev/null || git checkout -B deploy/vm "$remote/master"
+          git reset --hard "$remote/master"
           docker compose -p paperclip -f docker/docker-compose.yml --env-file .env pull
           docker compose -p paperclip -f docker/docker-compose.yml --env-file .env up -d
           tag="deploy/vm-$(date -u +%Y%m%d-%H%M)"
