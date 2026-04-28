@@ -53,3 +53,52 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy-vm:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/master' && github.repository == 'elmanGSB/paperclip'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: deploy-vm
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to VM via SSH
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_SSH_PORT: ${{ secrets.VM_SSH_PORT || '22' }}
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          VM_KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VM_HOST:-}" ] || [ -z "${VM_USER:-}" ] || [ -z "${VM_SSH_KEY:-}" ] || [ -z "${VM_KNOWN_HOSTS:-}" ]; then
+            echo "Required deploy secrets are missing (VM_HOST, VM_USER, VM_SSH_KEY, VM_KNOWN_HOSTS)." >&2
+            echo "Configure them in repo Settings → Secrets and variables → Actions." >&2
+            exit 1
+          fi
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VM_SSH_KEY" > ~/.ssh/id_deploy
+          printf '%s\n' "$VM_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_deploy \
+              -o UserKnownHostsFile=$HOME/.ssh/known_hosts \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -p "$VM_SSH_PORT" \
+              "$VM_USER@$VM_HOST" \
+              'bash -s' <<'REMOTE_SCRIPT'
+          set -euo pipefail
+          cd ~/paperclip
+          git fetch origin master
+          git reset --hard origin/master
+          docker compose -p paperclip -f docker/docker-compose.yml --env-file .env pull
+          docker compose -p paperclip -f docker/docker-compose.yml --env-file .env up -d
+          tag="deploy/vm-$(date -u +%Y%m%d-%H%M)"
+          GIT_AUTHOR_NAME="paperclip-deploy" GIT_AUTHOR_EMAIL="deploy@local" \
+            GIT_COMMITTER_NAME="paperclip-deploy" GIT_COMMITTER_EMAIL="deploy@local" \
+            git tag -a "$tag" -m "auto-deploy $tag"
+          mkdir -p .deploy
+          printf '%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$tag" "$(git rev-parse HEAD)" "auto" >> .deploy/shipped.log
+          REMOTE_SCRIPT

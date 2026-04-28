@@ -16,6 +16,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   server:
+    image: ghcr.io/elmangsb/paperclip:${PAPERCLIP_IMAGE_TAG:-latest}
     build:
       context: ..
       dockerfile: Dockerfile
