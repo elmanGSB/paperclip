@@ -33,7 +33,12 @@ the VM and runs the equivalent of the manual block above:
 
 ```bash
 cd ~/paperclip
-git fetch origin master && git reset --hard origin/master
+# Use whichever remote points at the fork (named "fork" on the current VM,
+# falls back to "origin" on a fresh provision).
+remote="$(git remote get-url fork >/dev/null 2>&1 && echo fork || echo origin)"
+git fetch "$remote" master
+git checkout deploy/vm 2>/dev/null || git checkout -B deploy/vm "$remote/master"
+git reset --hard "$remote/master"
 docker compose -p paperclip -f docker/docker-compose.yml --env-file .env pull
 docker compose -p paperclip -f docker/docker-compose.yml --env-file .env up -d
 # annotated tag + append to .deploy/shipped.log
