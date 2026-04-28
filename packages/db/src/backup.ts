@@ -11,7 +11,6 @@ type PartialConfig = {
     backup?: {
       dir?: string;
       retentionDays?: number;
-      retentionMaxFiles?: number;
     };
   };
 };
@@ -86,12 +85,7 @@ function resolveBackupDir(config: PartialConfig | null): string {
 }
 
 function resolveRetentionDays(config: PartialConfig | null): number {
-  return asPositiveInt(config?.database?.backup?.retentionDays) ?? 30;
-}
-
-function resolveRetentionMaxFiles(config: PartialConfig | null): number | undefined {
-  const value = asPositiveInt(config?.database?.backup?.retentionMaxFiles);
-  return value ?? undefined;
+  return asPositiveInt(config?.database?.backup?.retentionDays) ?? 7;
 }
 
 async function main() {
@@ -100,20 +94,16 @@ async function main() {
   const connectionString = resolveConnectionString(config);
   const backupDir = resolveBackupDir(config);
   const retentionDays = resolveRetentionDays(config);
-  const retentionMaxFiles = resolveRetentionMaxFiles(config);
 
   console.log(`Config path: ${configPath}`);
   console.log(`Backing up database to: ${backupDir}`);
-  console.log(
-    `Retention window: ${retentionDays} day(s)${retentionMaxFiles != null ? `, max ${retentionMaxFiles} file(s)` : ""}`,
-  );
+  console.log(`Retention window: ${retentionDays} day(s)`);
 
   try {
     const result = await runDatabaseBackup({
       connectionString,
       backupDir,
-      retentionDays,
-      ...(retentionMaxFiles != null ? { retentionMaxFiles } : {}),
+      retention: { dailyDays: retentionDays, weeklyWeeks: 4, monthlyMonths: 1 },
       filenamePrefix: "paperclip",
     });
 
