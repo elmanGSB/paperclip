@@ -90,6 +90,14 @@ jobs:
       - name: Typecheck
         run: pnpm -r typecheck
 
+      - name: Fix nvm POSIX sh stdout leak
+        run: |
+          # nvm bash_completion uses bash-only &> syntax; in POSIX sh (dash) this leaks
+          # "nvm" to stdout on every sh -lc invocation, breaking tests that parse sh output.
+          if [ -f /etc/profile.d/nvm.sh ] && ! grep -q 'BASH_VERSION' /etc/profile.d/nvm.sh; then
+            sudo sed -i 's/\[ -s "\$NVM_DIR\/bash_completion" \]/[ -n "${BASH_VERSION-}" ] \&\& [ -s "$NVM_DIR\/bash_completion" ]/' /etc/profile.d/nvm.sh || true
+          fi
+
       - name: Run tests
         run: pnpm test:run
 
