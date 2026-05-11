@@ -45,7 +45,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch upstream master
+      - name: Fetch upstream master + tags
         run: |
           git remote add upstream "$UPSTREAM_URL"
           git fetch upstream master --tags --no-recurse-submodules
@@ -78,6 +78,14 @@ jobs:
         if: steps.cmp.outputs.needed == 'true'
         run: |
           git push origin "${{ steps.cmp.outputs.up_sha }}:refs/heads/master"
+
+      - name: Mirror upstream tags
+        if: steps.cmp.outputs.needed == 'true'
+        run: |
+          # Push new tags only — never move existing ones (no --force).
+          # Fork-only tags (e.g. deploy/vm-*) don't share the upstream namespace,
+          # so this is a safe additive operation.
+          git push origin --tags
 
       - name: Ensure target branch exists
         if: steps.cmp.outputs.needed == 'true'
@@ -133,14 +141,29 @@ jobs:
           - New commits since \`$TARGET_BRANCH\`: **${COMMITS}**
           - Conflicts: **${HAD_CONFLICTS}**
 
-          If conflicts were detected, the merge commit on this branch contains the conflict markers verbatim. Check it out, resolve, and push back to \`$SYNC_BRANCH\`.
+          If conflicts were detected, the merge commit on this branch contains the conflict markers verbatim. Check it out, resolve, and push back to \`$SYNC_BRANCH\`. Otherwise, auto-merge has been enabled — the PR will squash-merge once branch-protection checks pass.
 
           See \`doc/TRIBU-DEPLOY.md\` for the upstream-sync model.
           EOF
           )
           existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number' || echo "")
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body "$body"
+            number="$existing"
+            gh pr edit "$number" --title "$title" --body "$body"
           else
-            gh pr create --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body "$body" --draft
+            # Conflict PRs stay draft so they're not eligible for auto-merge.
+            if [ "$HAD_CONFLICTS" = "true" ]; then
+              gh pr create --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body "$body" --draft
+            else
+              gh pr create --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body "$body"
+            fi
+            number=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number')
+          fi
+
+          if [ "$HAD_CONFLICTS" = "true" ]; then
+            echo "Conflicts present — not enabling auto-merge on PR #$number."
+          else
+            # Best-effort: requires repo Setting → 'Allow auto-merge' to be on.
+            # If not enabled, this exits non-zero; we don't want that to fail the run.
+            gh pr merge "$number" --auto --squash || echo "auto-merge not enabled on PR #$number (enable 'Allow auto-merge' in repo settings)"
           fi

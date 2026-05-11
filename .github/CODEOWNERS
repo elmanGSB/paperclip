@@ -15,3 +15,12 @@ package.json @cryppadotta @devinfoley
 pnpm-lock.yaml @cryppadotta @devinfoley
 pnpm-workspace.yaml @cryppadotta @devinfoley
 .npmrc @cryppadotta @devinfoley
+
+# Fork-specific ownership — last match wins, so these override the
+# upstream `.github/**` entry above for fork-only infrastructure.
+# These lines only take effect on `fork/deploy`; on `master` they're
+# overwritten by every upstream sync (which is intended — master is
+# governed by upstream's CODEOWNERS).
+.github/workflows/upstream-sync.yml @elmanGSB
+.github/workflows/docker.yml        @elmanGSB
+doc/TRIBU-DEPLOY.md                 @elmanGSB

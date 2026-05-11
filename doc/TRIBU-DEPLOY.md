@@ -112,6 +112,30 @@ Reviewers resolve any conflicts on the sync branch, then merge the PR. Net
 result: `fork/deploy` always lags `master` by at most one open sync PR, and the
 PRs stay small (one week of upstream commits per batch).
 
+**Tags** — the workflow also mirrors upstream tags (`v*`, etc.) into the fork
+via `git push origin --tags`. Tags are only added, never moved, so fork-only
+tags (e.g. `deploy/vm-*` created by `deploy-vm`) are unaffected.
+
+**Auto-merge** — conflict-free sync PRs are opened as ready-for-review and
+immediately marked auto-merge (squash). They merge themselves as soon as
+branch-protection checks pass. This requires:
+
+- Repo **Settings → General → "Allow auto-merge"** enabled.
+- Branch protection on `fork/deploy` requiring at least one CI check
+  (`verify`, `e2e`, etc.) — otherwise auto-merge fires instantly with no gate.
+
+If "Allow auto-merge" is off, the workflow logs a warning and leaves the PR
+for manual merge; nothing breaks.
+
+**Why the upstream `docker.yml` on `master` is harmless after cutover** — once
+the default branch flips to `fork/deploy`, pushes to `master` no longer satisfy
+`{{is_default_branch}}` in upstream's image-metadata config, so the `latest`
+tag is never re-pushed from a `master` build. The bot's weekly fast-forward
+will still trigger a `type=sha` image build of pristine upstream code (a few
+minutes of CI), which is harmless; live with it, or globally disable the
+`Docker` workflow only on `master` via repo Settings → Actions if it becomes
+annoying.
+
 ## One-time cutover runbook
 
 These steps are required exactly once to switch from "fork commits live on
@@ -119,6 +143,22 @@ master" to the new layout. **They include a destructive operation
 (`git push --force` to `master`), so run them deliberately — ideally after
 this branch's PR is merged so the new workflow + retargeted `docker.yml` are
 already on `fork/deploy`.**
+
+**Repo settings to flip alongside the cutover:**
+
+- **Settings → General → "Allow auto-merge"** ✅ (enables the workflow's
+  auto-merge on conflict-free sync PRs).
+- **Settings → Branches → branch protection for `fork/deploy`** — require
+  the `verify` (and `e2e` if you want it gating) check. Otherwise auto-merge
+  fires instantly.
+- **Settings → Branches → branch protection for `master`** — disallow direct
+  pushes from humans, allow `github-actions[bot]` to bypass (so the
+  scheduled fast-forward still works). Disallow force-pushes.
+- **Settings → Branches → default branch → `fork/deploy`** — required for the
+  scheduled trigger of `Upstream Sync` to actually fire (GitHub only schedules
+  workflows from the default branch).
+- **Repo PRs** — review any remaining open PRs targeting `master` and either
+  rebase them onto `fork/deploy` or close them.
 
 ```bash
 # 0. Make sure your local clone is current and you have an `upstream` remote.
