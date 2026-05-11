@@ -1,0 +1,169 @@
+name: Upstream Sync
+
+# Keeps elmanGSB/paperclip:master as a strict mirror of paperclipai/paperclip:master,
+# and opens a PR merging the new upstream commits into fork/deploy so the fork's
+# customizations rebase forward in small, reviewable batches.
+#
+# Master is never modified by humans on this fork. Fork-only commits live on
+# fork/deploy. See doc/TRIBU-DEPLOY.md for the full model.
+
+on:
+  schedule:
+    - cron: "17 13 * * 1" # Mondays 13:17 UTC
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Integration branch to open the sync PR against"
+        required: false
+        default: "fork/deploy"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'elmanGSB/paperclip'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      UPSTREAM_URL: https://github.com/paperclipai/paperclip.git
+      TARGET_BRANCH: ${{ inputs.target_branch || 'fork/deploy' }}
+    steps:
+      - name: Checkout fork (all history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream master + tags
+        run: |
+          git remote add upstream "$UPSTREAM_URL"
+          git fetch upstream master --tags --no-recurse-submodules
+
+      - name: Compare master vs upstream
+        id: cmp
+        run: |
+          fork_sha=$(git rev-parse origin/master)
+          up_sha=$(git rev-parse upstream/master)
+          echo "fork_sha=$fork_sha" >> "$GITHUB_OUTPUT"
+          echo "up_sha=$up_sha" >> "$GITHUB_OUTPUT"
+          echo "up_short=$(git rev-parse --short upstream/master)" >> "$GITHUB_OUTPUT"
+          if [ "$fork_sha" = "$up_sha" ]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "Already in sync with upstream/master."
+            exit 0
+          fi
+          # master must be a strict ancestor of upstream/master (fast-forward only).
+          # If not, the cutover hasn't been done yet — fail loudly so a human handles it.
+          if ! git merge-base --is-ancestor "$fork_sha" "$up_sha"; then
+            echo "::error::origin/master ($fork_sha) is not an ancestor of upstream/master ($up_sha)."
+            echo "::error::The fork has commits on master that aren't in upstream. Run the cutover described in doc/TRIBU-DEPLOY.md before re-enabling this workflow."
+            exit 1
+          fi
+          echo "needed=true" >> "$GITHUB_OUTPUT"
+          count=$(git rev-list --count "$fork_sha..$up_sha")
+          echo "commits=$count" >> "$GITHUB_OUTPUT"
+
+      - name: Fast-forward master to upstream
+        if: steps.cmp.outputs.needed == 'true'
+        run: |
+          git push origin "${{ steps.cmp.outputs.up_sha }}:refs/heads/master"
+
+      - name: Mirror upstream tags
+        if: steps.cmp.outputs.needed == 'true'
+        run: |
+          # Push new tags only — never move existing ones (no --force).
+          # Fork-only tags (e.g. deploy/vm-*) don't share the upstream namespace,
+          # so this is a safe additive operation.
+          git push origin --tags
+
+      - name: Ensure target branch exists
+        if: steps.cmp.outputs.needed == 'true'
+        run: |
+          if ! git ls-remote --exit-code --heads origin "$TARGET_BRANCH" >/dev/null; then
+            echo "::error::Target branch '$TARGET_BRANCH' does not exist on origin. Create it before running this workflow."
+            exit 1
+          fi
+          git fetch origin "$TARGET_BRANCH"
+
+      - name: Prepare sync branch (merge upstream into target)
+        if: steps.cmp.outputs.needed == 'true'
+        id: prep
+        run: |
+          sync_branch="auto/upstream-sync-${{ steps.cmp.outputs.up_short }}"
+          echo "sync_branch=$sync_branch" >> "$GITHUB_OUTPUT"
+          git checkout -B "$sync_branch" "origin/$TARGET_BRANCH"
+          set +e
+          git merge --no-edit --no-ff -m "merge: sync upstream/master @ ${{ steps.cmp.outputs.up_short }} into $TARGET_BRANCH" upstream/master
+          merge_rc=$?
+          set -e
+          if [ "$merge_rc" -ne 0 ]; then
+            # Commit the conflict markers so the PR shows what needs human attention.
+            git add -A
+            GIT_AUTHOR_NAME="github-actions[bot]" \
+            GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+            GIT_COMMITTER_NAME="github-actions[bot]" \
+            GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+              git commit --no-verify -m "merge: sync upstream/master @ ${{ steps.cmp.outputs.up_short }} (UNRESOLVED CONFLICTS)"
+            echo "had_conflicts=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "had_conflicts=false" >> "$GITHUB_OUTPUT"
+          fi
+          git push -u origin "$sync_branch" --force-with-lease
+
+      - name: Open or update PR
+        if: steps.cmp.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SYNC_BRANCH: ${{ steps.prep.outputs.sync_branch }}
+          HAD_CONFLICTS: ${{ steps.prep.outputs.had_conflicts }}
+          COMMITS: ${{ steps.cmp.outputs.commits }}
+          UP_SHORT: ${{ steps.cmp.outputs.up_short }}
+        run: |
+          title="Sync upstream paperclipai/paperclip @ ${UP_SHORT} (${COMMITS} commits)"
+          if [ "$HAD_CONFLICTS" = "true" ]; then
+            title="[CONFLICTS] $title"
+          fi
+          body=$(cat <<EOF
+          Automated upstream sync.
+
+          - Upstream tip: \`${UP_SHORT}\`
+          - New commits since \`$TARGET_BRANCH\`: **${COMMITS}**
+          - Conflicts: **${HAD_CONFLICTS}**
+
+          If conflicts were detected, the merge commit on this branch contains the conflict markers verbatim. Check it out, resolve, and push back to \`$SYNC_BRANCH\`. Otherwise, auto-merge has been enabled — the PR will squash-merge once branch-protection checks pass.
+
+          See \`doc/TRIBU-DEPLOY.md\` for the upstream-sync model.
+          EOF
+          )
+          existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number' || echo "")
+          if [ -n "$existing" ]; then
+            number="$existing"
+            gh pr edit "$number" --title "$title" --body "$body"
+          else
+            # Conflict PRs stay draft so they're not eligible for auto-merge.
+            if [ "$HAD_CONFLICTS" = "true" ]; then
+              gh pr create --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body "$body" --draft
+            else
+              gh pr create --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" --title "$title" --body "$body"
+            fi
+            number=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number')
+          fi
+
+          if [ "$HAD_CONFLICTS" = "true" ]; then
+            echo "Conflicts present — not enabling auto-merge on PR #$number."
+          else
+            # Best-effort: requires repo Setting → 'Allow auto-merge' to be on.
+            # If not enabled, this exits non-zero; we don't want that to fail the run.
+            gh pr merge "$number" --auto --squash || echo "auto-merge not enabled on PR #$number (enable 'Allow auto-merge' in repo settings)"
+          fi

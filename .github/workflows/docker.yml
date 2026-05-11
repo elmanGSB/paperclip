@@ -3,7 +3,10 @@ name: Docker
 on:
   push:
     branches:
-      - "master"
+      # fork/deploy is the integration branch that carries fork-only customizations.
+      # master is a strict mirror of paperclipai/paperclip:master and is not built/deployed
+      # from this fork — see doc/TRIBU-DEPLOY.md.
+      - "fork/deploy"
     tags:
       - "v*"
 
@@ -56,7 +59,7 @@ jobs:
 
   deploy-vm:
     needs: build-and-push
-    if: github.ref == 'refs/heads/master' && github.repository == 'elmanGSB/paperclip'
+    if: github.ref == 'refs/heads/fork/deploy' && github.repository == 'elmanGSB/paperclip'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
@@ -98,10 +101,11 @@ jobs:
           else
             remote=origin
           fi
-          git fetch "$remote" master
-          # Land on the deploy/vm branch, creating it from $remote/master if missing.
-          git checkout deploy/vm 2>/dev/null || git checkout -B deploy/vm "$remote/master"
-          git reset --hard "$remote/master"
+          # fork/deploy is the integration branch carrying fork-only customizations;
+          # master is now a pure upstream mirror and is not what we ship.
+          git fetch "$remote" fork/deploy
+          git checkout deploy/vm 2>/dev/null || git checkout -B deploy/vm "$remote/fork/deploy"
+          git reset --hard "$remote/fork/deploy"
           docker compose -p paperclip -f docker/docker-compose.yml --env-file .env pull
           docker compose -p paperclip -f docker/docker-compose.yml --env-file .env up -d
           tag="deploy/vm-$(date -u +%Y%m%d-%H%M)"
