@@ -1,0 +1,137 @@
+name: Cutover (one-shot)
+
+# One-time bootstrap to flip the repo to the master / fork/deploy layout.
+# After a successful run it deletes itself from fork/deploy.
+#
+# What it does, in order:
+#   1. Drops master branch protection so it can be force-reset.
+#   2. Force-resets origin/master to paperclipai/paperclip:master and mirrors upstream tags.
+#   3. Sets the repo default branch to fork/deploy.
+#   4. Enables "Allow auto-merge" on the repo.
+#   5. Re-protects master (no force-push, no deletion) so humans can't undo step 2.
+#   6. Protects fork/deploy and requires the `verify` check.
+#   7. Removes this workflow file from fork/deploy.
+#
+# Prerequisite: repo secret CUTOVER_TOKEN — a fine-grained PAT scoped to this
+# repo with permissions:
+#   - Administration:  Read & write
+#   - Contents:        Read & write
+#   - Pull requests:   Read & write
+#   - Workflows:       Read & write
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  cutover:
+    if: github.repository == 'elmanGSB/paperclip'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OWNER: elmanGSB
+      REPO: paperclip
+      UPSTREAM_URL: https://github.com/paperclipai/paperclip.git
+      GH_TOKEN: ${{ secrets.CUTOVER_TOKEN }}
+    steps:
+      - name: Validate token exists
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::CUTOVER_TOKEN secret is missing. See cutover.yml header for required PAT scopes."
+            exit 1
+          fi
+
+      - name: Checkout fork/deploy
+        uses: actions/checkout@v4
+        with:
+          ref: fork/deploy
+          fetch-depth: 0
+          token: ${{ secrets.CUTOVER_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream master + tags
+        run: |
+          git remote add upstream "$UPSTREAM_URL"
+          git fetch upstream master --tags --no-recurse-submodules
+
+      - name: Step 1 — Drop master branch protection (best effort)
+        run: |
+          gh api -X DELETE "repos/$OWNER/$REPO/branches/master/protection" >/dev/null 2>&1 \
+            && echo "Dropped existing master protection." \
+            || echo "No existing master protection (or already absent)."
+
+      - name: Step 2 — Force-reset master to upstream/master + mirror tags
+        run: |
+          UP_SHA=$(git rev-parse upstream/master)
+          echo "Pushing $UP_SHA → origin/master (force)…"
+          git push origin --force "${UP_SHA}:refs/heads/master"
+          echo "Mirroring upstream tags…"
+          git push origin --tags
+
+      - name: Step 3 — Set default branch to fork/deploy
+        run: |
+          gh api -X PATCH "repos/$OWNER/$REPO" -f default_branch=fork/deploy >/dev/null
+          echo "Default branch is now fork/deploy."
+
+      - name: Step 4 — Enable auto-merge on the repo
+        run: |
+          gh api -X PATCH "repos/$OWNER/$REPO" \
+            -F allow_auto_merge=true \
+            -F allow_squash_merge=true >/dev/null
+          echo "Auto-merge enabled."
+
+      - name: Step 5 — Re-protect master (no force-push, no delete)
+        run: |
+          gh api -X PUT "repos/$OWNER/$REPO/branches/master/protection" \
+            -H "Accept: application/vnd.github+json" \
+            --input - >/dev/null <<'JSON'
+          {
+            "required_status_checks": null,
+            "enforce_admins": false,
+            "required_pull_request_reviews": null,
+            "restrictions": null,
+            "allow_force_pushes": false,
+            "allow_deletions": false
+          }
+          JSON
+          echo "Master protected."
+
+      - name: Step 6 — Protect fork/deploy + require verify check
+        run: |
+          gh api -X PUT "repos/$OWNER/$REPO/branches/fork/deploy/protection" \
+            -H "Accept: application/vnd.github+json" \
+            --input - >/dev/null <<'JSON'
+          {
+            "required_status_checks": {
+              "strict": false,
+              "checks": [{"context": "verify"}]
+            },
+            "enforce_admins": false,
+            "required_pull_request_reviews": null,
+            "restrictions": null,
+            "allow_force_pushes": false,
+            "allow_deletions": false
+          }
+          JSON
+          echo "fork/deploy protected; verify check required."
+
+      - name: Step 7 — Self-delete this workflow file from fork/deploy
+        run: |
+          git rm .github/workflows/cutover.yml
+          git commit -m "chore(ci): remove one-shot cutover workflow after successful run"
+          git push origin HEAD:fork/deploy
+          echo "Cutover workflow file removed."
+
+      - name: Summary
+        run: |
+          echo "Cutover complete:"
+          echo "  - master = paperclipai/paperclip:master (mirror)"
+          echo "  - default branch = fork/deploy"
+          echo "  - auto-merge enabled"
+          echo "  - master + fork/deploy protected"
+          echo "  - cutover workflow removed from fork/deploy"
