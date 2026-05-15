@@ -3,7 +3,7 @@
 ## Branch model
 
 - **`paperclipai/paperclip` `master`** — upstream.
-- **`elmanGSB/paperclip` `master`** — **strict mirror** of upstream `master`. No fork commits ever land here. Kept up-to-date by the `Upstream Sync` GitHub Action (`.github/workflows/upstream-sync.yml`) which fast-forwards it weekly.
+- **`elmanGSB/paperclip` `master`** — **strict mirror** of upstream `master`. No fork commits ever land here. Kept up-to-date by the `Upstream Sync` GitHub Action (`.github/workflows/upstream-sync.yml`) which fast-forwards it daily.
 - **`elmanGSB/paperclip` `fork/deploy`** — long-lived integration branch: `origin/master` plus fork-only and not-yet-upstream changes. **This is the source of truth for what Tribu ships.** All Docker builds and VM deploys are triggered off this branch.
 - **Short-lived `fix/*` / `feat/*` on the fork** — use for **pull requests to upstream** (`paperclipai/paperclip`). When a PR merges upstream, the next scheduled sync will merge `origin/master` into `fork/deploy`; delete the fork topic branch if it is fully superseded.
 
@@ -96,8 +96,8 @@ so a future upstream merge of these workflow changes is a no-op for upstream.
 
 ## Upstream sync model
 
-`Upstream Sync` (`.github/workflows/upstream-sync.yml`) runs weekly (Mondays
-13:17 UTC) and can also be triggered manually from the Actions tab. Each run:
+`Upstream Sync` (`.github/workflows/upstream-sync.yml`) runs daily (13:17 UTC,
+~6:17am PT) and can also be triggered manually from the Actions tab. Each run:
 
 1. Fetches `paperclipai/paperclip:master`.
 2. Fast-forwards `origin/master` to it (refuses non-fast-forward, so if `master`
@@ -110,7 +110,7 @@ so a future upstream merge of these workflow changes is a no-op for upstream.
 
 Reviewers resolve any conflicts on the sync branch, then merge the PR. Net
 result: `fork/deploy` always lags `master` by at most one open sync PR, and the
-PRs stay small (one week of upstream commits per batch).
+PRs stay small (one day of upstream commits per batch).
 
 **Tags** — the workflow also mirrors upstream tags (`v*`, etc.) into the fork
 via `git push origin --tags`. Tags are only added, never moved, so fork-only
