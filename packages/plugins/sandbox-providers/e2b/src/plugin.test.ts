@@ -131,6 +131,26 @@ describe("E2B sandbox provider plugin", () => {
     });
   });
 
+  it("defaults a missing template to base", async () => {
+    const result = await plugin.definition.onEnvironmentValidateConfig?.({
+      driverKey: "e2b",
+      config: {
+        timeoutMs: "450000.9",
+        reuseLease: true,
+      },
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      normalizedConfig: {
+        template: "base",
+        apiKey: null,
+        timeoutMs: 450000,
+        reuseLease: true,
+      },
+    });
+  });
+
   it("rejects empty template strings instead of silently normalizing them", async () => {
     await expect(plugin.definition.onEnvironmentValidateConfig?.({
       driverKey: "e2b",
@@ -283,6 +303,7 @@ describe("E2B sandbox provider plugin", () => {
 
     expect(mockConnect).toHaveBeenCalledWith("sandbox-123", expect.objectContaining({ apiKey: "resolved-key" }));
     expect(sandbox.files.write).toHaveBeenCalledWith(expect.stringMatching(/^\/tmp\/paperclip-stdin-/), "input");
+<<<<<<< HEAD
     expect(sandbox.commands.run).toHaveBeenCalledWith(expect.stringMatching(
       /^exec 'printf' 'hello' < '\/tmp\/paperclip-stdin-/,
     ), expect.objectContaining({
@@ -294,6 +315,16 @@ describe("E2B sandbox provider plugin", () => {
       "exec 'printf' 'hello'",
       expect.objectContaining({ background: true }),
     );
+=======
+    const stdinCall = sandbox.commands.run.mock.calls.find(([cmd]: [string]) => cmd.includes("'printf'"));
+    expect(stdinCall).toBeDefined();
+    if (!stdinCall) throw new Error("stdinCall not found");
+    expect(stdinCall[0]).toMatch(/\.profile/);
+    expect(stdinCall[0]).toMatch(/exec env FOO='bar' 'printf' 'hello' < '\/tmp\/paperclip-stdin-/);
+    expect(stdinCall[1]).toEqual(expect.objectContaining({ cwd: "/workspace", timeoutMs: 1000 }));
+    expect(stdinCall[1]).not.toHaveProperty("envs");
+    expect(stdinCall[1]).not.toHaveProperty("background");
+>>>>>>> upstream/master
     expect(sandbox.commands.sendStdin).not.toHaveBeenCalled();
     expect(sandbox.commands.closeStdin).not.toHaveBeenCalled();
     expect(sandbox.handle.wait).not.toHaveBeenCalled();
@@ -343,6 +374,7 @@ describe("E2B sandbox provider plugin", () => {
       timeoutMs: 1000,
     });
 
+<<<<<<< HEAD
     expect(sandbox.commands.run).toHaveBeenCalledWith("exec 'printf' 'hello'", expect.objectContaining({
       cwd: "/workspace",
       envs: { FOO: "bar" },
@@ -352,6 +384,16 @@ describe("E2B sandbox provider plugin", () => {
       "exec 'printf' 'hello'",
       expect.objectContaining({ background: true }),
     );
+=======
+    const fgCall = sandbox.commands.run.mock.calls.find(([cmd]: [string]) => cmd.includes("'printf'"));
+    expect(fgCall).toBeDefined();
+    if (!fgCall) throw new Error("fgCall not found");
+    expect(fgCall[0]).toMatch(/\.profile/);
+    expect(fgCall[0]).toMatch(/exec env FOO='bar' 'printf' 'hello'$/);
+    expect(fgCall[1]).toEqual(expect.objectContaining({ cwd: "/workspace", timeoutMs: 1000 }));
+    expect(fgCall[1]).not.toHaveProperty("envs");
+    expect(fgCall[1]).not.toHaveProperty("background");
+>>>>>>> upstream/master
     expect(sandbox.commands.sendStdin).not.toHaveBeenCalled();
     expect(sandbox.commands.closeStdin).not.toHaveBeenCalled();
     expect(sandbox.handle.wait).not.toHaveBeenCalled();

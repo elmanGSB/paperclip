@@ -3,8 +3,13 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { AdapterExecutionContext } from "@paperclipai/adapter-utils";
+<<<<<<< HEAD
 
 const DEFAULT_PAPERCLIP_INSTANCE_ID = "default";
+=======
+import { resolvePaperclipInstanceRootForAdapter } from "@paperclipai/adapter-utils/server-utils";
+
+>>>>>>> upstream/master
 const SEEDED_SHARED_FILES = [
   ".credentials.json",
   "credentials.json",
@@ -92,11 +97,22 @@ export function resolveManagedClaudeConfigSeedDir(
   env: NodeJS.ProcessEnv,
   companyId?: string,
 ): string {
+<<<<<<< HEAD
   const paperclipHome = nonEmpty(env.PAPERCLIP_HOME) ?? path.resolve(os.homedir(), ".paperclip");
   const instanceId = nonEmpty(env.PAPERCLIP_INSTANCE_ID) ?? DEFAULT_PAPERCLIP_INSTANCE_ID;
   return companyId
     ? path.resolve(paperclipHome, "instances", instanceId, "companies", companyId, "claude-config-seed")
     : path.resolve(paperclipHome, "instances", instanceId, "claude-config-seed");
+=======
+  const instanceRoot = resolvePaperclipInstanceRootForAdapter({
+    homeDir: nonEmpty(env.PAPERCLIP_HOME) ?? undefined,
+    instanceId: nonEmpty(env.PAPERCLIP_INSTANCE_ID) ?? undefined,
+    env,
+  });
+  return companyId
+    ? path.resolve(instanceRoot, "companies", companyId, "claude-config-seed")
+    : path.resolve(instanceRoot, "claude-config-seed");
+>>>>>>> upstream/master
 }
 
 export async function prepareClaudeConfigSeed(

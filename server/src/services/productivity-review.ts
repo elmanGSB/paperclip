@@ -14,6 +14,13 @@ import { logger } from "../middleware/logger.js";
 import { logActivity } from "./activity-log.js";
 import { budgetService } from "./budgets.js";
 import { issueService } from "./issues.js";
+<<<<<<< HEAD
+=======
+import {
+  recoveryAssigneeAdapterOverrides,
+  withRecoveryModelProfileHint,
+} from "./recovery/model-profile-hint.js";
+>>>>>>> upstream/master
 import { RECOVERY_ORIGIN_KINDS } from "./recovery/origins.js";
 
 export const PRODUCTIVITY_REVIEW_ORIGIN_KIND = RECOVERY_ORIGIN_KINDS.issueProductivityReview;
@@ -22,12 +29,23 @@ export const DEFAULT_PRODUCTIVITY_REVIEW_LONG_ACTIVE_HOURS = 6;
 export const DEFAULT_PRODUCTIVITY_REVIEW_HIGH_CHURN_HOURLY = 10;
 export const DEFAULT_PRODUCTIVITY_REVIEW_HIGH_CHURN_SIX_HOURS = 30;
 export const DEFAULT_PRODUCTIVITY_REVIEW_RESOLVED_SNOOZE_MS = 6 * 60 * 60 * 1000;
+<<<<<<< HEAD
+=======
+export const DEFAULT_PRODUCTIVITY_REVIEW_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+export const DEFAULT_PRODUCTIVITY_REVIEW_MAX_REFRESH_COMMENTS = 3;
+export const DEFAULT_PRODUCTIVITY_REVIEW_CREATION_WINDOW_MS = 24 * 60 * 60 * 1000;
+export const DEFAULT_PRODUCTIVITY_REVIEW_MAX_CREATIONS_PER_WINDOW = 3;
+>>>>>>> upstream/master
 
 const TERMINAL_RUN_STATUSES = ["succeeded", "failed", "cancelled", "timed_out"] as const;
 const ACTIVE_RUN_STATUSES = ["queued", "running", "scheduled_retry"] as const;
 const MAX_CANDIDATE_ISSUES = 250;
 const MAX_RUNS_FOR_STREAK = 100;
 const MAX_PARENT_WALK_DEPTH = 25;
+<<<<<<< HEAD
+=======
+export const PRODUCTIVITY_REVIEW_REFRESH_COMMENT_PREFIX = "Productivity review evidence refreshed.";
+>>>>>>> upstream/master
 
 type IssueRow = typeof issues.$inferSelect;
 type AgentRow = typeof agents.$inferSelect;
@@ -40,6 +58,13 @@ type ProductivityReviewThresholds = {
   highChurnHourly: number;
   highChurnSixHours: number;
   resolvedSnoozeMs: number;
+<<<<<<< HEAD
+=======
+  refreshIntervalMs: number;
+  maxRefreshComments: number;
+  creationWindowMs: number;
+  maxCreationsPerWindow: number;
+>>>>>>> upstream/master
 };
 
 type ProductivityReviewEvidence = {
@@ -120,6 +145,14 @@ function readPositiveInteger(value: number, fallback: number) {
   return Number.isFinite(value) && value > 0 ? Math.floor(value) : fallback;
 }
 
+<<<<<<< HEAD
+=======
+function coerceDate(value: Date | string | null | undefined) {
+  if (!value) return null;
+  return value instanceof Date ? value : new Date(value);
+}
+
+>>>>>>> upstream/master
 function buildThresholds(overrides?: Partial<ProductivityReviewThresholds>): ProductivityReviewThresholds {
   return {
     noCommentStreakRuns: readPositiveInteger(
@@ -142,6 +175,25 @@ function buildThresholds(overrides?: Partial<ProductivityReviewThresholds>): Pro
       overrides?.resolvedSnoozeMs ?? DEFAULT_PRODUCTIVITY_REVIEW_RESOLVED_SNOOZE_MS,
       DEFAULT_PRODUCTIVITY_REVIEW_RESOLVED_SNOOZE_MS,
     ),
+<<<<<<< HEAD
+=======
+    refreshIntervalMs: readPositiveInteger(
+      overrides?.refreshIntervalMs ?? DEFAULT_PRODUCTIVITY_REVIEW_REFRESH_INTERVAL_MS,
+      DEFAULT_PRODUCTIVITY_REVIEW_REFRESH_INTERVAL_MS,
+    ),
+    maxRefreshComments: readPositiveInteger(
+      overrides?.maxRefreshComments ?? DEFAULT_PRODUCTIVITY_REVIEW_MAX_REFRESH_COMMENTS,
+      DEFAULT_PRODUCTIVITY_REVIEW_MAX_REFRESH_COMMENTS,
+    ),
+    creationWindowMs: readPositiveInteger(
+      overrides?.creationWindowMs ?? DEFAULT_PRODUCTIVITY_REVIEW_CREATION_WINDOW_MS,
+      DEFAULT_PRODUCTIVITY_REVIEW_CREATION_WINDOW_MS,
+    ),
+    maxCreationsPerWindow: readPositiveInteger(
+      overrides?.maxCreationsPerWindow ?? DEFAULT_PRODUCTIVITY_REVIEW_MAX_CREATIONS_PER_WINDOW,
+      DEFAULT_PRODUCTIVITY_REVIEW_MAX_CREATIONS_PER_WINDOW,
+    ),
+>>>>>>> upstream/master
   };
 }
 
@@ -249,6 +301,72 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
       .then((rows) => rows[0] ?? null);
   }
 
+<<<<<<< HEAD
+=======
+  async function countRecentProductivityReviews(
+    companyId: string,
+    sourceIssueId: string,
+    thresholds: ProductivityReviewThresholds,
+    now: Date,
+  ) {
+    const cutoff = new Date(now.getTime() - thresholds.creationWindowMs);
+    return db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(issues)
+      .where(
+        and(
+          eq(issues.companyId, companyId),
+          eq(issues.originKind, PRODUCTIVITY_REVIEW_ORIGIN_KIND),
+          eq(issues.originId, sourceIssueId),
+          isNull(issues.hiddenAt),
+          sql`${issues.status} <> 'cancelled'`,
+          sql`${issues.createdAt} >= ${cutoff.toISOString()}::timestamptz`,
+        ),
+      )
+      .then((rows) => Number(rows[0]?.count ?? 0));
+  }
+
+  async function getRefreshCommentState(companyId: string, reviewIssueId: string) {
+    return db
+      .select({
+        count: sql<number>`count(*)::int`,
+        latestCreatedAt: sql<Date | null>`max(${issueComments.createdAt})`,
+      })
+      .from(issueComments)
+      .where(
+        and(
+          eq(issueComments.companyId, companyId),
+          eq(issueComments.issueId, reviewIssueId),
+          sql`${issueComments.body} like ${`${PRODUCTIVITY_REVIEW_REFRESH_COMMENT_PREFIX}%`}`,
+        ),
+      )
+      .then((rows) => {
+        const row = rows[0];
+        return {
+          count: Number(row?.count ?? 0),
+          latestCreatedAt: coerceDate(row?.latestCreatedAt),
+        };
+      });
+  }
+
+  async function addRefreshComment(
+    reviewIssueId: string,
+    body: string,
+    generatedAt: Date,
+  ) {
+    const comment = await issuesSvc.addComment(reviewIssueId, body, {});
+    await db
+      .update(issueComments)
+      .set({ createdAt: generatedAt, updatedAt: generatedAt })
+      .where(eq(issueComments.id, comment.id));
+    await db
+      .update(issues)
+      .set({ updatedAt: generatedAt })
+      .where(eq(issues.id, reviewIssueId));
+    return comment;
+  }
+
+>>>>>>> upstream/master
   async function countIssueRunsSince(companyId: string, agentId: string, issueId: string, since: Date) {
     return db
       .select({ count: sql<number>`count(*)::int` })
@@ -538,11 +656,27 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
 
   async function createOrUpdateReview(
     evidence: ProductivityReviewEvidence,
+<<<<<<< HEAD
     opts: { prefix: string },
   ) {
     const existing = await findOpenProductivityReview(evidence.sourceIssue.companyId, evidence.sourceIssue.id);
     if (existing) {
       await issuesSvc.addComment(existing.id, buildRefreshComment(evidence, opts.prefix), {});
+=======
+    opts: { prefix: string; thresholds: ProductivityReviewThresholds },
+  ) {
+    const existing = await findOpenProductivityReview(evidence.sourceIssue.companyId, evidence.sourceIssue.id);
+    if (existing) {
+      const refreshState = await getRefreshCommentState(evidence.sourceIssue.companyId, existing.id);
+      const lastRefreshOrCreationAt = refreshState.latestCreatedAt ?? existing.createdAt;
+      if (
+        refreshState.count >= opts.thresholds.maxRefreshComments ||
+        evidence.generatedAt.getTime() - lastRefreshOrCreationAt.getTime() < opts.thresholds.refreshIntervalMs
+      ) {
+        return { kind: "existing" as const, reviewIssueId: existing.id };
+      }
+      await addRefreshComment(existing.id, buildRefreshComment(evidence, opts.prefix), evidence.generatedAt);
+>>>>>>> upstream/master
       await logActivity(db, {
         companyId: evidence.sourceIssue.companyId,
         actorType: "system",
@@ -563,6 +697,19 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
       return { kind: "updated" as const, reviewIssueId: existing.id };
     }
 
+<<<<<<< HEAD
+=======
+    const recentCreationCount = await countRecentProductivityReviews(
+      evidence.sourceIssue.companyId,
+      evidence.sourceIssue.id,
+      opts.thresholds,
+      evidence.generatedAt,
+    );
+    if (recentCreationCount >= opts.thresholds.maxCreationsPerWindow) {
+      return { kind: "creation_capped" as const, reviewIssueId: null };
+    }
+
+>>>>>>> upstream/master
     const ownerAgentId = await resolveReviewOwnerAgentId(evidence.sourceIssue, evidence.sourceAgent);
     let review: Awaited<ReturnType<typeof issuesSvc.create>>;
     try {
@@ -576,6 +723,10 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
         goalId: evidence.sourceIssue.goalId,
         billingCode: evidence.sourceIssue.billingCode,
         assigneeAgentId: ownerAgentId,
+<<<<<<< HEAD
+=======
+        assigneeAdapterOverrides: recoveryAssigneeAdapterOverrides(),
+>>>>>>> upstream/master
         originKind: PRODUCTIVITY_REVIEW_ORIGIN_KIND,
         originId: evidence.sourceIssue.id,
         originFingerprint: productivityReviewFingerprint(evidence.sourceIssue.id),
@@ -593,6 +744,13 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
       if (!raced) throw error;
       return { kind: "existing" as const, reviewIssueId: raced.id };
     }
+<<<<<<< HEAD
+=======
+    await db
+      .update(issues)
+      .set({ createdAt: evidence.generatedAt, updatedAt: evidence.generatedAt })
+      .where(eq(issues.id, review.id));
+>>>>>>> upstream/master
 
     await logActivity(db, {
       companyId: evidence.sourceIssue.companyId,
@@ -617,6 +775,7 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
         source: "assignment",
         triggerDetail: "system",
         reason: "issue_assigned",
+<<<<<<< HEAD
         payload: {
           issueId: review.id,
           sourceIssueId: evidence.sourceIssue.id,
@@ -625,13 +784,27 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
         requestedByActorType: "system",
         requestedByActorId: "productivity_review",
         contextSnapshot: {
+=======
+        payload: withRecoveryModelProfileHint({
+          issueId: review.id,
+          sourceIssueId: evidence.sourceIssue.id,
+          trigger: evidence.trigger,
+        }),
+        requestedByActorType: "system",
+        requestedByActorId: "productivity_review",
+        contextSnapshot: withRecoveryModelProfileHint({
+>>>>>>> upstream/master
           issueId: review.id,
           taskId: review.id,
           wakeReason: "issue_assigned",
           source: PRODUCTIVITY_REVIEW_ORIGIN_KIND,
           sourceIssueId: evidence.sourceIssue.id,
           productivityReviewTrigger: evidence.trigger,
+<<<<<<< HEAD
         },
+=======
+        }),
+>>>>>>> upstream/master
       });
     }
 
@@ -667,6 +840,10 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
       updated: 0,
       existing: 0,
       snoozed: 0,
+<<<<<<< HEAD
+=======
+      creationCapped: 0,
+>>>>>>> upstream/master
       skipped: 0,
       failed: 0,
       reviewIssueIds: [] as string[],
@@ -703,11 +880,20 @@ export function productivityReviewService(db: Db, deps?: { enqueueWakeup?: Enque
         prefixCache.set(candidate.companyId, prefix);
       }
       try {
+<<<<<<< HEAD
         const outcome = await createOrUpdateReview(evidence, { prefix });
         if (outcome.kind === "created") result.created += 1;
         else if (outcome.kind === "updated") result.updated += 1;
         else result.existing += 1;
         result.reviewIssueIds.push(outcome.reviewIssueId);
+=======
+        const outcome = await createOrUpdateReview(evidence, { prefix, thresholds });
+        if (outcome.kind === "created") result.created += 1;
+        else if (outcome.kind === "updated") result.updated += 1;
+        else if (outcome.kind === "creation_capped") result.creationCapped += 1;
+        else result.existing += 1;
+        if (outcome.reviewIssueId) result.reviewIssueIds.push(outcome.reviewIssueId);
+>>>>>>> upstream/master
       } catch (err) {
         result.failed += 1;
         result.failedIssueIds.push(candidate.id);
