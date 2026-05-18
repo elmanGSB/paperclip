@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CUTOVER_TOKEN }}
 
       - name: Configure git identity
         run: |
@@ -167,3 +167,4 @@ jobs:
             # If not enabled, this exits non-zero; we don't want that to fail the run.
             gh pr merge "$number" --auto --squash || echo "auto-merge not enabled on PR #$number (enable 'Allow auto-merge' in repo settings)"
           fi
+
