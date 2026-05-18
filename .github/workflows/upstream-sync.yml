@@ -124,7 +124,7 @@ jobs:
       - name: Open or update PR
         if: steps.cmp.outputs.needed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.CUTOVER_TOKEN }}
           SYNC_BRANCH: ${{ steps.prep.outputs.sync_branch }}
           HAD_CONFLICTS: ${{ steps.prep.outputs.had_conflicts }}
           COMMITS: ${{ steps.cmp.outputs.commits }}
