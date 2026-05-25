@@ -31,7 +31,7 @@ export const upsertAgentInstructionsFileSchema = z.object({
 
 export type UpsertAgentInstructionsFile = z.infer<typeof upsertAgentInstructionsFileSchema>;
 
-const adapterConfigSchema = z.record(z.unknown()).superRefine((value, ctx) => {
+const adapterConfigSchema = z.record(z.string(), z.unknown()).superRefine((value, ctx) => {
   const envValue = value.env;
   if (envValue === undefined) return;
   const parsed = envConfigSchema.safeParse(envValue);
@@ -46,11 +46,30 @@ const adapterConfigSchema = z.record(z.unknown()).superRefine((value, ctx) => {
 
 export const createAgentInstructionsBundleSchema = z.object({
   entryFile: z.string().trim().min(1).optional(),
+<<<<<<< HEAD
   files: z.record(z.string()).refine((files) => Object.keys(files).length > 0, {
+=======
+  files: z.record(z.string(), z.string()).refine((files) => Object.keys(files).length > 0, {
+>>>>>>> upstream/master
     message: "instructionsBundle.files must contain at least one file",
   }),
 });
 
+<<<<<<< HEAD
+=======
+const agentModelProfileConfigSchema = z.object({
+  enabled: z.boolean().optional(),
+  label: z.string().trim().min(1).optional(),
+  adapterConfig: adapterConfigSchema,
+}).strict();
+
+export const agentRuntimeConfigSchema = z.object({
+  modelProfiles: z.object({
+    cheap: agentModelProfileConfigSchema.optional(),
+  }).strict().optional(),
+}).catchall(z.unknown());
+
+>>>>>>> upstream/master
 export const createAgentSchema = z.object({
   name: z.string().min(1),
   role: z.enum(AGENT_ROLES).optional().default("general"),
@@ -62,11 +81,15 @@ export const createAgentSchema = z.object({
   adapterType: agentAdapterTypeSchema,
   adapterConfig: adapterConfigSchema.optional().default({}),
   instructionsBundle: createAgentInstructionsBundleSchema.optional(),
+<<<<<<< HEAD
   runtimeConfig: z.record(z.unknown()).optional().default({}),
+=======
+  runtimeConfig: agentRuntimeConfigSchema.optional().default({}),
+>>>>>>> upstream/master
   defaultEnvironmentId: z.string().uuid().optional().nullable(),
   budgetMonthlyCents: z.number().int().nonnegative().optional().default(0),
   permissions: agentPermissionsSchema.optional(),
-  metadata: z.record(z.unknown()).optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 
 export type CreateAgent = z.infer<typeof createAgentSchema>;
@@ -114,7 +137,7 @@ export const wakeAgentSchema = z.object({
   source: z.enum(["timer", "assignment", "on_demand", "automation"]).optional().default("on_demand"),
   triggerDetail: z.enum(["manual", "ping", "callback", "system"]).optional(),
   reason: z.string().optional().nullable(),
-  payload: z.record(z.unknown()).optional().nullable(),
+  payload: z.record(z.string(), z.unknown()).optional().nullable(),
   idempotencyKey: z.string().optional().nullable(),
   forceFreshSession: z.preprocess(
     (value) => (value === null ? undefined : value),
