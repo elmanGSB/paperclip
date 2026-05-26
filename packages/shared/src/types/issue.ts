@@ -161,8 +161,6 @@ export interface IssueBlockerAttention {
   sampleStalledBlockerIdentifier: string | null;
 }
 
-<<<<<<< HEAD
-=======
 export type IssueInboxAttentionKind = "blocked";
 
 export type IssueBlockedInboxState =
@@ -232,7 +230,6 @@ export interface IssueBlockedInboxAttention {
   };
 }
 
->>>>>>> upstream/master
 export type IssueProductivityReviewTrigger =
   | "no_comment_streak"
   | "long_active_duration"
@@ -249,8 +246,6 @@ export interface IssueProductivityReview {
   updatedAt: Date;
 }
 
-<<<<<<< HEAD
-=======
 export interface IssueRecoveryAction {
   id: string;
   companyId: string;
@@ -320,7 +315,6 @@ export interface IssueRetryNowResponse {
   scheduledRetry: IssueScheduledRetry | null;
 }
 
->>>>>>> upstream/master
 export interface IssueRelation {
   id: string;
   companyId: string;
@@ -483,15 +477,11 @@ export interface Issue {
   blockedBy?: IssueRelationIssueSummary[];
   blocks?: IssueRelationIssueSummary[];
   blockerAttention?: IssueBlockerAttention;
-<<<<<<< HEAD
-  productivityReview?: IssueProductivityReview | null;
-=======
   blockedInboxAttention?: IssueBlockedInboxAttention | null;
   productivityReview?: IssueProductivityReview | null;
   activeRecoveryAction?: IssueRecoveryAction | null;
   successfulRunHandoff?: SuccessfulRunHandoffState | null;
   scheduledRetry?: IssueScheduledRetry | null;
->>>>>>> upstream/master
   relatedWork?: IssueRelatedWorkSummary;
   referencedIssueIdentifiers?: string[];
   planDocument?: IssueDocument | null;
