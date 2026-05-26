@@ -20,10 +20,7 @@ import {
   resolveAdapterExecutionTargetTimeoutSec,
   resolveAdapterExecutionTargetCommandForLogs,
   runAdapterExecutionTargetProcess,
-<<<<<<< HEAD
-=======
   runAdapterExecutionTargetShellCommand,
->>>>>>> upstream/master
   startAdapterExecutionTargetPaperclipBridge,
 } from "@paperclipai/adapter-utils/execution-target";
 import {
@@ -447,14 +444,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       throw error;
     }
   }
-<<<<<<< HEAD
-  if (executionTargetIsRemote && adapterExecutionTargetUsesPaperclipBridge(executionTarget)) {
-    paperclipBridge = await startAdapterExecutionTargetPaperclipBridge({
-      runId,
-      target: executionTarget,
-      runtimeRootDir: remoteRuntimeRootDir,
-      adapterKey: "pi",
-=======
   const runtimeExecutionTarget = overrideAdapterExecutionTargetRemoteCwd(executionTarget, effectiveExecutionCwd);
   if (executionTargetIsRemote && adapterExecutionTargetUsesPaperclipBridge(runtimeExecutionTarget)) {
     paperclipBridge = await startAdapterExecutionTargetPaperclipBridge({
@@ -463,7 +452,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       runtimeRootDir: remoteRuntimeRootDir,
       adapterKey: "pi",
       timeoutSec,
->>>>>>> upstream/master
       hostApiToken: env.PAPERCLIP_API_KEY,
       onLog,
     });
