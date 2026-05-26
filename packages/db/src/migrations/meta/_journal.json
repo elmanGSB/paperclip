@@ -526,8 +526,6 @@
       "when": 1777384535070,
       "tag": "0074_striped_genesis",
       "breakpoints": true
-<<<<<<< HEAD
-=======
     },
     {
       "idx": 75,
@@ -633,7 +631,6 @@
       "when": 1779129600000,
       "tag": "0089_cloud_upstreams",
       "breakpoints": true
->>>>>>> upstream/master
     }
   ]
 }
