@@ -3,13 +3,9 @@ import * as ssh from "./ssh.js";
 import * as serverUtils from "./server-utils.js";
 import {
   adapterExecutionTargetUsesManagedHome,
-<<<<<<< HEAD
-  resolveAdapterExecutionTargetCwd,
-=======
   ensureAdapterExecutionTargetRuntimeCommandInstalled,
   resolveAdapterExecutionTargetCwd,
   runAdapterExecutionTargetProcess,
->>>>>>> upstream/master
   runAdapterExecutionTargetShellCommand,
 } from "./execution-target.js";
 
@@ -221,8 +217,6 @@ describe("runAdapterExecutionTargetShellCommand", () => {
   });
 });
 
-<<<<<<< HEAD
-=======
 describe("runAdapterExecutionTargetProcess", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -362,7 +356,6 @@ describe("ensureAdapterExecutionTargetRuntimeCommandInstalled", () => {
   });
 });
 
->>>>>>> upstream/master
 describe("resolveAdapterExecutionTargetCwd", () => {
   const sshTarget = {
     kind: "remote" as const,
