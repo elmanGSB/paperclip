@@ -29,15 +29,6 @@ import {
   projects,
 } from "@paperclipai/db";
 import type {
-<<<<<<< HEAD
-  IssueBlockerAttention,
-  IssueProductivityReview,
-  IssueProductivityReviewTrigger,
-  IssueRelationIssueSummary,
-} from "@paperclipai/shared";
-import { clampIssueRequestDepth, extractAgentMentionIds, extractProjectMentionIds, isUuidLike } from "@paperclipai/shared";
-import { conflict, notFound, unprocessable } from "../errors.js";
-=======
   IssueCommentAuthorType,
   IssueCommentMetadata,
   IssueCommentPresentation,
@@ -62,7 +53,6 @@ import {
 import { conflict, HttpError, notFound, unprocessable } from "../errors.js";
 import { logger } from "../middleware/logger.js";
 import { parseObject } from "../adapters/utils.js";
->>>>>>> upstream/master
 import {
   defaultIssueExecutionWorkspaceSettingsForProject,
   gateProjectExecutionWorkspacePolicy,
@@ -71,10 +61,7 @@ import {
   parseProjectExecutionWorkspacePolicy,
 } from "./execution-workspace-policy.js";
 import { mergeExecutionWorkspaceConfig } from "./execution-workspaces.js";
-<<<<<<< HEAD
-=======
 import { buildInitialIssueMonitorFields, normalizeIssueExecutionPolicy } from "./issue-execution-policy.js";
->>>>>>> upstream/master
 import { instanceSettingsService } from "./instance-settings.js";
 import { redactCurrentUserText } from "../log-redaction.js";
 import { redactSensitiveText } from "../redaction.js";
@@ -146,8 +133,6 @@ function buildReusedExecutionWorkspaceConfigPatchFromIssueSettings(
   };
 }
 
-<<<<<<< HEAD
-=======
 function toTimestampMs(value: Date | string | null | undefined) {
   if (!value) return null;
   const date = value instanceof Date ? value : new Date(value);
@@ -228,7 +213,6 @@ export function deriveIssueCommentRunLogAttribution(
   return derivedByCommentId;
 }
 
->>>>>>> upstream/master
 export interface IssueFilters {
   attention?: "blocked";
   status?: string;
@@ -255,11 +239,8 @@ export interface IssueFilters {
   q?: string;
   limit?: number;
   offset?: number;
-<<<<<<< HEAD
-=======
   sortField?: "updated";
   sortDir?: "asc" | "desc";
->>>>>>> upstream/master
 }
 
 type IssueRow = typeof issues.$inferSelect;
@@ -3594,15 +3575,6 @@ export function issueService(db: Db) {
         .select(issueListSelect)
         .from(issues)
         .where(and(...conditions))
-<<<<<<< HEAD
-        .orderBy(
-          hasSearch ? asc(searchOrder) : asc(priorityOrder),
-          asc(priorityOrder),
-          desc(canonicalLastActivityAt),
-          desc(issues.updatedAt),
-          desc(issues.id),
-        );
-=======
         .orderBy(...issueListOrderBy(companyId, {
           hasSearch,
           priorityOrder,
@@ -3610,7 +3582,6 @@ export function issueService(db: Db) {
           sortField: filters?.sortField,
           sortDir: filters?.sortDir,
         }));
->>>>>>> upstream/master
       const pageQuery = offset > 0
         ? (limit === undefined ? baseQuery.offset(offset) : baseQuery.limit(limit).offset(offset))
         : (limit === undefined ? baseQuery : baseQuery.limit(limit));
@@ -3640,11 +3611,6 @@ export function issueService(db: Db) {
       ]);
       const statsByIssueId = new Map(statsRows.map((row) => [row.issueId, row]));
       const lastActivityByIssueId = new Map(lastActivityRows.map((row) => [row.issueId, row]));
-<<<<<<< HEAD
-      const [blockerAttentionByIssueId, productivityReviewByIssueId] = await Promise.all([
-        listIssueBlockerAttentionMap(db, companyId, withRuns),
-        listIssueProductivityReviewMap(db, companyId, issueIds),
-=======
       const [
         blockerAttentionByIssueId,
         productivityReviewByIssueId,
@@ -3655,7 +3621,6 @@ export function issueService(db: Db) {
         includeBlockedInboxAttention
           ? listIssueBlockedInboxAttentionMap(db, companyId, withRuns)
           : Promise.resolve(new Map<string, IssueBlockedInboxAttention>()),
->>>>>>> upstream/master
       ]);
 
       if (!contextUserId) {
@@ -3671,10 +3636,7 @@ export function issueService(db: Db) {
             ...(includeBlockedBy ? { blockedBy: blockedByMap.get(row.id) ?? [] } : {}),
             lastActivityAt,
             ...(blockerAttentionByIssueId.has(row.id) ? { blockerAttention: blockerAttentionByIssueId.get(row.id) } : {}),
-<<<<<<< HEAD
-=======
             ...(includeBlockedInboxAttention ? { blockedInboxAttention: blockedInboxAttentionByIssueId.get(row.id) ?? null } : {}),
->>>>>>> upstream/master
             ...(productivityReviewByIssueId.has(row.id)
               ? { productivityReview: productivityReviewByIssueId.get(row.id) }
               : {}),
@@ -3696,10 +3658,7 @@ export function issueService(db: Db) {
           ...(includeBlockedBy ? { blockedBy: blockedByMap.get(row.id) ?? [] } : {}),
           lastActivityAt,
           ...(blockerAttentionByIssueId.has(row.id) ? { blockerAttention: blockerAttentionByIssueId.get(row.id) } : {}),
-<<<<<<< HEAD
-=======
           ...(includeBlockedInboxAttention ? { blockedInboxAttention: blockedInboxAttentionByIssueId.get(row.id) ?? null } : {}),
->>>>>>> upstream/master
           ...(productivityReviewByIssueId.has(row.id)
             ? { productivityReview: productivityReviewByIssueId.get(row.id) }
             : {}),
