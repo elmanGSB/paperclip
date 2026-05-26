@@ -305,38 +305,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   if (!hasExplicitApiKey && authToken) {
     env.PAPERCLIP_API_KEY = authToken;
   }
-<<<<<<< HEAD
-  const timeoutSec = asNumber(config.timeoutSec, 0);
-  const graceSec = asNumber(config.graceSec, 20);
-  // Probe the sandbox before the managed-home override so we discover
-  // cursor-agent from the real system HOME (e.g. ~/.local/bin/cursor-agent).
-  // The managed HOME set later is for runtime isolation, not for finding the CLI.
-  const sandboxCommand = await prepareCursorSandboxCommand({
-    runId,
-    target: executionTarget,
-    command,
-    cwd,
-    env,
-    timeoutSec,
-    graceSec,
-  });
-  command = sandboxCommand.command;
-  env = sandboxCommand.env;
-  const effectiveEnv = Object.fromEntries(
-    Object.entries({ ...process.env, ...env }).filter(
-      (entry): entry is [string, string] => typeof entry[1] === "string",
-    ),
-  );
-  const billingType = resolveCursorBillingType(effectiveEnv);
-  const runtimeEnv = ensurePathInEnv(effectiveEnv);
-  await ensureAdapterExecutionTargetCommandResolvable(command, executionTarget, cwd, runtimeEnv);
-  const resolvedCommand = await resolveAdapterExecutionTargetCommandForLogs(command, executionTarget, cwd, runtimeEnv);
-  let loggedEnv = buildInvocationEnvForLogs(env, {
-    runtimeEnv,
-    includeRuntimeKeys: ["HOME"],
-    resolvedCommand,
-  });
-=======
   const timeoutSec = resolveAdapterExecutionTargetTimeoutSec(
     executionTarget,
     asNumber(config.timeoutSec, 0),
@@ -369,7 +337,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   const sandboxSystemHomeDir = initialSandboxCommand.remoteSystemHomeDir;
   command = initialSandboxCommand.command;
   env = initialSandboxCommand.env;
->>>>>>> upstream/master
 
   const extraArgs = (() => {
     const fromExtraArgs = asStringArray(config.extraArgs);
@@ -404,8 +371,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
         }],
       });
       restoreRemoteWorkspace = () => preparedExecutionTargetRuntime.restoreWorkspace();
-<<<<<<< HEAD
-=======
       effectiveExecutionCwd = preparedExecutionTargetRuntime.workspaceRemoteDir ?? effectiveExecutionCwd;
       refreshPaperclipWorkspaceEnvForExecution({
         env,
@@ -420,7 +385,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
         executionTargetIsRemote,
         executionCwd: effectiveExecutionCwd,
       });
->>>>>>> upstream/master
       remoteRuntimeRootDir = preparedExecutionTargetRuntime.runtimeRootDir;
       const managedHome = adapterExecutionTargetUsesManagedHome(executionTarget);
       if (managedHome && preparedExecutionTargetRuntime.runtimeRootDir) {
@@ -452,14 +416,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       throw error;
     }
   }
-<<<<<<< HEAD
-  if (executionTargetIsRemote && adapterExecutionTargetUsesPaperclipBridge(executionTarget)) {
-    paperclipBridge = await startAdapterExecutionTargetPaperclipBridge({
-      runId,
-      target: executionTarget,
-      runtimeRootDir: remoteRuntimeRootDir,
-      adapterKey: "cursor",
-=======
   const finalSandboxCommand = executionTarget?.kind === "remote" && executionTarget.transport === "sandbox"
     ? await prepareCursorSandboxCommand({
       runId,
@@ -501,7 +457,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       runtimeRootDir: remoteRuntimeRootDir,
       adapterKey: "cursor",
       timeoutSec,
->>>>>>> upstream/master
       hostApiToken: env.PAPERCLIP_API_KEY,
       onLog,
     });
@@ -562,13 +517,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       notes.push("Auto-added --yolo to bypass interactive prompts.");
     }
     notes.push("Prompt is piped to Cursor via stdin.");
-<<<<<<< HEAD
-    if (sandboxCommand.addedPathEntry) {
-      notes.push(`Remote sandbox runs prepend ${sandboxCommand.addedPathEntry} to PATH.`);
-    }
-    if (sandboxCommand.preferredCommandPath) {
-      notes.push(`Remote sandbox runs prefer ${sandboxCommand.preferredCommandPath} when using the default Cursor entrypoint.`);
-=======
     const sandboxCommand = finalSandboxCommand ?? initialSandboxCommand;
     if (sandboxCommand?.addedPathEntry) {
       notes.push(`Remote sandbox runs prepend ${sandboxCommand.addedPathEntry} to PATH.`);
@@ -577,7 +525,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       notes.push(
         `Remote sandbox runs prefer ${sandboxCommand.preferredCommandPath} when using the default Cursor entrypoint.`,
       );
->>>>>>> upstream/master
     }
     if (!instructionsFilePath) return notes;
     if (instructionsPrefix.length > 0) {
