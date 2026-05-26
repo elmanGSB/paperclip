@@ -55,11 +55,6 @@ describe("command managed runtime", () => {
           ...process.env,
           ...input.env,
         };
-<<<<<<< HEAD
-        const command = input.command === "sh" ? "/bin/sh" : input.command;
-        const args = [...(input.args ?? [])];
-        if (input.stdin != null && input.command === "sh" && args[0] === "-lc" && typeof args[1] === "string") {
-=======
         const command =
           input.command === "sh" ? "/bin/sh" : input.command === "bash" ? "/bin/bash" : input.command;
         const args = [...(input.args ?? [])];
@@ -69,7 +64,6 @@ describe("command managed runtime", () => {
           (args[0] === "-c" || args[0] === "-lc") &&
           typeof args[1] === "string"
         ) {
->>>>>>> upstream/master
           env.PAPERCLIP_TEST_STDIN = input.stdin;
           args[1] = `printf '%s' \"$PAPERCLIP_TEST_STDIN\" | (${args[1]})`;
         }
@@ -137,8 +131,6 @@ describe("command managed runtime", () => {
       .toMatchObject({ code: "ENOENT" });
     expect(calls.every((call) => call.stdin == null)).toBe(true);
   });
-<<<<<<< HEAD
-=======
 
   it("runs setup commands from a stable root cwd when staging into a nested remote workspace dir", async () => {
     const rootDir = await mkdtemp(path.join(os.tmpdir(), "paperclip-command-runtime-nested-"));
@@ -225,5 +217,4 @@ describe("command managed runtime", () => {
     expect(calls.every((call) => call.cwd === "/")).toBe(true);
     await expect(readFile(path.join(remoteWorkspaceDir, "README.md"), "utf8")).resolves.toBe("local workspace\n");
   });
->>>>>>> upstream/master
 });
