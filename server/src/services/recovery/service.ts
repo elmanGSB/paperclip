@@ -293,11 +293,7 @@ function isUnsuccessfulTerminalIssueRun(latestRun: LatestIssueRun) {
   );
 }
 
-<<<<<<< HEAD
-function isSuccessfulInProgressContinuationRun(latestRun: LatestIssueRun) {
-=======
 function isSuccessfulInProgressContinuationRun(latestRun: LatestIssueRun): latestRun is SuccessfulLatestIssueRun {
->>>>>>> upstream/master
   return latestRun?.status === "succeeded";
 }
 
@@ -309,8 +305,6 @@ function isProductiveContinuationRun(latestRun: LatestIssueRun) {
       latestRun.livenessState === "needs_followup");
 }
 
-<<<<<<< HEAD
-=======
 function isRepeatedProductiveContinuationRecovery(latestRun: SuccessfulLatestIssueRun) {
   const latestContext = parseObject(latestRun.contextSnapshot);
   return readNonEmptyString(latestContext.retryReason) === "issue_continuation_needed" &&
@@ -318,7 +312,6 @@ function isRepeatedProductiveContinuationRecovery(latestRun: SuccessfulLatestIss
     isProductiveContinuationRun(latestRun);
 }
 
->>>>>>> upstream/master
 function parseLivenessIncidentKey(incidentKey: string | null | undefined) {
   if (!incidentKey) return null;
   return parseIssueGraphLivenessIncidentKey(incidentKey);
@@ -2482,15 +2475,6 @@ export function recoveryService(db: Db, deps: { enqueueWakeup: RecoveryWakeup })
         result.skipped += 1;
         continue;
       }
-<<<<<<< HEAD
-      if (isSuccessfulInProgressContinuationRun(latestRun)) {
-        if (isProductiveContinuationRun(latestRun)) {
-          result.productiveContinuationObserved += 1;
-        } else {
-          result.successfulContinuationObserved += 1;
-        }
-        result.skipped += 1;
-=======
       const handoffEvidence = isExhaustedSuccessfulRunHandoff(latestRun);
       if (handoffEvidence) {
         if (!handoffEvidence.exhausted) {
@@ -2559,7 +2543,6 @@ export function recoveryService(db: Db, deps: { enqueueWakeup: RecoveryWakeup })
         } else {
           result.skipped += 1;
         }
->>>>>>> upstream/master
         continue;
       }
       if (didAutomaticRecoveryFail(latestRun, "issue_continuation_needed")) {
