@@ -3,11 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { runChildProcess } from "@paperclipai/adapter-utils/server-utils";
-<<<<<<< HEAD
-import { execute } from "@paperclipai/adapter-claude-local/server";
-=======
 import { claudeSessionCwdMatchesExecutionTarget, execute } from "@paperclipai/adapter-claude-local/server";
->>>>>>> upstream/master
 
 async function writeFailingClaudeCommand(
   commandPath: string,
@@ -584,11 +580,7 @@ describe("claude execute", () => {
     const remoteWorkspace = path.join(root, "sandbox-$HOME");
     const binDir = path.join(root, "bin");
     const commandPath = path.join(binDir, "claude");
-<<<<<<< HEAD
-    const capturePath = path.join(remoteWorkspace, "capture.json");
-=======
     const capturePath1 = path.join(remoteWorkspace, "capture-1.json");
->>>>>>> upstream/master
     const claudeRoot = path.join(root, ".claude");
     const previousHome = process.env.HOME;
     const previousPath = process.env.PATH;
@@ -623,11 +615,7 @@ describe("claude execute", () => {
           command: commandPath,
           cwd: localWorkspace,
           env: {
-<<<<<<< HEAD
-            PAPERCLIP_TEST_CAPTURE_PATH: capturePath,
-=======
             PAPERCLIP_TEST_CAPTURE_PATH: capturePath1,
->>>>>>> upstream/master
           },
           promptTemplate: "Follow the paperclip heartbeat.",
         },
@@ -647,9 +635,6 @@ describe("claude execute", () => {
       });
 
       expect(result.exitCode).toBe(0);
-<<<<<<< HEAD
-      const capture = JSON.parse(await fs.readFile(capturePath, "utf8")) as CapturePayload;
-=======
       expect(result.sessionParams).toMatchObject({
         cwd: localWorkspace,
         remoteExecution: {
@@ -666,7 +651,6 @@ describe("claude execute", () => {
         "Task AskUserQuestion Bash(*) CronCreate CronDelete CronList Edit EnterPlanMode EnterWorktree ExitPlanMode ExitWorktree Glob Grep Monitor NotebookEdit PushNotification Read RemoteTrigger ScheduleWakeup Skill TaskOutput TaskStop TodoWrite ToolSearch WebFetch WebSearch Write",
       );
       expect(capture.argv).not.toContain("--dangerously-skip-permissions");
->>>>>>> upstream/master
       expect(capture.claudeConfigDir).toBe(path.join(remoteWorkspace, ".paperclip-runtime", "claude", "config"));
       expect(capture.claudeConfigEntries).toContain("settings.json");
       expect(capture.paperclipApiUrl).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
@@ -679,8 +663,6 @@ describe("claude execute", () => {
       else process.env.PATH = previousPath;
       await fs.rm(root, { recursive: true, force: true });
     }
-<<<<<<< HEAD
-=======
   }, 10_000);
 
   it("allows remote session resumes when saved cwd is the host workspace", () => {
@@ -694,7 +676,6 @@ describe("claude execute", () => {
       effectiveExecutionCwd: "/remote/workspace",
       executionTargetIsRemote: false,
     })).toBe(false);
->>>>>>> upstream/master
   });
 
   it("reuses a stable Paperclip-managed Claude prompt bundle across equivalent runs", async () => {
