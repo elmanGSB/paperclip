@@ -303,19 +303,6 @@ describe("E2B sandbox provider plugin", () => {
 
     expect(mockConnect).toHaveBeenCalledWith("sandbox-123", expect.objectContaining({ apiKey: "resolved-key" }));
     expect(sandbox.files.write).toHaveBeenCalledWith(expect.stringMatching(/^\/tmp\/paperclip-stdin-/), "input");
-<<<<<<< HEAD
-    expect(sandbox.commands.run).toHaveBeenCalledWith(expect.stringMatching(
-      /^exec 'printf' 'hello' < '\/tmp\/paperclip-stdin-/,
-    ), expect.objectContaining({
-      cwd: "/workspace",
-      envs: { FOO: "bar" },
-      timeoutMs: 1000,
-    }));
-    expect(sandbox.commands.run).not.toHaveBeenCalledWith(
-      "exec 'printf' 'hello'",
-      expect.objectContaining({ background: true }),
-    );
-=======
     const stdinCall = sandbox.commands.run.mock.calls.find(([cmd]: [string]) => cmd.includes("'printf'"));
     expect(stdinCall).toBeDefined();
     if (!stdinCall) throw new Error("stdinCall not found");
@@ -324,7 +311,6 @@ describe("E2B sandbox provider plugin", () => {
     expect(stdinCall[1]).toEqual(expect.objectContaining({ cwd: "/workspace", timeoutMs: 1000 }));
     expect(stdinCall[1]).not.toHaveProperty("envs");
     expect(stdinCall[1]).not.toHaveProperty("background");
->>>>>>> upstream/master
     expect(sandbox.commands.sendStdin).not.toHaveBeenCalled();
     expect(sandbox.commands.closeStdin).not.toHaveBeenCalled();
     expect(sandbox.handle.wait).not.toHaveBeenCalled();
@@ -374,17 +360,6 @@ describe("E2B sandbox provider plugin", () => {
       timeoutMs: 1000,
     });
 
-<<<<<<< HEAD
-    expect(sandbox.commands.run).toHaveBeenCalledWith("exec 'printf' 'hello'", expect.objectContaining({
-      cwd: "/workspace",
-      envs: { FOO: "bar" },
-      timeoutMs: 1000,
-    }));
-    expect(sandbox.commands.run).not.toHaveBeenCalledWith(
-      "exec 'printf' 'hello'",
-      expect.objectContaining({ background: true }),
-    );
-=======
     const fgCall = sandbox.commands.run.mock.calls.find(([cmd]: [string]) => cmd.includes("'printf'"));
     expect(fgCall).toBeDefined();
     if (!fgCall) throw new Error("fgCall not found");
@@ -393,7 +368,6 @@ describe("E2B sandbox provider plugin", () => {
     expect(fgCall[1]).toEqual(expect.objectContaining({ cwd: "/workspace", timeoutMs: 1000 }));
     expect(fgCall[1]).not.toHaveProperty("envs");
     expect(fgCall[1]).not.toHaveProperty("background");
->>>>>>> upstream/master
     expect(sandbox.commands.sendStdin).not.toHaveBeenCalled();
     expect(sandbox.commands.closeStdin).not.toHaveBeenCalled();
     expect(sandbox.handle.wait).not.toHaveBeenCalled();
@@ -405,8 +379,6 @@ describe("E2B sandbox provider plugin", () => {
     });
   });
 
-<<<<<<< HEAD
-=======
   it("refreshes the sandbox lifetime on every execute so long runs don't die mid-command", async () => {
     const sandbox = createMockSandbox();
     mockConnect.mockResolvedValue(sandbox);
@@ -460,7 +432,6 @@ describe("E2B sandbox provider plugin", () => {
     expect(result?.exitCode).toBe(0);
   });
 
->>>>>>> upstream/master
   it("cleans up staged stdin even when writing it fails", async () => {
     const sandbox = createMockSandbox();
     const failure = new Error("write failed");
