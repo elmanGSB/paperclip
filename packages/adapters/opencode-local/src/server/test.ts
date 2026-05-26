@@ -17,19 +17,13 @@ import {
 } from "@paperclipai/adapter-utils/server-utils";
 import {
   ensureAdapterExecutionTargetCommandResolvable,
-<<<<<<< HEAD
-=======
   maybeRunSandboxInstallCommand,
->>>>>>> upstream/master
   ensureAdapterExecutionTargetDirectory,
   runAdapterExecutionTargetProcess,
   describeAdapterExecutionTarget,
   resolveAdapterExecutionTargetCwd,
-<<<<<<< HEAD
-=======
   prepareAdapterExecutionTargetRuntime,
   overrideAdapterExecutionTargetRemoteCwd,
->>>>>>> upstream/master
 } from "@paperclipai/adapter-utils/execution-target";
 import { discoverOpenCodeModels, ensureOpenCodeModelConfiguredAndAvailable } from "./models.js";
 import { parseOpenCodeJsonl } from "./parse.js";
@@ -79,10 +73,7 @@ export async function testEnvironment(
   const command = asString(config.command, "opencode");
   const target = ctx.executionTarget ?? null;
   const targetIsRemote = target?.kind === "remote";
-<<<<<<< HEAD
-=======
   const targetIsSandbox = target?.kind === "remote" && target.transport === "sandbox";
->>>>>>> upstream/master
   const cwd = resolveAdapterExecutionTargetCwd(target, asString(config.cwd, ""), process.cwd());
   const targetLabel = targetIsRemote
     ? ctx.environmentName ?? describeAdapterExecutionTarget(target)
@@ -203,11 +194,7 @@ export async function testEnvironment(
       });
       if (installCheck) checks.push(installCheck);
       try {
-<<<<<<< HEAD
-        await ensureAdapterExecutionTargetCommandResolvable(command, target, cwd, runtimeEnv);
-=======
         await ensureAdapterExecutionTargetCommandResolvable(command, runtimeTarget, runtimeCwd, runtimeEnv);
->>>>>>> upstream/master
         checks.push({
           code: "opencode_command_resolvable",
           level: "info",
@@ -360,11 +347,7 @@ export async function testEnvironment(
       try {
         const probe = await runAdapterExecutionTargetProcess(
           runId,
-<<<<<<< HEAD
-          target,
-=======
           runtimeTarget,
->>>>>>> upstream/master
           command,
           args,
           {
