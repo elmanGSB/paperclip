@@ -151,12 +151,9 @@ interface IssueChatMessageContext {
     options?: { allowSharing?: boolean; reason?: string },
   ) => Promise<void>;
   onStopRun?: (runId: string) => Promise<void>;
-<<<<<<< HEAD
-=======
   stopRunLabel?: string;
   stoppingRunLabel?: string;
   stopRunVariant?: "stop" | "pause";
->>>>>>> upstream/master
   onInterruptQueued?: (runId: string) => Promise<void>;
   onCancelQueued?: (commentId: string) => void;
   onImageClick?: (src: string) => void;
@@ -182,11 +179,8 @@ interface IssueChatMessageContext {
 const IssueChatCtx = createContext<IssueChatMessageContext>({
   feedbackDataSharingPreference: "prompt",
   feedbackTermsUrl: null,
-<<<<<<< HEAD
-=======
   issueStatus: undefined,
   successfulRunHandoff: null,
->>>>>>> upstream/master
 });
 
 export function resolveAssistantMessageFoldedState(args: {
@@ -378,10 +372,7 @@ interface IssueChatThreadProps {
     interaction: AskUserQuestionsInteraction,
   ) => Promise<void> | void;
   composerRef?: Ref<IssueChatComposerHandle>;
-<<<<<<< HEAD
-=======
   issueWorkMode?: IssueWorkMode;
->>>>>>> upstream/master
   /**
    * Hook for the parent to refetch comments when the user explicitly asks
    * to jump to the latest comment. Used to make sure the absolute newest
@@ -658,8 +649,6 @@ const IssueChatTextPart = memo(function IssueChatTextPart({ text, recessed }: { 
     </MarkdownBody>
   );
 });
-<<<<<<< HEAD
-=======
 
 export function SuccessfulRunHandoffCommentCallout({
   text,
@@ -695,7 +684,6 @@ export function SuccessfulRunHandoffCommentCallout({
     </div>
   );
 }
->>>>>>> upstream/master
 
 function humanizeValue(value: string | null) {
   if (!value) return "None";
@@ -1449,12 +1437,9 @@ function IssueChatAssistantMessage({
     onVote,
     agentMap,
     onStopRun,
-<<<<<<< HEAD
-=======
     stopRunLabel = "Stop run",
     stoppingRunLabel = "Stopping...",
     stopRunVariant = "stop",
->>>>>>> upstream/master
   } = useContext(IssueChatCtx);
   const custom = message.metadata.custom as Record<string, unknown>;
   const anchorId = typeof custom.anchorId === "string" ? custom.anchorId : undefined;
@@ -1648,30 +1633,21 @@ function IssueChatAssistantMessage({
                     {canStopRun && onStopRun && runId ? (
                       <DropdownMenuItem
                         disabled={isStoppingRun}
-<<<<<<< HEAD
-                        className="text-red-700 focus:text-red-800 dark:text-red-300 dark:focus:text-red-200"
-=======
                         className={cn(
                           stopRunVariant === "pause"
                             ? "text-amber-700 focus:text-amber-800 dark:text-amber-300 dark:focus:text-amber-200"
                             : "text-red-700 focus:text-red-800 dark:text-red-300 dark:focus:text-red-200",
                         )}
->>>>>>> upstream/master
                         onSelect={() => {
                           void onStopRun(runId);
                         }}
                       >
-<<<<<<< HEAD
-                        <Square className="mr-2 h-3.5 w-3.5 fill-current" />
-                        {isStoppingRun ? "Stopping…" : "Stop run"}
-=======
                         {stopRunVariant === "pause" ? (
                           <PauseCircle className="mr-2 h-3.5 w-3.5" />
                         ) : (
                           <Square className="mr-2 h-3.5 w-3.5 fill-current" />
                         )}
                         {isStoppingRun ? stoppingRunLabel : stopRunLabel}
->>>>>>> upstream/master
                       </DropdownMenuItem>
                     ) : null}
                     {runHref ? (
@@ -3149,13 +3125,10 @@ const IssueChatComposer = forwardRef<IssueChatComposerHandle, IssueChatComposerP
   const effectiveSuggestedAssigneeValue = suggestedAssigneeValue ?? currentAssigneeValue;
   const [reassignTarget, setReassignTarget] = useState(effectiveSuggestedAssigneeValue);
   const [unassignedConfirmed, setUnassignedConfirmed] = useState(false);
-<<<<<<< HEAD
-=======
   const resolvedIssueWorkMode: IssueWorkMode = issueWorkMode ?? "standard";
   const [pendingWorkMode, setPendingWorkMode] = useState<IssueWorkMode>(resolvedIssueWorkMode);
   const [workModeMenuOpen, setWorkModeMenuOpen] = useState(false);
   const canToggleWorkMode = typeof onWorkModeChange === "function";
->>>>>>> upstream/master
   const attachInputRef = useRef<HTMLInputElement | null>(null);
   const editorRef = useRef<MarkdownEditorRef>(null);
   const composerContainerRef = useRef<HTMLDivElement | null>(null);
@@ -3206,13 +3179,10 @@ const IssueChatComposer = forwardRef<IssueChatComposerHandle, IssueChatComposerP
     setUnassignedConfirmed(false);
   }, [reassignTarget]);
 
-<<<<<<< HEAD
-=======
   useEffect(() => {
     setPendingWorkMode(resolvedIssueWorkMode);
   }, [resolvedIssueWorkMode]);
 
->>>>>>> upstream/master
   useImperativeHandle(forwardedRef, () => ({
     focus: focusComposer,
     restoreDraft: (submittedBody: string) => {
@@ -3702,16 +3672,12 @@ export function IssueChatThread({
   onSubmitInteractionAnswers,
   onCancelInteraction,
   composerRef,
-<<<<<<< HEAD
-  onRefreshLatestComments,
-=======
   issueWorkMode,
   onWorkModeChange,
   onRefreshLatestComments,
   assigneeUserId = null,
   onResumeFromBacklog,
   resumeFromBacklogPending = false,
->>>>>>> upstream/master
 }: IssueChatThreadProps) {
   const location = useLocation();
   const lastScrolledHashRef = useRef<string | null>(null);
@@ -3864,11 +3830,6 @@ export function IssueChatThread({
   function scrollToThreadAnchor(
     anchorId: string,
     options?: { align?: "start" | "center" | "end" | "auto"; behavior?: ScrollBehavior },
-<<<<<<< HEAD
-  ) {
-    const virtualIndex = messageAnchorIndex.get(anchorId);
-    if (useVirtualizedThread && virtualIndex !== undefined) {
-=======
     messageSnapshot: readonly ThreadMessage[] = messages,
   ) {
     const snapshotUsesVirtualizer = messageSnapshot.length >= VIRTUALIZED_THREAD_ROW_THRESHOLD;
@@ -3877,7 +3838,6 @@ export function IssueChatThread({
         ? messageAnchorIndex.get(anchorId)
         : findMessageAnchorIndex(messageSnapshot, anchorId);
     if (snapshotUsesVirtualizer && virtualIndex !== undefined && virtualIndex >= 0) {
->>>>>>> upstream/master
       if (!virtualizedThreadRef.current) return false;
       virtualizedThreadRef.current.scrollToIndex(virtualIndex, {
         align: options?.align ?? "center",
@@ -4005,17 +3965,6 @@ export function IssueChatThread({
     bottomAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
-<<<<<<< HEAD
-  // Walks the thread by anchor and lands on the latest `comment-*` row, with
-  // a short series of settle passes. The virtualizer estimates row sizes for
-  // unmeasured rows, and that estimate undershoots tall markdown comments —
-  // so the first scroll often lands above the actual bottom and the user
-  // ends up clicking Jump to latest repeatedly to converge. Re-issuing the
-  // scroll after measurements catch up lets one click reach the actual
-  // latest comment (PAP-2672 follow-up).
-  function scrollToLatestCommentWithSettle() {
-    const latestCommentIndex = findLatestCommentMessageIndex(messages);
-=======
   // Lands on the latest `comment-*` row and then drives the scroll the rest
   // of the way home as the virtualizer's per-row measurements arrive.
   //
@@ -4030,30 +3979,21 @@ export function IssueChatThread({
   // and content height stop changing).
   function scrollToLatestCommentWithSettle(messageSnapshot: readonly ThreadMessage[] = latestMessagesRef.current) {
     const latestCommentIndex = findLatestCommentMessageIndex(messageSnapshot);
->>>>>>> upstream/master
     if (latestCommentIndex < 0) {
       jumpToLatestFallback();
       return;
     }
-<<<<<<< HEAD
-    const latestCommentAnchor = issueChatMessageAnchorId(messages[latestCommentIndex]);
-=======
     const latestCommentAnchor = issueChatMessageAnchorId(messageSnapshot[latestCommentIndex]);
->>>>>>> upstream/master
     if (!latestCommentAnchor) {
       jumpToLatestFallback();
       return;
     }
 
-<<<<<<< HEAD
-    const initial = scrollToThreadAnchor(latestCommentAnchor, { align: "end", behavior: "smooth" });
-=======
     const initial = scrollToThreadAnchor(
       latestCommentAnchor,
       { align: "end", behavior: "smooth" },
       messageSnapshot,
     );
->>>>>>> upstream/master
     if (!initial) {
       jumpToLatestFallback();
       return;
@@ -4061,19 +4001,6 @@ export function IssueChatThread({
 
     if (typeof window === "undefined") return;
 
-<<<<<<< HEAD
-    const settleDelays = [380, 760, 1140];
-    settleDelays.forEach((delay) => {
-      window.setTimeout(() => {
-        const el = document.getElementById(latestCommentAnchor);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "end" });
-          return;
-        }
-        // The row may still be outside the virtualizer's render buffer; nudge
-        // the offset so it gets mounted, then the next pass can align with
-        // real DOM measurements.
-=======
     const startedAt = (typeof performance !== "undefined" ? performance.now() : Date.now());
     const MAX_DURATION_MS = 4000;
     const TICK_MS = 80;
@@ -4135,15 +4062,10 @@ export function IssueChatThread({
       if (!el) {
         // Row hasn't been rendered into the virtualizer's buffer yet — nudge
         // the offset (instant) so it gets mounted, then keep settling.
->>>>>>> upstream/master
         virtualizedThreadRef.current?.scrollToIndex(latestCommentIndex, {
           align: "end",
           behavior: "auto",
         });
-<<<<<<< HEAD
-      }, delay);
-    });
-=======
         scheduleTick(TICK_MS);
         return;
       }
@@ -4182,22 +4104,10 @@ export function IssueChatThread({
     // scroll has begun (and the virtualizer has rendered the buffer around
     // the target) before we start settling.
     scheduleTick(120);
->>>>>>> upstream/master
   }
 
   function handleJumpToLatest() {
     if (onRefreshLatestComments) {
-<<<<<<< HEAD
-      // Refetching from page 0 (newest first) brings any comments that
-      // arrived after the initial load into the cache before we scroll —
-      // otherwise we'd land on the latest *loaded* row rather than the
-      // absolute newest, which is what PAP-2672 reopened on.
-      const refreshed = onRefreshLatestComments();
-      if (refreshed && typeof (refreshed as Promise<unknown>).then === "function") {
-        (refreshed as Promise<unknown>).then(
-          () => scrollToLatestCommentWithSettle(),
-          () => scrollToLatestCommentWithSettle(),
-=======
       // Refetching the comments query (page 0 first) brings any comment that
       // arrived after the initial load — including ones live updates may
       // have missed during reconnects — into the loaded set before we
@@ -4208,16 +4118,11 @@ export function IssueChatThread({
         (refreshed as Promise<unknown>).then(
           () => scrollToLatestCommentWithSettle(latestMessagesRef.current),
           () => scrollToLatestCommentWithSettle(latestMessagesRef.current),
->>>>>>> upstream/master
         );
         return;
       }
     }
-<<<<<<< HEAD
-    scrollToLatestCommentWithSettle();
-=======
     scrollToLatestCommentWithSettle(latestMessagesRef.current);
->>>>>>> upstream/master
   }
 
   const stableOnVote = useStableEvent(onVote);
@@ -4228,10 +4133,7 @@ export function IssueChatThread({
   const stableOnAcceptInteraction = useStableEvent(onAcceptInteraction);
   const stableOnRejectInteraction = useStableEvent(onRejectInteraction);
   const stableOnSubmitInteractionAnswers = useStableEvent(onSubmitInteractionAnswers);
-<<<<<<< HEAD
-=======
   const stableOnCancelInteraction = useStableEvent(onCancelInteraction);
->>>>>>> upstream/master
 
   const chatCtx = useMemo<IssueChatMessageContext>(
     () => ({
@@ -4243,24 +4145,18 @@ export function IssueChatThread({
       userProfileMap,
       onVote: stableOnVote,
       onStopRun: stableOnStopRun,
-<<<<<<< HEAD
-=======
       stopRunLabel,
       stoppingRunLabel,
       stopRunVariant,
->>>>>>> upstream/master
       onInterruptQueued: stableOnInterruptQueued,
       onCancelQueued: stableOnCancelQueued,
       onImageClick: stableOnImageClick,
       onAcceptInteraction: stableOnAcceptInteraction,
       onRejectInteraction: stableOnRejectInteraction,
       onSubmitInteractionAnswers: stableOnSubmitInteractionAnswers,
-<<<<<<< HEAD
-=======
       onCancelInteraction: stableOnCancelInteraction,
       issueStatus,
       successfulRunHandoff,
->>>>>>> upstream/master
     }),
     [
       feedbackDataSharingPreference,
@@ -4271,24 +4167,18 @@ export function IssueChatThread({
       userProfileMap,
       stableOnVote,
       stableOnStopRun,
-<<<<<<< HEAD
-=======
       stopRunLabel,
       stoppingRunLabel,
       stopRunVariant,
->>>>>>> upstream/master
       stableOnInterruptQueued,
       stableOnCancelQueued,
       stableOnImageClick,
       stableOnAcceptInteraction,
       stableOnRejectInteraction,
       stableOnSubmitInteractionAnswers,
-<<<<<<< HEAD
-=======
       stableOnCancelInteraction,
       issueStatus,
       successfulRunHandoff,
->>>>>>> upstream/master
     ],
   );
 
@@ -4364,13 +4254,8 @@ export function IssueChatThread({
                     stoppingRunId={stoppingRunId}
                     interruptingQueuedRunId={interruptingQueuedRunId}
                   />
-<<<<<<< HEAD
-                ))
-              )}
-=======
               ))
             )}
->>>>>>> upstream/master
               {showComposer ? (
                 <div data-testid="issue-chat-thread-notices" className="space-y-2">
                   <IssueAssignedBacklogNotice
