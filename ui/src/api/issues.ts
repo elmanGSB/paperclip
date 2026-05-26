@@ -60,11 +60,8 @@ export const issuesApi = {
       q?: string;
       limit?: number;
       offset?: number;
-<<<<<<< HEAD
-=======
       sortField?: "updated";
       sortDir?: "asc" | "desc";
->>>>>>> upstream/master
     },
   ) => {
     const params = new URLSearchParams();
@@ -91,11 +88,8 @@ export const issuesApi = {
     if (filters?.q) params.set("q", filters.q);
     if (filters?.limit) params.set("limit", String(filters.limit));
     if (filters?.offset !== undefined) params.set("offset", String(filters.offset));
-<<<<<<< HEAD
-=======
     if (filters?.sortField) params.set("sortField", filters.sortField);
     if (filters?.sortDir) params.set("sortDir", filters.sortDir);
->>>>>>> upstream/master
     const qs = params.toString();
     return api.get<Issue[]>(`/companies/${companyId}/issues${qs ? `?${qs}` : ""}`);
   },
