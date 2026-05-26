@@ -25,10 +25,7 @@ import { PageTabBar } from "../components/PageTabBar";
 import { AgentIcon } from "../components/AgentIconPicker";
 import { InlineEntitySelector, type InlineEntityOption } from "../components/InlineEntitySelector";
 import { MarkdownEditor, type MarkdownEditorRef, type MentionOption } from "../components/MarkdownEditor";
-<<<<<<< HEAD
-=======
 import { RoutineListRow, nextRoutineStatus } from "../components/RoutineList";
->>>>>>> upstream/master
 import {
   RoutineRunVariablesDialog,
   type RoutineRunDialogSubmitData,
