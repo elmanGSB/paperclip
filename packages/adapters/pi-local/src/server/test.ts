@@ -13,10 +13,7 @@ import {
 } from "@paperclipai/adapter-utils/server-utils";
 import {
   ensureAdapterExecutionTargetCommandResolvable,
-<<<<<<< HEAD
-=======
   maybeRunSandboxInstallCommand,
->>>>>>> upstream/master
   ensureAdapterExecutionTargetDirectory,
   runAdapterExecutionTargetProcess,
   describeAdapterExecutionTarget,
