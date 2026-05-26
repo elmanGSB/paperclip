@@ -54,18 +54,11 @@ describe("resolveEnvironmentExecutionTarget", () => {
       remoteCwd: DEFAULT_SANDBOX_REMOTE_CWD,
       leaseId: "lease-1",
       environmentId: "env-1",
-      paperclipTransport: "bridge",
       timeoutMs: 30_000,
     });
   });
 
-<<<<<<< HEAD
-  it("prefers an explicit Paperclip API URL from lease metadata for sandbox targets", async () => {
-    process.env.PAPERCLIP_API_URL = "https://paperclip.example.test";
-    process.env.PAPERCLIP_RUNTIME_API_URL = "http://paperclip.example.test:3200";
-=======
   it("keeps sandbox targets on bridge mode even when lease metadata includes a Paperclip API URL", async () => {
->>>>>>> upstream/master
     mockResolveEnvironmentDriverConfigForRuntime.mockResolvedValue({
       driver: "sandbox",
       config: {
@@ -97,12 +90,6 @@ describe("resolveEnvironmentExecutionTarget", () => {
     expect(target).toMatchObject({
       kind: "remote",
       transport: "sandbox",
-<<<<<<< HEAD
-      paperclipApiUrl: "https://paperclip.example.test",
-      paperclipTransport: "direct",
-    });
-  });
-=======
       providerKey: "fake-plugin",
       remoteCwd: DEFAULT_SANDBOX_REMOTE_CWD,
     });
@@ -191,5 +178,4 @@ describe("resolveEnvironmentExecutionTarget", () => {
     });
     expect(target).not.toHaveProperty("paperclipApiUrl");
   });
->>>>>>> upstream/master
 });
