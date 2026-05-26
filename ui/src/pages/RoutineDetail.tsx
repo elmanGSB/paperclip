@@ -379,8 +379,6 @@ export function RoutineDetail() {
     queryFn: () => accessApi.listUserDirectory(selectedCompanyId!),
     enabled: !!selectedCompanyId,
   });
-<<<<<<< HEAD
-=======
   const { data: availableSecrets = [] } = useQuery({
     queryKey: selectedCompanyId ? queryKeys.secrets.list(selectedCompanyId) : ["secrets", "none"],
     queryFn: () => secretsApi.list(selectedCompanyId!),
@@ -396,7 +394,6 @@ export function RoutineDetail() {
       queryClient.invalidateQueries({ queryKey: queryKeys.secrets.list(selectedCompanyId) });
     },
   });
->>>>>>> upstream/master
 
   const routineDefaults = useMemo(
     () =>
