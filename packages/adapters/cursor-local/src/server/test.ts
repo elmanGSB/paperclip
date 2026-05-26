@@ -13,10 +13,7 @@ import {
 import {
   ensureAdapterExecutionTargetCommandResolvable,
   ensureAdapterExecutionTargetDirectory,
-<<<<<<< HEAD
-=======
   maybeRunSandboxInstallCommand,
->>>>>>> upstream/master
   runAdapterExecutionTargetProcess,
   describeAdapterExecutionTarget,
   resolveAdapterExecutionTargetCwd,
@@ -102,10 +99,7 @@ export async function testEnvironment(
   let command = asString(config.command, "agent");
   const target = ctx.executionTarget ?? null;
   const targetIsRemote = target?.kind === "remote";
-<<<<<<< HEAD
-=======
   const targetIsSandbox = target?.kind === "remote" && target.transport === "sandbox";
->>>>>>> upstream/master
   const cwd = resolveAdapterExecutionTargetCwd(target, asString(config.cwd, ""), process.cwd());
   const targetLabel = targetIsRemote
     ? ctx.environmentName ?? describeAdapterExecutionTarget(target)
@@ -156,8 +150,6 @@ export async function testEnvironment(
   });
   command = sandboxCommand.command;
   env = sandboxCommand.env;
-<<<<<<< HEAD
-=======
   const installCheck = await maybeRunSandboxInstallCommand({
     runId,
     target,
@@ -179,7 +171,6 @@ export async function testEnvironment(
   });
   command = finalSandboxCommand.command;
   env = finalSandboxCommand.env;
->>>>>>> upstream/master
   const runtimeEnv = ensurePathInEnv({ ...process.env, ...env });
   try {
     await ensureAdapterExecutionTargetCommandResolvable(command, target, cwd, runtimeEnv);
@@ -312,15 +303,12 @@ export async function testEnvironment(
       if (extraArgs.length > 0) args.push(...extraArgs);
       args.push("Respond with hello.");
 
-<<<<<<< HEAD
-=======
       // Sandbox bridges still add cursor CLI cold-start overhead, but the
       // standard-2 tier now completes probes fast enough that 90s is ample.
       const helloProbeTimeoutSec = Math.max(
         1,
         asNumber(config.helloProbeTimeoutSec, targetIsSandbox ? 90 : 45),
       );
->>>>>>> upstream/master
       const probe = await runAdapterExecutionTargetProcess(
         runId,
         target,
