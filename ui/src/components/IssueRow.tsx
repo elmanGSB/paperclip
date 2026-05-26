@@ -1,11 +1,7 @@
 import type { ReactNode } from "react";
 import type { Issue, IssueRecoveryAction } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
-<<<<<<< HEAD
-import { Eye, X } from "lucide-react";
-=======
 import { Eye, Flag, X } from "lucide-react";
->>>>>>> upstream/master
 import {
   createIssueDetailPath,
   rememberIssueDetailLocationState,
@@ -15,10 +11,7 @@ import { cn } from "../lib/utils";
 import { deriveActiveRecoveryDisplayState, RECOVERY_CHIP_DEFAULT_TONE } from "../lib/recovery-display";
 import { StatusIcon } from "./StatusIcon";
 import { productivityReviewTriggerLabel } from "./ProductivityReviewBadge";
-<<<<<<< HEAD
-=======
 import { hasAssignedBacklogBlocker } from "../lib/issue-blockers";
->>>>>>> upstream/master
 
 type UnreadState = "hidden" | "visible" | "fading";
 
@@ -125,11 +118,8 @@ export function IssueRow({
       <span className="flex shrink-0 items-center gap-1 pt-px sm:hidden">
         {mobileLeading ?? <StatusIcon status={issue.status} blockerAttention={issue.blockerAttention} className={selectedStatusClass} />}
         {productivityReviewIndicator}
-<<<<<<< HEAD
-=======
         {parkedBlockerIndicator}
         {recoveryIndicator}
->>>>>>> upstream/master
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1 sm:contents">
         <span className={cn("line-clamp-2 text-sm sm:order-2 sm:min-w-0 sm:flex-1 sm:truncate sm:line-clamp-none", titleClassName)}>
