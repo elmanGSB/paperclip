@@ -19,16 +19,12 @@ export {
   INBOX_MINE_ISSUE_STATUSES,
   INBOX_MINE_ISSUE_STATUS_FILTER,
   ISSUE_PRIORITIES,
-<<<<<<< HEAD
-  MAX_ISSUE_REQUEST_DEPTH,
-=======
   ISSUE_WORK_MODES,
   MAX_ISSUE_REQUEST_DEPTH,
   ISSUE_COMMENT_AUTHOR_TYPES,
   ISSUE_COMMENT_METADATA_ROW_TYPES,
   ISSUE_COMMENT_PRESENTATION_KINDS,
   ISSUE_COMMENT_PRESENTATION_TONES,
->>>>>>> upstream/master
   clampIssueRequestDepth,
   ISSUE_THREAD_INTERACTION_KINDS,
   ISSUE_THREAD_INTERACTION_STATUSES,
@@ -385,10 +381,6 @@ export type {
   IssueBlockerAttention,
   IssueBlockerAttentionReason,
   IssueBlockerAttentionState,
-<<<<<<< HEAD
-  IssueProductivityReview,
-  IssueProductivityReviewTrigger,
-=======
   IssueInboxAttentionKind,
   IssueBlockedInboxAction,
   IssueBlockedInboxAttention,
@@ -407,7 +399,6 @@ export type {
   IssueScheduledRetryStatus,
   IssueRetryNowOutcome,
   IssueRetryNowResponse,
->>>>>>> upstream/master
   IssueReferenceSource,
   IssueRelatedWorkItem,
   IssueRelatedWorkSummary,
