@@ -1,13 +1,10 @@
 import { z } from "zod";
 import { MAX_COMPANY_ATTACHMENT_MAX_BYTES } from "../constants.js";
-<<<<<<< HEAD
-=======
 import {
   issueCommentAuthorTypeSchema,
   issueCommentMetadataSchema,
   issueCommentPresentationSchema,
 } from "./issue.js";
->>>>>>> upstream/master
 import { routineVariableSchema } from "./routine.js";
 
 export const portabilityIncludeSchema = z
