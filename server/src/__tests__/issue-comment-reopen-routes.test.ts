@@ -863,8 +863,6 @@ describe.sequential("issue comment reopen routes", () => {
     ));
   });
 
-<<<<<<< HEAD
-=======
   it("moves in-progress issues with a scheduled retry back to todo via the PATCH comment path", async () => {
     const issue = {
       ...makeIssue("in_progress"),
@@ -955,7 +953,6 @@ describe.sequential("issue comment reopen routes", () => {
     );
   });
 
->>>>>>> upstream/master
   it("rejects non-assignee agent PATCH comments on closed issues", async () => {
     mockIssueService.getById.mockResolvedValue(makeIssue("done"));
     mockIssueService.addComment.mockResolvedValue({
