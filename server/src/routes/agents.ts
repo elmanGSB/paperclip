@@ -57,17 +57,12 @@ import {
 import type { PluginWorkerManager } from "../services/plugin-worker-manager.js";
 import { environmentService } from "../services/environments.js";
 import { resolveEnvironmentExecutionTarget } from "../services/environment-execution-target.js";
-<<<<<<< HEAD
-import type { AdapterExecutionTarget } from "@paperclipai/adapter-utils/execution-target";
-import type { AdapterEnvironmentCheck } from "@paperclipai/adapter-utils";
-=======
 import { environmentRuntimeService } from "../services/environment-runtime.js";
 import type { AdapterExecutionTarget } from "@paperclipai/adapter-utils/execution-target";
 import type {
   AdapterEnvironmentCheck,
   AdapterEnvironmentTestResult,
 } from "@paperclipai/adapter-utils";
->>>>>>> upstream/master
 import { secretService } from "../services/secrets.js";
 import {
   detectAdapterModel,
@@ -204,11 +199,6 @@ export function agentRoutes(
    * - SSH environment → builds an SSH execution target from the environment
    *   config so the adapter probes the remote box. No lease is required:
    *   the SSH spec is fully derived from the saved environment config.
-<<<<<<< HEAD
-   * - Sandbox / plugin environments → currently fall back to local probing
-   *   with a warning check, since lifting a temporary sandbox lease for an
-   *   ad-hoc test invocation is out of scope for this iteration.
-=======
    * - Sandbox / plugin environments → acquires an ad-hoc lease, realizes the
    *   workspace, and resolves a sandbox execution target wired to the runtime
    *   so the adapter probe runs inside the sandbox the same way a heartbeat
@@ -216,7 +206,6 @@ export function agentRoutes(
    *   route is done.
    *
    * The caller MUST always invoke `release()` (typically in a `finally` block).
->>>>>>> upstream/master
    */
   async function resolveAdapterTestExecutionContext(input: {
     companyId: string;
@@ -226,11 +215,6 @@ export function agentRoutes(
     executionTarget: AdapterExecutionTarget | null;
     environmentName: string | null;
     fallbackChecks: AdapterEnvironmentCheck[];
-<<<<<<< HEAD
-  }> {
-    if (!input.environmentId) {
-      return { executionTarget: null, environmentName: null, fallbackChecks: [] };
-=======
     release: (status?: "released" | "failed") => Promise<void>;
   }> {
     const noopRelease = async () => {};
@@ -242,7 +226,6 @@ export function agentRoutes(
         fallbackChecks: [],
         release: noopRelease,
       };
->>>>>>> upstream/master
     }
 
     const environment = await environmentsSvc.getById(input.environmentId);
@@ -254,30 +237,20 @@ export function agentRoutes(
           {
             code: "environment_not_found",
             level: "warn",
-<<<<<<< HEAD
-            message: "Selected environment was not found. Falling back to a local probe.",
-          },
-        ],
-=======
             message: "Selected environment was not found. The test did not run.",
           },
         ],
         release: noopRelease,
->>>>>>> upstream/master
       };
     }
 
     if (environment.driver === "local") {
-<<<<<<< HEAD
-      return { executionTarget: null, environmentName: environment.name, fallbackChecks: [] };
-=======
       return {
         executionTarget: null,
         environmentName: environment.name,
         fallbackChecks: [],
         release: noopRelease,
       };
->>>>>>> upstream/master
     }
 
     if (environment.driver === "ssh") {
@@ -294,16 +267,12 @@ export function agentRoutes(
           leaseMetadata: null,
         });
         if (target) {
-<<<<<<< HEAD
-          return { executionTarget: target, environmentName: environment.name, fallbackChecks: [] };
-=======
           return {
             executionTarget: target,
             environmentName: environment.name,
             fallbackChecks: [],
             release: noopRelease,
           };
->>>>>>> upstream/master
         }
         return {
           executionTarget: null,
@@ -313,16 +282,10 @@ export function agentRoutes(
               code: "environment_target_unavailable",
               level: "warn",
               message:
-<<<<<<< HEAD
-                `Could not resolve an execution target for environment "${environment.name}". Falling back to a local probe.`,
-            },
-          ],
-=======
                 `Could not resolve an execution target for environment "${environment.name}". The test did not run.`,
             },
           ],
           release: noopRelease,
->>>>>>> upstream/master
         };
       } catch (err) {
         return {
@@ -333,37 +296,15 @@ export function agentRoutes(
               code: "environment_target_failed",
               level: "warn",
               message:
-<<<<<<< HEAD
-                `Could not connect to environment "${environment.name}" to run the test. Falling back to a local probe.`,
-              detail: err instanceof Error ? err.message : String(err),
-            },
-          ],
-=======
                 `Could not connect to environment "${environment.name}" to run the test.`,
               detail: err instanceof Error ? err.message : String(err),
             },
           ],
           release: noopRelease,
->>>>>>> upstream/master
         };
       }
     }
 
-<<<<<<< HEAD
-    // sandbox / plugin / other drivers: not yet supported for ad-hoc adapter tests.
-    return {
-      executionTarget: null,
-      environmentName: environment.name,
-      fallbackChecks: [
-        {
-          code: "environment_driver_not_supported_for_test",
-          level: "warn",
-          message:
-            `Adapter testing inside ${environment.driver} environments is not yet supported. Falling back to a local probe; results may not reflect runs in "${environment.name}".`,
-          hint: "Run a real heartbeat in the environment to verify end-to-end behavior.",
-        },
-      ],
-=======
     // sandbox / plugin / other remote drivers: spin up an ad-hoc lease, realize
     // the workspace inside the box, and run the same probe SSH uses against
     // a sandbox execution target wired to the environment runtime.
@@ -512,7 +453,6 @@ export function agentRoutes(
       environmentName: environment.name,
       fallbackChecks: [],
       release: releaseLease,
->>>>>>> upstream/master
     };
   }
 
@@ -1242,16 +1182,6 @@ export function agentRoutes(
     return details;
   }
 
-  function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
-    let timerId: ReturnType<typeof setTimeout>;
-    return Promise.race([
-      promise.finally(() => clearTimeout(timerId)),
-      new Promise<never>((_, reject) => {
-        timerId = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
-      }),
-    ]);
-  }
-
   function buildUnsupportedSkillSnapshot(
     adapterType: string,
     desiredSkills: string[] = [],
@@ -1478,39 +1408,12 @@ export function agentRoutes(
         normalizedAdapterConfig,
       );
 
-<<<<<<< HEAD
-      const { executionTarget, environmentName, fallbackChecks } =
-=======
       const { executionTarget, environmentName, fallbackChecks, release } =
->>>>>>> upstream/master
         await resolveAdapterTestExecutionContext({
           companyId,
           adapterType: type,
           environmentId: requestedEnvironmentId,
         });
-<<<<<<< HEAD
-
-      const result = await adapter.testEnvironment({
-        companyId,
-        adapterType: type,
-        config: runtimeAdapterConfig,
-        executionTarget,
-        environmentName,
-      });
-
-      if (fallbackChecks.length > 0) {
-        const checks = [...fallbackChecks, ...result.checks];
-        const status: typeof result.status = checks.some((c) => c.level === "error")
-          ? "fail"
-          : checks.some((c) => c.level === "warn")
-            ? "warn"
-            : result.status;
-        res.json({ ...result, checks, status });
-        return;
-      }
-
-      res.json(result);
-=======
 
       let releaseStatus: "released" | "failed" = "released";
       try {
@@ -1550,7 +1453,6 @@ export function agentRoutes(
       } finally {
         await release(releaseStatus);
       }
->>>>>>> upstream/master
     },
   );
 
@@ -1563,48 +1465,35 @@ export function agentRoutes(
     }
     await assertCanReadConfigurations(req, agent.companyId);
 
-    try {
-      const adapter = findActiveServerAdapter(agent.adapterType);
-      if (!adapter?.listSkills) {
-        const preference = readPaperclipSkillSyncPreference(
-          agent.adapterConfig as Record<string, unknown>,
-        );
-        const runtimeSkillEntries = await withTimeout(
-          companySkills.listRuntimeSkillEntries(agent.companyId, {
-            materializeMissing: false,
-          }),
-          30_000,
-          "listRuntimeSkillEntries",
-        );
-        const requiredSkills = runtimeSkillEntries.filter((entry) => entry.required).map((entry) => entry.key);
-        res.json(buildUnsupportedSkillSnapshot(agent.adapterType, Array.from(new Set([...requiredSkills, ...preference.desiredSkills]))));
-        return;
-      }
-
-      const { config: runtimeConfig } = await secretsSvc.resolveAdapterConfigForRuntime(
-        agent.companyId,
-        agent.adapterConfig,
+    const adapter = findActiveServerAdapter(agent.adapterType);
+    if (!adapter?.listSkills) {
+      const preference = readPaperclipSkillSyncPreference(
+        agent.adapterConfig as Record<string, unknown>,
       );
-      const runtimeSkillConfig = await buildRuntimeSkillConfig(
-        agent.companyId,
-        agent.adapterType,
-        runtimeConfig,
-      );
-      const snapshot = await withTimeout(
-        adapter.listSkills({
-          agentId: agent.id,
-          companyId: agent.companyId,
-          adapterType: agent.adapterType,
-          config: runtimeSkillConfig,
-        }),
-        30_000,
-        "adapter.listSkills",
-      );
-      res.json(snapshot);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      res.status(504).json({ error: message });
+      const runtimeSkillEntries = await companySkills.listRuntimeSkillEntries(agent.companyId, {
+        materializeMissing: false,
+      });
+      const requiredSkills = runtimeSkillEntries.filter((entry) => entry.required).map((entry) => entry.key);
+      res.json(buildUnsupportedSkillSnapshot(agent.adapterType, Array.from(new Set([...requiredSkills, ...preference.desiredSkills]))));
+      return;
     }
+
+    const { config: runtimeConfig } = await secretsSvc.resolveAdapterConfigForRuntime(
+      agent.companyId,
+      agent.adapterConfig,
+    );
+    const runtimeSkillConfig = await buildRuntimeSkillConfig(
+      agent.companyId,
+      agent.adapterType,
+      runtimeConfig,
+    );
+    const snapshot = await adapter.listSkills({
+      agentId: agent.id,
+      companyId: agent.companyId,
+      adapterType: agent.adapterType,
+      config: runtimeSkillConfig,
+    });
+    res.json(snapshot);
   });
 
   router.post(
@@ -1663,37 +1552,21 @@ export function agentRoutes(
         ...runtimeConfig,
         paperclipRuntimeSkills: runtimeSkillEntries,
       };
-
-      let snapshot: AgentSkillSnapshot;
-      try {
-        snapshot = adapter?.syncSkills
-          ? await withTimeout(
-              adapter.syncSkills({
-                agentId: updated.id,
-                companyId: updated.companyId,
-                adapterType: updated.adapterType,
-                config: runtimeSkillConfig,
-              }, desiredSkills),
-              30_000,
-              "adapter.syncSkills",
-            )
-          : adapter?.listSkills
-            ? await withTimeout(
-                adapter.listSkills({
-                  agentId: updated.id,
-                  companyId: updated.companyId,
-                  adapterType: updated.adapterType,
-                  config: runtimeSkillConfig,
-                }),
-                30_000,
-                "adapter.listSkills",
-              )
-            : buildUnsupportedSkillSnapshot(updated.adapterType, desiredSkills);
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        res.status(504).json({ error });
-        return;
-      }
+      const snapshot = adapter?.syncSkills
+        ? await adapter.syncSkills({
+            agentId: updated.id,
+            companyId: updated.companyId,
+            adapterType: updated.adapterType,
+            config: runtimeSkillConfig,
+          }, desiredSkills)
+        : adapter?.listSkills
+          ? await adapter.listSkills({
+              agentId: updated.id,
+              companyId: updated.companyId,
+              adapterType: updated.adapterType,
+              config: runtimeSkillConfig,
+            })
+          : buildUnsupportedSkillSnapshot(updated.adapterType, desiredSkills);
 
       await logActivity(db, {
         companyId: updated.companyId,
@@ -2081,24 +1954,10 @@ export function agentRoutes(
       ...hireInput
     } = req.body;
     hireInput.adapterType = assertKnownAdapterType(hireInput.adapterType);
-<<<<<<< HEAD
-    assertNoNewAgentLegacyPromptTemplate(
-      hireInput.adapterType,
-      (hireInput.adapterConfig ?? {}) as Record<string, unknown>,
-    );
-    assertNoAgentHostWorkspaceCommandMutation(
-      req,
-      collectAgentAdapterWorkspaceCommandPaths(hireInput.adapterConfig),
-    );
-    assertNoAgentInstructionsConfigMutation(
-      req,
-      (hireInput.adapterConfig ?? {}) as Record<string, unknown>,
-=======
     const rawHireAdapterConfig = (hireInput.adapterConfig ?? {}) as Record<string, unknown>;
     assertNoNewAgentLegacyPromptTemplate(
       hireInput.adapterType,
       rawHireAdapterConfig,
->>>>>>> upstream/master
     );
     assertNoAgentAdapterConfigMutation(req, rawHireAdapterConfig);
     assertNoAgentRuntimeConfigAdapterConfigMutation(req, hireInput.runtimeConfig);
@@ -2281,24 +2140,10 @@ export function agentRoutes(
       ...createInput
     } = req.body;
     createInput.adapterType = assertKnownAdapterType(createInput.adapterType);
-<<<<<<< HEAD
-    assertNoNewAgentLegacyPromptTemplate(
-      createInput.adapterType,
-      (createInput.adapterConfig ?? {}) as Record<string, unknown>,
-    );
-    assertNoAgentHostWorkspaceCommandMutation(
-      req,
-      collectAgentAdapterWorkspaceCommandPaths(createInput.adapterConfig),
-    );
-    assertNoAgentInstructionsConfigMutation(
-      req,
-      (createInput.adapterConfig ?? {}) as Record<string, unknown>,
-=======
     const rawCreateAdapterConfig = (createInput.adapterConfig ?? {}) as Record<string, unknown>;
     assertNoNewAgentLegacyPromptTemplate(
       createInput.adapterType,
       rawCreateAdapterConfig,
->>>>>>> upstream/master
     );
     assertNoAgentAdapterConfigMutation(req, rawCreateAdapterConfig);
     assertNoAgentRuntimeConfigAdapterConfigMutation(req, createInput.runtimeConfig);
@@ -2338,8 +2183,6 @@ export function agentRoutes(
       lastHeartbeatAt: null,
     });
     const agent = await materializeDefaultInstructionsBundleForNewAgent(createdAgent, instructionsBundle);
-<<<<<<< HEAD
-=======
     const agentEnv = asRecord(agent.adapterConfig)?.env;
     if (agentEnv) {
       await secretsSvc.syncEnvBindingsForTarget?.(
@@ -2348,7 +2191,6 @@ export function agentRoutes(
         agentEnv,
       );
     }
->>>>>>> upstream/master
 
     const actor = getActorInfo(req);
     await logActivity(db, {
