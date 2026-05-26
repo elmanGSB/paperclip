@@ -365,8 +365,6 @@ describe("Routines page", () => {
     expect(groups[1]?.items.map((item) => item.title)).toEqual(["Weekly digest"]);
   });
 
-<<<<<<< HEAD
-=======
   it("sorts routines by selected field and direction without mutating the source list", () => {
     const routines = [
       createRoutine({
@@ -498,7 +496,6 @@ describe("Routines page", () => {
     });
   });
 
->>>>>>> upstream/master
   it("passes company mention options to the routine description editor", async () => {
     routinesListMock.mockResolvedValue([]);
     issuesListMock.mockResolvedValue([]);
