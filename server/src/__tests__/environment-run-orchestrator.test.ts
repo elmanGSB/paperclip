@@ -420,8 +420,6 @@ describe("environmentRunOrchestrator — realizeForRun", () => {
     }));
   });
 
-<<<<<<< HEAD
-=======
   it("runs project-level provision commands for ssh environments", async () => {
     mockBuildWorkspaceRealizationRequest.mockReturnValue({
       version: 1,
@@ -501,7 +499,6 @@ describe("environmentRunOrchestrator — realizeForRun", () => {
     expect(mockResolveEnvironmentExecutionTarget).toHaveBeenCalledOnce();
   });
 
->>>>>>> upstream/master
   it("surfaces remote provision command failures before resolving the adapter target", async () => {
     mockBuildWorkspaceRealizationRequest.mockReturnValue({
       version: 1,
