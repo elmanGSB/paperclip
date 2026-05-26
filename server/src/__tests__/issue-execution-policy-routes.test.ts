@@ -43,13 +43,6 @@ function registerModuleMocks() {
   vi.doMock("../services/index.js", () => ({
     companyService: () => ({
       getById: vi.fn(async () => ({ id: "company-1", attachmentMaxBytes: 10 * 1024 * 1024 })),
-<<<<<<< HEAD
-    }),
-    accessService: () => ({
-      canUser: vi.fn(async () => false),
-      hasPermission: vi.fn(async () => false),
-=======
->>>>>>> upstream/master
     }),
     accessService: () => mockAccessService,
     agentService: () => ({
