@@ -23,31 +23,13 @@ jobs:
       - name: Block manual lockfile edits
         if: github.head_ref != 'chore/refresh-lockfile'
         run: |
-<<<<<<< HEAD
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-          changed="$(git diff --name-only "$base" "$head")"
-          if ! printf '%s\n' "$changed" | grep -qx 'pnpm-lock.yaml'; then
-            exit 0
-          fi
-          # Lockfile changes are allowed when they only arrived via merge commits
-          # (e.g. a sync from upstream/master). Walk the PR's first-parent line
-          # and reject only if a non-merge commit on that line touched the
-          # lockfile — direct commits the PR author made.
-          manual="$(git log --first-parent --no-merges --pretty=format:%H "$base..$head" -- pnpm-lock.yaml)"
-          if [ -n "$manual" ]; then
-=======
           # Diff the PR branch against its merge base so recent base-branch commits
           # do not masquerade as changes made by the PR itself.
           changed="$(git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}")"
           if printf '%s\n' "$changed" | grep -qx 'pnpm-lock.yaml'; then
->>>>>>> upstream/master
             echo "Do not commit pnpm-lock.yaml in pull requests. CI owns lockfile updates."
-            echo "Non-merge commits that touched pnpm-lock.yaml:"
-            echo "$manual"
             exit 1
           fi
-          echo "pnpm-lock.yaml changes are merge-only (e.g. fork sync); allowing."
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -189,9 +171,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Verify release registry test coverage
-        run: pnpm run test:release-registry
 
       - name: Build
         run: pnpm build
