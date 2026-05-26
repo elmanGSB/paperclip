@@ -218,8 +218,6 @@ describe("claude_local environment diagnostics", () => {
     ).toBe(true);
     expect(result.checks.some((check) => check.code === "claude_cwd_invalid")).toBe(false);
   });
-<<<<<<< HEAD
-=======
 
   it("uses --allowedTools instead of --dangerously-skip-permissions for sandbox hello probes", async () => {
     const executeCalls: Array<{ command: string; args?: string[] }> = [];
@@ -280,5 +278,4 @@ describe("claude_local environment diagnostics", () => {
     // approval that no human is present to answer.
     expect(probeCall?.args).toContain("--allowedTools");
   });
->>>>>>> upstream/master
 });
