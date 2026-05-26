@@ -346,8 +346,6 @@ describe("IssueChatThread", () => {
     });
   });
 
-<<<<<<< HEAD
-=======
   it("renders footer content inside the thread viewport before the bottom anchor", () => {
     const root = createRoot(container);
 
@@ -479,7 +477,6 @@ describe("IssueChatThread", () => {
     });
   });
 
->>>>>>> upstream/master
   it("virtualizes long merged threads so only a windowed slice mounts", () => {
     const root = createRoot(container);
     const totalMergedRows =
@@ -735,8 +732,6 @@ describe("IssueChatThread", () => {
     scrollHost.remove();
   });
 
-<<<<<<< HEAD
-=======
   it("cancels jump-to-latest settling when the user scrolls manually", () => {
     vi.useFakeTimers();
     container.remove();
@@ -802,7 +797,6 @@ describe("IssueChatThread", () => {
     scrollHost.remove();
   });
 
->>>>>>> upstream/master
   // Regression for PAP-2672: when the merged feed ends with a non-comment row
   // (run/timeline/embedded output) we still want Jump to latest to land on the
   // last comment, not whichever activity row sorts last.
@@ -959,8 +953,6 @@ describe("IssueChatThread", () => {
     });
   });
 
-<<<<<<< HEAD
-=======
   it("uses comments rendered by onRefreshLatestComments before resolving latest", async () => {
     const scrolledIds: string[] = [];
     const originalScrollIntoView = Element.prototype.scrollIntoView;
@@ -1036,7 +1028,6 @@ describe("IssueChatThread", () => {
     });
   });
 
->>>>>>> upstream/master
   it("findLatestCommentMessageIndex prefers the last comment-anchored row (PAP-2672)", () => {
     const messages = [
       { metadata: { custom: { anchorId: "comment-a" } } },
@@ -1199,12 +1190,9 @@ describe("IssueChatThread", () => {
       authorAgentId: "agent-1",
       authorUserId: null,
       body: "Agent summary with **markdown**",
-<<<<<<< HEAD
-=======
       authorType: "agent" as const,
       presentation: null,
       metadata: null,
->>>>>>> upstream/master
       createdAt: new Date("2026-04-06T12:00:00.000Z"),
       updatedAt: new Date("2026-04-06T12:00:00.000Z"),
     }];
