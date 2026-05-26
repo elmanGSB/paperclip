@@ -1235,11 +1235,7 @@ describe("IssuesList", () => {
   });
 
   it("waits for the desktop main scroll container before rendering more local rows", async () => {
-<<<<<<< HEAD
-    const manyIssues = Array.from({ length: 420 }, (_, index) =>
-=======
     const manyIssues = Array.from({ length: 120 }, (_, index) =>
->>>>>>> upstream/master
       createIssue({
         id: `issue-${index + 1}`,
         identifier: `PAP-${index + 1}`,
