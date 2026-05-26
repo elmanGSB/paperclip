@@ -3,14 +3,10 @@ import test from "node:test";
 
 import {
   collectInternalDependencyProblems,
-<<<<<<< HEAD
-  isCanaryVersion,
-=======
   createManifestLookupKey,
   fetchRegistryJson,
   isCanaryVersion,
   verifyPackageRegistryProblems,
->>>>>>> upstream/master
   verifyPackageRegistryState,
 } from "./verify-release-registry-state.mjs";
 
@@ -37,11 +33,6 @@ test("collectInternalDependencyProblems flags missing internal versions", () => 
     ],
   ]);
 
-<<<<<<< HEAD
-  assert.deepEqual(collectInternalDependencyProblems(manifest, packageDocsByName), [
-    "dependencies requires @paperclipai/plugin-sdk@2026.425.0-canary.5, but npm does not expose that version",
-  ]);
-=======
   assert.deepEqual(
     collectInternalDependencyProblems(manifest, packageDocsByName),
     ["dependencies requires @paperclipai/plugin-sdk@2026.425.0-canary.5, but npm does not expose that version"],
@@ -155,7 +146,6 @@ test("verifyPackageRegistryState tolerates a stale root versions map when dist-t
     }),
     [],
   );
->>>>>>> upstream/master
 });
 
 test("verifyPackageRegistryState fails when canary latest is left in place by default", () => {
@@ -202,18 +192,12 @@ test("verifyPackageRegistryState fails when canary latest is left in place by de
       allowCanaryLatest: false,
     }),
     [
-<<<<<<< HEAD
-      "@paperclipai/plugin-e2b: latest dist-tag still resolves to canary 2026.425.0-canary.5; rerun with --allow-canary-latest only when that state is intentional",
-=======
       "@paperclipai/plugin-e2b: latest dist-tag still resolves to canary 2026.425.0-canary.5; if that state is intentional, rerun the verification script directly with --allow-canary-latest",
->>>>>>> upstream/master
       "@paperclipai/plugin-e2b@2026.425.0-canary.5 via latest: dependencies requires @paperclipai/plugin-sdk@2026.425.0-canary.5, but npm does not expose that version",
     ],
   );
 });
 
-<<<<<<< HEAD
-=======
 test("verifyPackageRegistryProblems marks canary latest drift as non-retriable", () => {
   const packageDocsByName = new Map([
     [
@@ -244,7 +228,6 @@ test("verifyPackageRegistryProblems marks canary latest drift as non-retriable",
   assert.match(problems[0]?.message ?? "", /latest dist-tag still resolves to canary/);
 });
 
->>>>>>> upstream/master
 test("verifyPackageRegistryState allows intentional canary latest but still checks dependencies", () => {
   const packageDocsByName = new Map([
     [
@@ -286,8 +269,6 @@ test("verifyPackageRegistryState allows intentional canary latest but still chec
     [],
   );
 });
-<<<<<<< HEAD
-=======
 
 test("verifyPackageRegistryState still fails when the dist-tag is stale", () => {
   const packageDocsByName = new Map([
@@ -380,4 +361,3 @@ test("fetchRegistryJson times out hung requests", async () => {
     globalThis.fetch = originalFetch;
   }
 });
->>>>>>> upstream/master
