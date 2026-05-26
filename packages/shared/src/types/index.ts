@@ -149,10 +149,6 @@ export type {
   IssueBlockerAttention,
   IssueBlockerAttentionReason,
   IssueBlockerAttentionState,
-<<<<<<< HEAD
-  IssueProductivityReview,
-  IssueProductivityReviewTrigger,
-=======
   IssueInboxAttentionKind,
   IssueBlockedInboxAction,
   IssueBlockedInboxAttention,
@@ -171,7 +167,6 @@ export type {
   IssueScheduledRetryStatus,
   IssueRetryNowOutcome,
   IssueRetryNowResponse,
->>>>>>> upstream/master
   IssueReferenceSource,
   IssueRelatedWorkItem,
   IssueRelatedWorkSummary,
