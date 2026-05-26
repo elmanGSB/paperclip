@@ -46,17 +46,11 @@ const adapterConfigSchema = z.record(z.string(), z.unknown()).superRefine((value
 
 export const createAgentInstructionsBundleSchema = z.object({
   entryFile: z.string().trim().min(1).optional(),
-<<<<<<< HEAD
-  files: z.record(z.string()).refine((files) => Object.keys(files).length > 0, {
-=======
   files: z.record(z.string(), z.string()).refine((files) => Object.keys(files).length > 0, {
->>>>>>> upstream/master
     message: "instructionsBundle.files must contain at least one file",
   }),
 });
 
-<<<<<<< HEAD
-=======
 const agentModelProfileConfigSchema = z.object({
   enabled: z.boolean().optional(),
   label: z.string().trim().min(1).optional(),
@@ -69,7 +63,6 @@ export const agentRuntimeConfigSchema = z.object({
   }).strict().optional(),
 }).catchall(z.unknown());
 
->>>>>>> upstream/master
 export const createAgentSchema = z.object({
   name: z.string().min(1),
   role: z.enum(AGENT_ROLES).optional().default("general"),
@@ -81,11 +74,7 @@ export const createAgentSchema = z.object({
   adapterType: agentAdapterTypeSchema,
   adapterConfig: adapterConfigSchema.optional().default({}),
   instructionsBundle: createAgentInstructionsBundleSchema.optional(),
-<<<<<<< HEAD
-  runtimeConfig: z.record(z.unknown()).optional().default({}),
-=======
   runtimeConfig: agentRuntimeConfigSchema.optional().default({}),
->>>>>>> upstream/master
   defaultEnvironmentId: z.string().uuid().optional().nullable(),
   budgetMonthlyCents: z.number().int().nonnegative().optional().default(0),
   permissions: agentPermissionsSchema.optional(),
