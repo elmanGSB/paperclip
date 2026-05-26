@@ -14,14 +14,11 @@ import {
   ISSUE_COMMENT_PRESENTATION_TONES,
   ISSUE_MONITOR_SCHEDULED_BY,
   ISSUE_PRIORITIES,
-<<<<<<< HEAD
-=======
   ISSUE_RECOVERY_ACTION_KINDS,
   ISSUE_RECOVERY_ACTION_OUTCOMES,
   ISSUE_RECOVERY_ACTION_OWNER_TYPES,
   ISSUE_RECOVERY_ACTION_STATUSES,
   ISSUE_WORK_MODES,
->>>>>>> upstream/master
   clampIssueRequestDepth,
   ISSUE_STATUSES,
   ISSUE_THREAD_INTERACTION_CONTINUATION_POLICIES,
@@ -237,8 +234,6 @@ export const issueExecutionStateSchema = z.object({
   monitor: issueExecutionMonitorStateSchema.optional().nullable(),
 });
 
-<<<<<<< HEAD
-=======
 export const issueRecoveryActionReadModelSchema = z.object({
   id: z.string().uuid(),
   companyId: z.string().uuid(),
@@ -326,16 +321,12 @@ export const resolveIssueRecoveryActionSchema = z.object({
 
 export type ResolveIssueRecoveryAction = z.infer<typeof resolveIssueRecoveryActionSchema>;
 
->>>>>>> upstream/master
 const issueRequestDepthInputSchema = z
   .number()
   .int()
   .nonnegative()
   .transform((value) => clampIssueRequestDepth(value));
 
-<<<<<<< HEAD
-export const createIssueSchema = z.object({
-=======
 type IssueCreateStatusDefaultInput = {
   status?: unknown;
   assigneeAgentId?: unknown;
@@ -378,7 +369,6 @@ function withCreateIssueStatusDefault<T extends z.ZodRawShape>(schema: z.ZodObje
 }
 
 const createIssueBaseSchema = z.object({
->>>>>>> upstream/master
   projectId: z.string().uuid().optional().nullable(),
   projectWorkspaceId: z.string().uuid().optional().nullable(),
   goalId: z.string().uuid().optional().nullable(),
@@ -429,11 +419,7 @@ export const createIssueLabelSchema = z.object({
 
 export type CreateIssueLabel = z.infer<typeof createIssueLabelSchema>;
 
-<<<<<<< HEAD
-export const updateIssueSchema = createIssueSchema.partial().extend({
-=======
 export const updateIssueSchema = createIssueBaseSchema.partial().extend({
->>>>>>> upstream/master
   requestDepth: issueRequestDepthInputSchema.optional(),
   assigneeAgentId: z.string().trim().min(1).optional().nullable(),
   comment: multilineTextSchema.pipe(z.string().min(1)).optional(),
