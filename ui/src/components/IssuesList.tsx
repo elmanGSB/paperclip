@@ -1201,44 +1201,6 @@ export function IssuesList({
     let animationFrameId: number | null = null;
     const scrollContainer = findIssuesScrollContainer(rootRef.current);
     const scrollTarget: Window | HTMLElement = scrollContainer ?? window;
-<<<<<<< HEAD
-
-    const checkScrollPosition = (trigger: "initial" | "scroll" | "resize" = "scroll") => {
-      if (animationFrameId !== null) return;
-      animationFrameId = window.requestAnimationFrame(() => {
-        animationFrameId = null;
-        const scrollHeight = scrollContainer?.scrollHeight ?? document.documentElement.scrollHeight;
-        if (scrollHeight === 0) return;
-        const viewportHeight = scrollContainer?.clientHeight ?? window.innerHeight;
-        const scrollBottom = scrollContainer
-          ? scrollContainer.scrollTop + scrollContainer.clientHeight
-          : window.scrollY + window.innerHeight;
-        const hasScrollableOverflow = scrollHeight > viewportHeight + 1;
-        const threshold = scrollHeight - ISSUE_SCROLL_LOAD_THRESHOLD_PX;
-        if (scrollBottom >= threshold) {
-          if (trigger === "initial" && !hasMoreRenderedRows && hasMoreIssues && !hasScrollableOverflow) {
-            if (initialServerFillRequestedRef.current) return;
-            initialServerFillRequestedRef.current = true;
-          }
-          loadMoreIssueRows();
-        }
-      });
-    };
-
-    const handleScroll = () => checkScrollPosition("scroll");
-    const handleResize = () => checkScrollPosition("resize");
-    scrollTarget.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleResize);
-    checkScrollPosition("initial");
-
-    return () => {
-      scrollTarget.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
-      if (animationFrameId !== null) window.cancelAnimationFrame(animationFrameId);
-    };
-  }, [canLoadMoreIssues, hasMoreIssues, hasMoreRenderedRows, loadMoreIssueRows]);
-=======
->>>>>>> upstream/master
 
     const checkScrollPosition = (trigger: "initial" | "scroll" | "resize" = "scroll") => {
       if (animationFrameId !== null) return;
