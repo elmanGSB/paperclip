@@ -391,39 +391,6 @@ const plugin = definePlugin({
 
     const config = parseDriverConfig(params.config);
     const sandbox = await connectSandbox(config, params.lease.providerLeaseId);
-<<<<<<< HEAD
-    const command = buildCommandLine(params.command, params.args);
-    if (params.stdin == null) {
-      try {
-        const result = await sandbox.commands.run(command, {
-          cwd: params.cwd,
-          envs: params.env,
-          timeoutMs: params.timeoutMs ?? config.timeoutMs,
-        }) as Awaited<ReturnType<Sandbox["commands"]["run"]>> & {
-          exitCode: number;
-          stdout: string;
-          stderr: string;
-        };
-        return {
-          exitCode: result.exitCode,
-          timedOut: false,
-          stdout: result.stdout,
-          stderr: result.stderr,
-        };
-      } catch (error) {
-        if (error instanceof CommandExitError) {
-          const commandError = error as CommandExitError;
-          return {
-            exitCode: commandError.exitCode,
-            timedOut: false,
-            stdout: commandError.stdout,
-            stderr: commandError.stderr,
-          };
-        }
-        if (error instanceof TimeoutError) {
-          return buildTimeoutExecuteResult(error);
-        }
-=======
     // Refresh the sandbox death clock on every command. E2B's `timeoutMs` is
     // the absolute sandbox lifetime from create/connect; without this, a run
     // longer than `config.timeoutMs` will have its sandbox killed mid-command
@@ -459,31 +426,10 @@ const plugin = definePlugin({
         // Best-effort cleanup in case the write partially succeeded; ignore
         // remove failures so the original error is what propagates.
         await sandbox.files.remove(stagedStdinPath).catch(() => undefined);
->>>>>>> upstream/master
         throw error;
       }
     }
 
-<<<<<<< HEAD
-    const started = await sandbox.commands.run(command, {
-      stdin: true,
-      cwd: params.cwd,
-      envs: params.env,
-      timeoutMs: params.timeoutMs ?? config.timeoutMs,
-    }) as Awaited<ReturnType<Sandbox["commands"]["run"]>> & {
-      pid: number;
-      exitCode: number;
-      stdout: string;
-      stderr: string;
-    };
-
-    try {
-      try {
-        await sandbox.commands.sendStdin(started.pid, params.stdin);
-      } finally {
-        await sandbox.commands.closeStdin(started.pid);
-      }
-=======
     const command = stagedStdinPath
       ? `${baseCommand} < ${shellQuote(stagedStdinPath)}`
       : baseCommand;
@@ -500,12 +446,11 @@ const plugin = definePlugin({
         stdout: string;
         stderr: string;
       };
->>>>>>> upstream/master
       return {
-        exitCode: started.exitCode,
+        exitCode: result.exitCode,
         timedOut: false,
-        stdout: started.stdout,
-        stderr: started.stderr,
+        stdout: result.stdout,
+        stderr: result.stderr,
       };
     } catch (error) {
       if (error instanceof CommandExitError) {
