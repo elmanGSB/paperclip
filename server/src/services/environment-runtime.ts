@@ -683,10 +683,7 @@ function createSandboxEnvironmentDriver(
             driverKey: providerKey,
             companyId: input.lease.companyId,
             environmentId: input.environment.id,
-<<<<<<< HEAD
-=======
             issueId: input.lease.issueId,
->>>>>>> upstream/master
             config: sanitizedConfig,
             lease: {
               providerLeaseId: input.lease.providerLeaseId,
