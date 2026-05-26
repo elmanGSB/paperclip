@@ -517,8 +517,6 @@ function SkillPane({
   deletePending,
   onSave,
   savePending,
-  error,
-  onRetry,
 }: {
   loading: boolean;
   detail: CompanySkillDetail | null | undefined;
@@ -540,25 +538,7 @@ function SkillPane({
   deletePending: boolean;
   onSave: () => void;
   savePending: boolean;
-  error: string | null;
-  onRetry: () => void;
 }) {
-<<<<<<< HEAD
-  const { pushToast } = useToastActions();
-
-  if (error) {
-    return (
-      <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 py-10 text-center">
-        <p className="max-w-md text-sm text-destructive">{error}</p>
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
-=======
->>>>>>> upstream/master
   if (!detail) {
     if (loading) {
       return <PageSkeleton variant="detail" />;
@@ -893,23 +873,11 @@ export function CompanySkills() {
   }, [detailQuery.data]);
 
   useEffect(() => {
-    if (detailQuery.error) {
-      setDisplayedDetail(null);
-    }
-  }, [detailQuery.error]);
-
-  useEffect(() => {
     if (fileQuery.data) {
       setDisplayedFile(fileQuery.data);
       setDraft(fileQuery.data.markdown ? splitFrontmatter(fileQuery.data.content).body : fileQuery.data.content);
     }
   }, [fileQuery.data]);
-
-  useEffect(() => {
-    if (fileQuery.error) {
-      setDisplayedFile(null);
-    }
-  }, [fileQuery.error]);
 
   useEffect(() => {
     if (selectedSkillId) return;
@@ -919,20 +887,6 @@ export function CompanySkills() {
 
   const activeDetail = detailQuery.data ?? displayedDetail;
   const activeFile = fileQuery.data ?? displayedFile;
-
-  const skillPaneError = detailQuery.isError
-    ? (detailQuery.error instanceof Error ? detailQuery.error.message : String(detailQuery.error))
-    : fileQuery.isError
-      ? (fileQuery.error instanceof Error ? fileQuery.error.message : String(fileQuery.error))
-      : null;
-
-  const retrySkillPane = () => {
-    if (detailQuery.isError) {
-      void detailQuery.refetch();
-    } else if (fileQuery.isError) {
-      void fileQuery.refetch();
-    }
-  };
 
   function openDeleteDialog() {
     setDeleteTargetSkillId(selectedSkillId);
@@ -1350,8 +1304,6 @@ export function CompanySkills() {
             deletePending={deleteSkill.isPending}
             onSave={() => saveFile.mutate()}
             savePending={saveFile.isPending}
-            error={skillPaneError}
-            onRetry={retrySkillPane}
           />
         </div>
       </div>
