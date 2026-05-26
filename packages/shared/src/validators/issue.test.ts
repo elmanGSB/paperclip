@@ -214,8 +214,6 @@ describe("issue validators", () => {
     expect(parsed.requestDepth).toBe(MAX_ISSUE_REQUEST_DEPTH);
   });
 
-<<<<<<< HEAD
-=======
   it("defaults omitted create status to todo when an assignee is present", () => {
     expect(createIssueSchema.parse({
       title: "Assigned work",
@@ -293,7 +291,6 @@ describe("issue validators", () => {
     }).success).toBe(false);
   });
 
->>>>>>> upstream/master
   it("clamps oversized requestDepth values on update", () => {
     const parsed = updateIssueSchema.parse({
       requestDepth: MAX_ISSUE_REQUEST_DEPTH + 1,
@@ -301,8 +298,6 @@ describe("issue validators", () => {
 
     expect(parsed.requestDepth).toBe(MAX_ISSUE_REQUEST_DEPTH);
   });
-<<<<<<< HEAD
-=======
 
   it("accepts the cheap model profile in issue assignee adapter overrides", () => {
     const parsed = createIssueSchema.parse({
@@ -386,5 +381,4 @@ describe("issue validators", () => {
 
     expect(parsed.success).toBe(false);
   });
->>>>>>> upstream/master
 });
