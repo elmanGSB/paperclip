@@ -323,10 +323,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
     await db.delete(costEvents);
     await db.delete(environmentLeases);
     await db.delete(environments);
-<<<<<<< HEAD
-=======
     await db.delete(issueWorkProducts);
->>>>>>> upstream/master
     await db.delete(issueComments);
     await db.delete(issueDocuments);
     await db.delete(documentRevisions);
@@ -2023,10 +2020,7 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
         retryOfRunId: runId,
         source: "issue.continuation_recovery",
       });
-<<<<<<< HEAD
-=======
       expect(retryRun?.contextSnapshot as Record<string, unknown>).not.toHaveProperty("modelProfile");
->>>>>>> upstream/master
 
       const recoveries = await db
         .select()
@@ -2776,33 +2770,20 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
     expect(wakeups).toHaveLength(1);
   });
 
-<<<<<<< HEAD
-  it("records productive continuation instead of recovery when the latest automatic continuation succeeded", async () => {
-    const { agentId, issueId, runId } = await seedStrandedIssueFixture({
-      status: "in_progress",
-      runStatus: "succeeded",
-      retryReason: "issue_continuation_needed",
-=======
   it("re-enqueues recovery when the latest in-progress continuation made progress but left no live path", async () => {
     const { agentId, issueId, runId } = await seedStrandedIssueFixture({
       status: "in_progress",
       runStatus: "succeeded",
->>>>>>> upstream/master
       livenessState: "advanced",
     });
     const heartbeat = heartbeatService(db);
 
     const result = await heartbeat.reconcileStrandedAssignedIssues();
-<<<<<<< HEAD
-    expect(result.continuationRequeued).toBe(0);
-    expect(result.productiveContinuationObserved).toBe(1);
-=======
     expect(result.continuationRequeued).toBe(1);
     expect(result.productiveContinuationObserved).toBe(0);
->>>>>>> upstream/master
     expect(result.successfulContinuationObserved).toBe(0);
     expect(result.escalated).toBe(0);
-    expect(result.issueIds).toEqual([]);
+    expect(result.issueIds).toEqual([issueId]);
 
     const issue = await db.select().from(issues).where(eq(issues.id, issueId)).then((rows) => rows[0] ?? null);
     expect(issue?.status).toBe("in_progress");
@@ -2814,12 +2795,6 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
       .select()
       .from(heartbeatRuns)
       .where(eq(heartbeatRuns.agentId, agentId));
-<<<<<<< HEAD
-    expect(runs.map((row) => row.id)).toEqual([runId]);
-
-    const wakeups = await db.select().from(agentWakeupRequests).where(eq(agentWakeupRequests.agentId, agentId));
-    expect(wakeups).toHaveLength(1);
-=======
     expect(runs).toHaveLength(2);
     const retryRun = runs.find((row) => row.id !== runId);
     expect(retryRun?.contextSnapshot as Record<string, unknown> | undefined).toMatchObject({
@@ -2954,7 +2929,6 @@ describeEmbeddedPostgres("heartbeat orphaned process recovery", () => {
       source: "issue.productive_terminal_continuation_recovery",
     });
     expect(retryRun?.contextSnapshot as Record<string, unknown>).not.toHaveProperty("modelProfile");
->>>>>>> upstream/master
   });
 
   it("does not reconcile user-assigned work through the agent stranded-work recovery path", async () => {
