@@ -22,10 +22,7 @@ describe("sandbox adapter execution targets", () => {
   const cleanupDirs: string[] = [];
 
   afterEach(async () => {
-<<<<<<< HEAD
-=======
     vi.unstubAllEnvs();
->>>>>>> upstream/master
     while (cleanupDirs.length > 0) {
       const dir = cleanupDirs.pop();
       if (!dir) continue;
@@ -47,12 +44,8 @@ describe("sandbox adapter execution targets", () => {
         onSpawn?: (meta: { pid: number; startedAt: string }) => Promise<void>;
       }) => {
         counter += 1;
-<<<<<<< HEAD
-        return runChildProcess(`sandbox-run-${counter}`, input.command, input.args ?? [], {
-=======
         const command = input.command === "bash" ? "/bin/bash" : input.command;
         return runChildProcess(`sandbox-run-${counter}`, command, input.args ?? [], {
->>>>>>> upstream/master
           cwd: input.cwd ?? process.cwd(),
           env: input.env ?? {},
           stdin: input.stdin,
@@ -116,7 +109,6 @@ describe("sandbox adapter execution targets", () => {
       environmentId: "env-1",
       leaseId: "lease-1",
       remoteCwd: "/workspace",
-      paperclipTransport: "bridge",
     });
   });
 
@@ -236,8 +228,6 @@ describe("sandbox adapter execution targets", () => {
     }));
   });
 
-<<<<<<< HEAD
-=======
   it("strips inherited host identity env before sandbox execution", async () => {
     vi.stubEnv("PATH", "/host/bin:/usr/bin");
     vi.stubEnv("HOME", "/Users/local");
@@ -386,7 +376,6 @@ describe("sandbox adapter execution targets", () => {
     }));
   });
 
->>>>>>> upstream/master
   it("starts a localhost Paperclip bridge for sandbox targets in bridge mode", async () => {
     const rootDir = await mkdtemp(path.join(os.tmpdir(), "paperclip-execution-target-bridge-"));
     cleanupDirs.push(rootDir);
@@ -421,10 +410,6 @@ describe("sandbox adapter execution targets", () => {
       environmentId: "env-1",
       leaseId: "lease-1",
       remoteCwd,
-<<<<<<< HEAD
-      paperclipTransport: "bridge",
-=======
->>>>>>> upstream/master
       runner: createLocalSandboxRunner(),
       timeoutMs: 30_000,
     };
@@ -464,8 +449,6 @@ describe("sandbox adapter execution targets", () => {
     }
   });
 
-<<<<<<< HEAD
-=======
   it("uses the effective adapter timeout when starting the sandbox callback bridge", async () => {
     const rootDir = await mkdtemp(path.join(os.tmpdir(), "paperclip-execution-target-bridge-timeout-"));
     cleanupDirs.push(rootDir);
@@ -520,7 +503,6 @@ describe("sandbox adapter execution targets", () => {
     }
   });
 
->>>>>>> upstream/master
   it("fails oversized host responses with a 502 before returning them to the sandbox client", async () => {
     const rootDir = await mkdtemp(path.join(os.tmpdir(), "paperclip-execution-target-bridge-limit-"));
     cleanupDirs.push(rootDir);
@@ -559,10 +541,6 @@ describe("sandbox adapter execution targets", () => {
       environmentId: "env-1",
       leaseId: "lease-1",
       remoteCwd,
-<<<<<<< HEAD
-      paperclipTransport: "bridge",
-=======
->>>>>>> upstream/master
       runner: createLocalSandboxRunner(),
       timeoutMs: 30_000,
     };
