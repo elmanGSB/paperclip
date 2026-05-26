@@ -378,8 +378,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   const maxTurns = asNumber(config.maxTurnsPerRun, 0);
   const dangerouslySkipPermissions = asBoolean(config.dangerouslySkipPermissions, true);
   const configEnv = parseObject(config.env);
-<<<<<<< HEAD
-=======
   const workspaceContext = parseObject(context.paperclipWorkspace);
   const workspaceCwd = asString(workspaceContext.cwd, "");
   const workspaceSource = asString(workspaceContext.source, "");
@@ -395,7 +393,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   const configuredCwd = asString(config.cwd, "");
   const useConfiguredInsteadOfAgentHome = workspaceSource === "agent_home" && configuredCwd.length > 0;
   const effectiveWorkspaceCwd = useConfiguredInsteadOfAgentHome ? "" : workspaceCwd;
->>>>>>> upstream/master
   const hasExplicitClaudeConfigDir =
     typeof configEnv.CLAUDE_CONFIG_DIR === "string" && configEnv.CLAUDE_CONFIG_DIR.trim().length > 0;
   const instructionsFilePath = asString(config.instructionsFilePath, "").trim();
@@ -424,11 +421,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     extraArgs,
   } = runtimeConfig;
   let loggedEnv = initialLoggedEnv;
-<<<<<<< HEAD
-  const effectiveExecutionCwd = adapterExecutionTargetRemoteCwd(executionTarget, cwd);
-=======
   let effectiveExecutionCwd = adapterExecutionTargetRemoteCwd(executionTarget, cwd);
->>>>>>> upstream/master
   const terminalResultCleanupGraceMs = Math.max(
     0,
     asNumber(config.terminalResultCleanupGraceMs, 5_000),
@@ -573,14 +566,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     );
   }
   let paperclipBridge: Awaited<ReturnType<typeof startAdapterExecutionTargetPaperclipBridge>> = null;
-<<<<<<< HEAD
-  if (executionTargetIsRemote && adapterExecutionTargetUsesPaperclipBridge(executionTarget)) {
-    paperclipBridge = await startAdapterExecutionTargetPaperclipBridge({
-      runId,
-      target: executionTarget,
-      runtimeRootDir: preparedExecutionTargetRuntime?.runtimeRootDir,
-      adapterKey: "claude",
-=======
   if (executionTargetIsRemote && adapterExecutionTargetUsesPaperclipBridge(runtimeExecutionTarget)) {
     paperclipBridge = await startAdapterExecutionTargetPaperclipBridge({
       runId,
@@ -588,7 +573,6 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
       runtimeRootDir: preparedExecutionTargetRuntime?.runtimeRootDir,
       adapterKey: "claude",
       timeoutSec,
->>>>>>> upstream/master
       hostApiToken: env.PAPERCLIP_API_KEY,
       onLog,
     });
