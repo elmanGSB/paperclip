@@ -58,10 +58,7 @@ import {
   accessService,
   agentService,
   companyService,
-<<<<<<< HEAD
-=======
   companySearchService,
->>>>>>> upstream/master
   executionWorkspaceService,
   goalService,
   heartbeatService,
@@ -856,15 +853,12 @@ export function issueRoutes(
   });
   const feedback = feedbackService(db);
   const companiesSvc = companyService(db);
-<<<<<<< HEAD
-=======
   let searchSvc = opts.searchService ?? null;
   const getSearchService = () => {
     searchSvc ??= companySearchService(db);
     return searchSvc;
   };
   const searchRateLimiter = opts.searchRateLimiter ?? defaultCompanySearchRateLimiter;
->>>>>>> upstream/master
   const instanceSettings = instanceSettingsService(db);
   const agentsSvc = agentService(db);
   const projectsSvc = projectService(db);
@@ -890,8 +884,6 @@ export function issueRoutes(
   };
   const feedbackExportService = opts?.feedbackExportService;
   const environmentsSvc = environmentService(db);
-<<<<<<< HEAD
-=======
 
   async function cancelScheduledRetrySupersededByComment(input: {
     scheduledRetryRunId: string | null | undefined;
@@ -1103,7 +1095,6 @@ export function issueRoutes(
     }
   }
 
->>>>>>> upstream/master
   function withContentPath<T extends { id: string }>(attachment: T) {
     return {
       ...attachment,
@@ -1817,12 +1808,9 @@ export function issueRoutes(
     const parsedOffset = rawOffset !== undefined && /^\d+$/.test(rawOffset)
       ? Number.parseInt(rawOffset, 10)
       : null;
-<<<<<<< HEAD
-=======
     const attention = req.query.attention as string | undefined;
     const sortField = req.query.sortField as string | undefined;
     const sortDir = req.query.sortDir as string | undefined;
->>>>>>> upstream/master
 
     if (assigneeUserFilterRaw === "me" && (!assigneeUserId || req.actor.type !== "board")) {
       res.status(403).json({ error: "assigneeUserId=me requires board authentication" });
@@ -1852,8 +1840,6 @@ export function issueRoutes(
       res.status(400).json({ error: "offset must be a non-negative integer" });
       return;
     }
-<<<<<<< HEAD
-=======
     if (sortField !== undefined && sortField !== "updated") {
       res.status(400).json({ error: "sortField must be 'updated' when provided" });
       return;
@@ -1862,7 +1848,6 @@ export function issueRoutes(
       res.status(400).json({ error: "sortDir must be 'asc' or 'desc' when provided" });
       return;
     }
->>>>>>> upstream/master
     const offset = parsedOffset ?? 0;
 
     const result = await svc.list(companyId, {
@@ -1895,11 +1880,8 @@ export function issueRoutes(
       q: req.query.q as string | undefined,
       limit,
       offset,
-<<<<<<< HEAD
-=======
       sortField: sortField === "updated" ? "updated" : undefined,
       sortDir: sortDir === "asc" || sortDir === "desc" ? sortDir : undefined,
->>>>>>> upstream/master
     });
     const issueIds = result.map((issue) => issue.id);
     const [handoffStates, recoveryActionByIssue] = await Promise.all([
@@ -2046,10 +2028,7 @@ export function issueRoutes(
       relations,
       blockerAttention,
       productivityReview,
-<<<<<<< HEAD
-=======
       scheduledRetry,
->>>>>>> upstream/master
       attachments,
       continuationSummary,
       currentExecutionWorkspace,
@@ -2063,10 +2042,7 @@ export function issueRoutes(
         svc.getRelationSummaries(issue.id),
         svc.listBlockerAttention(issue.companyId, [issue]).then((map) => map.get(issue.id) ?? null),
         svc.listProductivityReviews(issue.companyId, [issue.id]).then((map) => map.get(issue.id) ?? null),
-<<<<<<< HEAD
-=======
         svc.getCurrentScheduledRetry(issue.id),
->>>>>>> upstream/master
         svc.listAttachments(issue.id),
         documentsSvc.getIssueDocumentByKey(issue.id, ISSUE_CONTINUATION_SUMMARY_DOCUMENT_KEY),
         currentExecutionWorkspacePromise,
@@ -2098,11 +2074,8 @@ export function issueRoutes(
         workMode: issue.workMode,
         ...(blockerAttention ? { blockerAttention } : {}),
         productivityReview,
-<<<<<<< HEAD
-=======
         scheduledRetry,
         activeRecoveryAction: revalidatedActiveRecoveryAction,
->>>>>>> upstream/master
         priority: issue.priority,
         projectId: issue.projectId,
         goalId: goal?.id ?? issue.goalId,
@@ -2183,12 +2156,9 @@ export function issueRoutes(
       blockerAttention,
       productivityReview,
       referenceSummary,
-<<<<<<< HEAD
-=======
       successfulRunHandoffStates,
       scheduledRetry,
       activeRecoveryAction,
->>>>>>> upstream/master
     ] = await Promise.all([
       resolveIssueProjectAndGoal(issue),
       svc.getAncestors(issue.id),
@@ -2230,16 +2200,11 @@ export function issueRoutes(
       ancestors,
       ...(blockerAttention ? { blockerAttention } : {}),
       productivityReview,
-<<<<<<< HEAD
-      blockedBy: relations.blockedBy,
-      blocks: relations.blocks,
-=======
       successfulRunHandoff: successfulRunHandoffStates.get(issue.id) ?? null,
       scheduledRetry,
       activeRecoveryAction: revalidatedActiveRecoveryAction,
       blockedBy: relationsWithRecoveryActions.blockedBy,
       blocks: relationsWithRecoveryActions.blocks,
->>>>>>> upstream/master
       relatedWork: referenceSummary,
       referencedIssueIdentifiers: referenceSummary.outbound.map((item) => item.issue.identifier ?? item.issue.id),
       ...documentPayload,
@@ -5579,9 +5544,6 @@ export function issueRoutes(
     }
     if (!(await assertAgentIssueMutationAllowed(req, res, issue))) return;
     if (!(await assertDeliverableMutationAllowedByRunContext(req, res, issue))) return;
-
-    const company = await companiesSvc.getById(companyId);
-    const attachmentMaxBytes = normalizeIssueAttachmentMaxBytes(company?.attachmentMaxBytes);
 
     const company = await companiesSvc.getById(companyId);
     const attachmentMaxBytes = normalizeIssueAttachmentMaxBytes(company?.attachmentMaxBytes);
