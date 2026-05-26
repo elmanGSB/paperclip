@@ -59,15 +59,9 @@ export async function resolveEnvironmentExecutionTarget(input: {
         ? input.leaseMetadata.remoteCwd.trim()
         : DEFAULT_SANDBOX_REMOTE_CWD;
     const timeoutMs = "timeoutMs" in parsed.config ? parsed.config.timeoutMs : null;
-<<<<<<< HEAD
-    const paperclipApiUrl =
-      typeof input.leaseMetadata?.paperclipApiUrl === "string" && input.leaseMetadata.paperclipApiUrl.trim().length > 0
-        ? input.leaseMetadata.paperclipApiUrl.trim()
-=======
     const shellCommand =
       input.leaseMetadata?.shellCommand === "bash" || input.leaseMetadata?.shellCommand === "sh"
         ? input.leaseMetadata.shellCommand
->>>>>>> upstream/master
         : null;
 
     return {
@@ -78,11 +72,6 @@ export async function resolveEnvironmentExecutionTarget(input: {
       remoteCwd,
       environmentId: input.environment.id ?? null,
       leaseId: input.leaseId ?? null,
-<<<<<<< HEAD
-      paperclipApiUrl,
-      paperclipTransport: paperclipApiUrl ? "direct" : "bridge",
-=======
->>>>>>> upstream/master
       timeoutMs,
       runner: input.environmentRuntime && input.lease
         ? {
