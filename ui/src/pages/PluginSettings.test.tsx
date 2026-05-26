@@ -12,11 +12,8 @@ const mockPluginsApi = vi.hoisted(() => ({
   dashboard: vi.fn(),
   logs: vi.fn(),
   getConfig: vi.fn(),
-<<<<<<< HEAD
-=======
   listLocalFolders: vi.fn(),
   configureLocalFolder: vi.fn(),
->>>>>>> upstream/master
 }));
 
 const mockSetBreadcrumbs = vi.hoisted(() => vi.fn());
@@ -63,8 +60,6 @@ async function flushReact() {
   });
 }
 
-<<<<<<< HEAD
-=======
 function basePlugin(overrides: Record<string, unknown> = {}) {
   return {
     id: "plugin-1",
@@ -141,7 +136,6 @@ async function renderSettings(container: HTMLDivElement) {
   return root;
 }
 
->>>>>>> upstream/master
 describe("PluginSettings", () => {
   let container: HTMLDivElement;
 
@@ -149,32 +143,6 @@ describe("PluginSettings", () => {
     container = document.createElement("div");
     document.body.appendChild(container);
 
-<<<<<<< HEAD
-    mockPluginsApi.get.mockResolvedValue({
-      id: "plugin-1",
-      pluginKey: "paperclip.e2b-sandbox-provider",
-      packageName: "@paperclipai/plugin-e2b",
-      version: "0.1.0",
-      status: "error",
-      categories: ["automation"],
-      manifestJson: {
-        displayName: "E2B Sandbox Provider",
-        version: "0.1.0",
-        description: "E2B environments for Paperclip.",
-        author: "Paperclip",
-        capabilities: ["environment.drivers.register"],
-        environmentDrivers: [
-          {
-            driverKey: "e2b",
-            kind: "sandbox_provider",
-            displayName: "E2B Cloud Sandbox",
-          },
-        ],
-      },
-      lastError: null,
-    });
-    mockPluginsApi.dashboard.mockResolvedValue(null);
-=======
     mockPluginsApi.get.mockResolvedValue(basePlugin());
     mockPluginsApi.dashboard.mockResolvedValue(null);
     mockPluginsApi.health.mockResolvedValue({ pluginId: "plugin-1", status: "ready", healthy: true, checks: [] });
@@ -185,7 +153,6 @@ describe("PluginSettings", () => {
       declarations: [],
       folders: [],
     });
->>>>>>> upstream/master
   });
 
   afterEach(() => {
@@ -195,24 +162,7 @@ describe("PluginSettings", () => {
   });
 
   it("routes environment-provider plugins to company environments when they have no instance config", async () => {
-<<<<<<< HEAD
-    const root = createRoot(container);
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-
-    await act(async () => {
-      root.render(
-        <QueryClientProvider client={queryClient}>
-          <PluginSettings />
-        </QueryClientProvider>,
-      );
-    });
-    await flushReact();
-    await flushReact();
-=======
     const root = await renderSettings(container);
->>>>>>> upstream/master
 
     expect(container.textContent).toContain("Configure this plugin from Company Environments.");
     expect(container.textContent).toContain("company-scoped instead of instance-global");
@@ -223,8 +173,6 @@ describe("PluginSettings", () => {
       root.unmount();
     });
   });
-<<<<<<< HEAD
-=======
 
   it("renders unconfigured manifest local folders with required paths", async () => {
     const declaration = wikiFolderDeclaration();
@@ -386,5 +334,4 @@ describe("PluginSettings", () => {
       root.unmount();
     });
   });
->>>>>>> upstream/master
 });
