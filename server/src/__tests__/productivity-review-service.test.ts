@@ -16,14 +16,10 @@ import {
 } from "./helpers/embedded-postgres.js";
 import { MAX_ISSUE_REQUEST_DEPTH } from "@paperclipai/shared";
 import {
-<<<<<<< HEAD
-  DEFAULT_PRODUCTIVITY_REVIEW_NO_COMMENT_STREAK_RUNS,
-=======
   DEFAULT_PRODUCTIVITY_REVIEW_MAX_REFRESH_COMMENTS,
   DEFAULT_PRODUCTIVITY_REVIEW_NO_COMMENT_STREAK_RUNS,
   DEFAULT_PRODUCTIVITY_REVIEW_REFRESH_INTERVAL_MS,
   PRODUCTIVITY_REVIEW_REFRESH_COMMENT_PREFIX,
->>>>>>> upstream/master
   PRODUCTIVITY_REVIEW_ORIGIN_KIND,
   productivityReviewService,
 } from "../services/productivity-review.ts";
@@ -172,9 +168,6 @@ describeEmbeddedPostgres("productivity review service", () => {
       .orderBy(issues.createdAt);
   }
 
-<<<<<<< HEAD
-  it("creates exactly one manager-assigned review for a no-comment run streak and refreshes it idempotently", async () => {
-=======
   async function listRefreshComments(reviewIssueId: string) {
     return db
       .select()
@@ -187,7 +180,6 @@ describeEmbeddedPostgres("productivity review service", () => {
   }
 
   it("creates exactly one manager-assigned review for a no-comment run streak and rate-limits immediate refresh", async () => {
->>>>>>> upstream/master
     const now = new Date("2026-04-28T12:00:00.000Z");
     const seeded = await seedAssignedIssue();
     await insertRuns({
@@ -203,32 +195,18 @@ describeEmbeddedPostgres("productivity review service", () => {
     const second = await service.reconcileProductivityReviews({ now, companyId: seeded.companyId });
 
     expect(first.created).toBe(1);
-<<<<<<< HEAD
-    expect(second.updated).toBe(1);
-=======
     expect(second.updated).toBe(0);
     expect(second.existing).toBe(1);
->>>>>>> upstream/master
     const reviews = await listProductivityReviews(seeded.companyId);
     expect(reviews).toHaveLength(1);
     expect(reviews[0]?.parentId).toBe(seeded.issueId);
     expect(reviews[0]?.assigneeAgentId).toBe(seeded.managerId);
-<<<<<<< HEAD
-=======
     expect(reviews[0]?.assigneeAdapterOverrides).toEqual({ modelProfile: "cheap" });
->>>>>>> upstream/master
     expect(reviews[0]?.originId).toBe(seeded.issueId);
     expect(reviews[0]?.originFingerprint).toBe(`productivity-review:${seeded.issueId}`);
     expect(reviews[0]?.description).toContain("Primary trigger: `no_comment_streak`");
     expect(reviews[0]?.description).toContain("No-comment completed-run streak: 10");
 
-<<<<<<< HEAD
-    const comments = await db
-      .select()
-      .from(issueComments)
-      .where(eq(issueComments.issueId, reviews[0]!.id));
-    expect(comments.some((comment) => comment.body.includes("Productivity review evidence refreshed"))).toBe(true);
-=======
     expect(await listRefreshComments(reviews[0]!.id)).toHaveLength(0);
   });
 
@@ -357,7 +335,6 @@ describeEmbeddedPostgres("productivity review service", () => {
     expect(result.created).toBe(1);
     expect(result.creationCapped).toBe(0);
     expect(await listProductivityReviews(seeded.companyId)).toHaveLength(4);
->>>>>>> upstream/master
   });
 
   it("creates a long-active review without enabling a continuation hold", async () => {
