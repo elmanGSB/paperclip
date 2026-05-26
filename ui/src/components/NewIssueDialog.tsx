@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { memo, useState, useEffect, useRef, useCallback, useMemo, type ChangeEvent, type DragEvent, type RefObject } from "react";
-=======
 import { memo, useState, useEffect, useRef, useCallback, useMemo, type ChangeEvent, type CSSProperties, type DragEvent, type RefObject } from "react";
->>>>>>> upstream/master
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IssueWorkMode } from "@paperclipai/shared";
 import { pickTextColorForSolidBg } from "@/lib/color-contrast";
@@ -275,8 +271,6 @@ function defaultExecutionWorkspaceModeForProject(project: { executionWorkspacePo
   return "shared_workspace";
 }
 
-<<<<<<< HEAD
-=======
 function defaultExecutionWorkspaceModeForIssueDefaults(
   defaults: {
     executionWorkspaceId?: unknown;
@@ -292,7 +286,6 @@ function defaultExecutionWorkspaceModeForIssueDefaults(
     : defaultExecutionWorkspaceModeForProject(project);
 }
 
->>>>>>> upstream/master
 const IssueTitleTextarea = memo(function IssueTitleTextarea({
   value,
   pending,
@@ -669,44 +662,6 @@ export function NewIssueDialog() {
   }, [
     newIssueOpen,
     scheduleSave,
-<<<<<<< HEAD
-    status,
-    priority,
-    assigneeValue,
-    reviewerValue,
-    approverValue,
-    projectId,
-    projectWorkspaceId,
-    assigneeModelOverride,
-    assigneeThinkingEffort,
-    assigneeChrome,
-    executionWorkspaceMode,
-    selectedExecutionWorkspaceId,
-  ]);
-
-  const handleTitleChange = useCallback((nextTitle: string) => {
-    titleRef.current = nextTitle;
-    const nextTitleHasText = nextTitle.trim().length > 0;
-    const nextDraftHasText = nextTitleHasText || descriptionRef.current.trim().length > 0;
-    setTitleHasText((current) => current === nextTitleHasText ? current : nextTitleHasText);
-    setDraftHasText((current) => current === nextDraftHasText ? current : nextDraftHasText);
-    queueDraftSave({ title: nextTitle });
-  }, [queueDraftSave]);
-
-  const handleDescriptionChange = useCallback((nextDescription: string) => {
-    descriptionRef.current = nextDescription;
-    const nextDraftHasText = titleRef.current.trim().length > 0 || nextDescription.trim().length > 0;
-    setDraftHasText((current) => current === nextDraftHasText ? current : nextDraftHasText);
-    queueDraftSave({ description: nextDescription });
-  }, [queueDraftSave]);
-
-  // Save draft on meaningful changes
-  useEffect(() => {
-    if (!newIssueOpen) return;
-    queueDraftSave();
-  }, [
-=======
->>>>>>> upstream/master
     status,
     priority,
     assigneeValue,
@@ -781,13 +736,7 @@ export function NewIssueDialog() {
       const hasExplicitProjectWorkspaceId = newIssueDefaults.projectWorkspaceId !== undefined;
       const defaultProjectWorkspaceId = newIssueDefaults.projectWorkspaceId
         ?? defaultProjectWorkspaceIdForProject(defaultProject);
-<<<<<<< HEAD
-      const defaultExecutionWorkspaceMode = newIssueDefaults.executionWorkspaceId
-        ? "reuse_existing"
-        : (newIssueDefaults.executionWorkspaceMode ?? defaultExecutionWorkspaceModeForProject(defaultProject));
-=======
       const defaultExecutionWorkspaceMode = defaultExecutionWorkspaceModeForIssueDefaults(newIssueDefaults, defaultProject);
->>>>>>> upstream/master
       setIssueText(newIssueDefaults.title ?? "", newIssueDefaults.description ?? "");
       setStatus(newIssueDefaults.status ?? "todo");
       setPriority(newIssueDefaults.priority ?? "");
@@ -805,10 +754,7 @@ export function NewIssueDialog() {
         ? defaultProjectId || null
         : null;
     } else if (newIssueDefaults.title) {
-<<<<<<< HEAD
-=======
       const nextWorkMode = isIssueWorkMode(newIssueDefaults.workMode) ? newIssueDefaults.workMode : "standard";
->>>>>>> upstream/master
       setIssueText(newIssueDefaults.title, newIssueDefaults.description ?? "");
       setStatus(newIssueDefaults.status ?? "todo");
       setPriority(newIssueDefaults.priority ?? "");
@@ -835,12 +781,9 @@ export function NewIssueDialog() {
       const nextWorkMode = isIssueWorkMode(draft.workMode) ? draft.workMode : "standard";
       const restoredProjectId = newIssueDefaults.projectId ?? draft.projectId;
       const restoredProject = orderedProjects.find((project) => project.id === restoredProjectId);
-<<<<<<< HEAD
-=======
       const hasExplicitProjectWorkspaceId = newIssueDefaults.projectWorkspaceId !== undefined;
       const hasExplicitExecutionWorkspaceId = newIssueDefaults.executionWorkspaceId !== undefined;
       const hasExplicitExecutionWorkspaceMode = newIssueDefaults.executionWorkspaceMode !== undefined;
->>>>>>> upstream/master
       setIssueText(draft.title, draft.description);
       setStatus(draft.status || "todo");
       setPriority(draft.priority);
@@ -884,10 +827,7 @@ export function NewIssueDialog() {
       setWorkMode("standard");
       const defaultProjectId = newIssueDefaults.projectId ?? "";
       const defaultProject = orderedProjects.find((project) => project.id === defaultProjectId);
-<<<<<<< HEAD
-=======
       const hasExplicitProjectWorkspaceId = newIssueDefaults.projectWorkspaceId !== undefined;
->>>>>>> upstream/master
       setIssueText("", "");
       setStatus(newIssueDefaults.status ?? "todo");
       setPriority(newIssueDefaults.priority ?? "");
@@ -907,11 +847,7 @@ export function NewIssueDialog() {
         ? defaultProjectId || null
         : null;
     }
-<<<<<<< HEAD
-  }, [newIssueOpen, newIssueDefaults, orderedProjects, setIssueText]);
-=======
   }, [newIssueOpen, newIssueDefaults, orderedProjects, selectedCompanyId, setIssueText]);
->>>>>>> upstream/master
 
   useEffect(() => {
     if (!supportsAssigneeOverrides) {
@@ -1008,14 +944,11 @@ export function NewIssueDialog() {
     const currentTitle = titleRef.current.trim();
     const currentDescription = descriptionRef.current.trim();
     if (!effectiveCompanyId || !currentTitle || createIssue.isPending) return;
-<<<<<<< HEAD
-=======
     const effectiveLane = assigneeSupportsCheapLane
       ? assigneeModelLane
       : assigneeModelLane === "cheap"
         ? "primary"
         : assigneeModelLane;
->>>>>>> upstream/master
     const assigneeAdapterOverrides = buildAssigneeAdapterOverrides({
       adapterType: assigneeAdapterType,
       lane: effectiveLane,
