@@ -11,12 +11,6 @@ import {
 import {
   ensureAdapterExecutionTargetCommandResolvable,
   ensureAdapterExecutionTargetDirectory,
-<<<<<<< HEAD
-  runAdapterExecutionTargetProcess,
-  describeAdapterExecutionTarget,
-  resolveAdapterExecutionTargetCwd,
-} from "@paperclipai/adapter-utils/execution-target";
-=======
   maybeRunSandboxInstallCommand,
   runAdapterExecutionTargetProcess,
   describeAdapterExecutionTarget,
@@ -24,7 +18,6 @@ import {
   prepareAdapterExecutionTargetRuntime,
 } from "@paperclipai/adapter-utils/execution-target";
 import fs from "node:fs/promises";
->>>>>>> upstream/master
 import path from "node:path";
 import os from "node:os";
 import { parseCodexJsonl } from "./parse.js";
@@ -169,10 +162,7 @@ export async function testEnvironment(
   const command = asString(config.command, "codex");
   const target = ctx.executionTarget ?? null;
   const targetIsRemote = target?.kind === "remote";
-<<<<<<< HEAD
-=======
   const targetIsSandbox = target?.kind === "remote" && target.transport === "sandbox";
->>>>>>> upstream/master
   const cwd = resolveAdapterExecutionTargetCwd(target, asString(config.cwd, ""), process.cwd());
   const targetLabel = targetIsRemote
     ? ctx.environmentName ?? describeAdapterExecutionTarget(target)
@@ -304,11 +294,6 @@ export async function testEnvironment(
         });
       }
 
-<<<<<<< HEAD
-      const probe = await runAdapterExecutionTargetProcess(
-        runId,
-        target,
-=======
       // Codex CLI (>= 0.122) ignores the OPENAI_API_KEY env var and only reads
       // credentials from $CODEX_HOME/auth.json. When we have a key available,
       // wrap the probe with a shell that materializes a per-run auth.json so
@@ -325,7 +310,6 @@ export async function testEnvironment(
         target,
         targetIsRemote,
         cwd,
->>>>>>> upstream/master
         command,
         args,
         env,
