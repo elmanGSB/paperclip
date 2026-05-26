@@ -1,21 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
-<<<<<<< HEAD
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-=======
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DEFAULT_COMPANY_ATTACHMENT_MAX_BYTES,
   MAX_COMPANY_ATTACHMENT_MAX_BYTES,
 } from "@paperclipai/shared";
->>>>>>> upstream/master
 import { useCompany } from "../context/CompanyContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { companiesApi } from "../api/companies";
 import { assetsApi } from "../api/assets";
-<<<<<<< HEAD
-=======
 import { instanceSettingsApi } from "../api/instanceSettings";
->>>>>>> upstream/master
 import { queryKeys } from "../lib/queryKeys";
 import { Button } from "@/components/ui/button";
 import { Settings, CloudUpload, Download, Upload } from "lucide-react";
@@ -23,23 +16,11 @@ import { CompanyPatternIcon } from "../components/CompanyPatternIcon";
 import {
   Field,
   ToggleField,
-<<<<<<< HEAD
-  HintIcon,
-} from "../components/agent-config-primitives";
-
-type AgentSnippetInput = {
-  onboardingTextUrl: string;
-  connectionCandidates?: string[] | null;
-  testResolutionUrl?: string | null;
-};
-
-=======
 } from "../components/agent-config-primitives";
 
 const BYTES_PER_MIB = 1024 * 1024;
 const DEFAULT_COMPANY_ATTACHMENT_MAX_MIB = DEFAULT_COMPANY_ATTACHMENT_MAX_BYTES / BYTES_PER_MIB;
 const MAX_COMPANY_ATTACHMENT_MAX_MIB = MAX_COMPANY_ATTACHMENT_MAX_BYTES / BYTES_PER_MIB;
->>>>>>> upstream/master
 export function CompanySettings() {
   const {
     companies,
@@ -71,19 +52,12 @@ export function CompanySettings() {
     setLogoUrl(selectedCompany.logoUrl ?? "");
   }, [selectedCompany]);
 
-<<<<<<< HEAD
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [inviteSnippet, setInviteSnippet] = useState<string | null>(null);
-  const [snippetCopied, setSnippetCopied] = useState(false);
-  const [snippetCopyDelightId, setSnippetCopyDelightId] = useState(0);
-=======
   const attachmentMaxBytes = Number.parseInt(attachmentMaxMiB, 10) * BYTES_PER_MIB;
   const attachmentMaxValid =
     Number.isInteger(attachmentMaxBytes)
     && attachmentMaxBytes >= BYTES_PER_MIB
     && attachmentMaxBytes <= MAX_COMPANY_ATTACHMENT_MAX_BYTES;
   const cloudSyncEnabled = experimentalSettings?.enableCloudSync === true;
->>>>>>> upstream/master
 
   const generalDirty =
     !!selectedCompany &&
@@ -150,16 +124,6 @@ export function CompanySettings() {
     clearLogoMutation.mutate();
   }
 
-<<<<<<< HEAD
-  useEffect(() => {
-    setInviteError(null);
-    setInviteSnippet(null);
-    setSnippetCopied(false);
-    setSnippetCopyDelightId(0);
-  }, [selectedCompanyId]);
-
-=======
->>>>>>> upstream/master
   const archiveMutation = useMutation({
     mutationFn: ({
       companyId,
