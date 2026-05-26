@@ -633,10 +633,7 @@ type IssueDetailChatTabProps = {
   commentsLoadingOlder: boolean;
   onLoadOlderComments: () => void;
   onRefreshLatestComments: () => Promise<unknown> | void;
-<<<<<<< HEAD
-=======
   onWorkModeChange?: (workMode: IssueWorkMode) => Promise<void> | void;
->>>>>>> upstream/master
   composerRef: Ref<IssueChatComposerHandle>;
   footer?: ReactNode;
   feedbackVotes?: FeedbackVote[];
@@ -705,10 +702,7 @@ const IssueDetailChatTab = memo(function IssueDetailChatTab({
   commentsLoadingOlder,
   onLoadOlderComments,
   onRefreshLatestComments,
-<<<<<<< HEAD
-=======
   onWorkModeChange,
->>>>>>> upstream/master
   composerRef,
   footer,
   feedbackVotes,
@@ -956,13 +950,10 @@ const IssueDetailChatTab = memo(function IssueDetailChatTab({
           : undefined}
         onImageClick={onImageClick}
         onRefreshLatestComments={onRefreshLatestComments}
-<<<<<<< HEAD
-=======
         assigneeUserId={assigneeUserId}
         onResumeFromBacklog={onResumeFromBacklog}
         resumeFromBacklogPending={resumeFromBacklogPending}
         footer={footer}
->>>>>>> upstream/master
       />
     </div>
   );
@@ -2925,14 +2916,6 @@ export function IssueDetail() {
     void fetchOlderComments();
   }, [fetchOlderComments]);
   const refetchLatestComments = useCallback(async () => {
-<<<<<<< HEAD
-    // Refetch the entire infinite-query (page 0 first), so any comments that
-    // arrived after the initial load — including ones live updates may have
-    // missed during reconnects — are present before we scroll the user to
-    // the absolute newest.
-    await refetchComments();
-  }, [refetchComments]);
-=======
     // Refetch page 0 first so comments that arrived after initial load are
     // visible, then load every remaining older page. The chat thread is
     // paginated and virtualized, so "latest" must be resolved against the
@@ -2962,7 +2945,6 @@ export function IssueDetail() {
       window.requestAnimationFrame(() => resolve());
     });
   }, [issueId, queryClient, refetchComments]);
->>>>>>> upstream/master
   useEffect(() => {
     if (!shouldPrefetchOlderComments) return;
     void fetchOlderComments();
@@ -3394,8 +3376,6 @@ export function IssueDetail() {
             </span>
           ) : null}
 
-<<<<<<< HEAD
-=======
           {issue.workMode === "planning" ? (
             <span
               className="inline-flex items-center rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300 shrink-0"
@@ -3416,7 +3396,6 @@ export function IssueDetail() {
             </span>
           ) : null}
 
->>>>>>> upstream/master
           {issue.projectId ? (
             <Link
               to={`/projects/${issue.projectId}`}
