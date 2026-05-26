@@ -149,9 +149,6 @@ The plugin runtime tracks plugin-owned database namespaces and migrations in `pl
 
 ## Backups
 
-<<<<<<< HEAD
-Paperclip supports automatic and manual database backups. See `doc/DEVELOPING.md` for the current `paperclipai db:backup` / `pnpm db:backup` commands and backup retention configuration.
-=======
 Paperclip supports automatic and manual logical database backups. These dumps include
 non-system database schemas such as `public`, the Drizzle migration journal, and
 plugin-owned database schemas. See `doc/DEVELOPING.md` for the current
@@ -161,7 +158,6 @@ configuration.
 Database backups do not include non-database instance files such as local-disk
 uploads, workspace files, or the local encrypted secrets master key. Back those paths
 up separately when you need full instance disaster recovery.
->>>>>>> upstream/master
 
 ## Secret storage
 
