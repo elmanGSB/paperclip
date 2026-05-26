@@ -670,10 +670,7 @@ export function AgentDetail() {
   const { companies, selectedCompanyId, setSelectedCompanyId } = useCompany();
   const { closePanel } = usePanel();
   const { openNewIssue } = useDialogActions();
-<<<<<<< HEAD
-=======
   const { pushToast } = useToastActions();
->>>>>>> upstream/master
   const { setBreadcrumbs } = useBreadcrumbs();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -2606,7 +2603,7 @@ export function AgentSkillsTab({
   const hasHydratedSkillSnapshotRef = useRef(false);
   const skipNextSkillAutosaveRef = useRef(true);
 
-  const { data: skillSnapshot, isLoading, isError, error: skillsError } = useQuery({
+  const { data: skillSnapshot, isLoading } = useQuery({
     queryKey: queryKeys.agents.skills(agent.id),
     queryFn: () => agentsApi.skills(agent.id, companyId),
     enabled: Boolean(companyId),
@@ -2774,13 +2771,11 @@ export function AgentSkillsTab({
     return "Paperclip cannot manage skills for this adapter yet. Manage them in the adapter directly.";
   }, [agent.adapterConfig.agent, agent.adapterType, skillSnapshot?.mode]);
   const hasUnsavedChanges = !arraysEqual(skillDraft, lastSavedSkills);
-  const saveStatusLabel = syncSkills.isError
-    ? "Save failed - will retry"
-    : syncSkills.isPending
-      ? "Saving changes..."
-      : hasUnsavedChanges
-        ? "Saving soon..."
-        : null;
+  const saveStatusLabel = syncSkills.isPending
+    ? "Saving changes..."
+    : hasUnsavedChanges
+      ? "Saving soon..."
+      : null;
 
   return (
     <div className="max-w-4xl space-y-5">
@@ -2792,12 +2787,7 @@ export function AgentSkillsTab({
           View company skills library
         </Link>
         {saveStatusLabel ? (
-          <div
-            className={cn(
-              "flex items-center gap-2 text-xs",
-              syncSkills.isError ? "text-destructive" : "text-muted-foreground",
-            )}
-          >
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {syncSkills.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
             <span>{saveStatusLabel}</span>
           </div>
@@ -2820,21 +2810,6 @@ export function AgentSkillsTab({
 
       {isLoading ? (
         <PageSkeleton variant="list" />
-      ) : isError ? (
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-4 text-sm">
-          <p className="text-destructive">
-            {skillsError instanceof Error ? skillsError.message : String(skillsError)}
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              void queryClient.invalidateQueries({ queryKey: queryKeys.agents.skills(agent.id) });
-            }}
-          >
-            Retry
-          </Button>
-        </div>
       ) : (
         <>
           {(() => {
