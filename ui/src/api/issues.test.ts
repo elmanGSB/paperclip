@@ -50,8 +50,6 @@ describe("issuesApi.list", () => {
       "/companies/company-1/issues?limit=500&offset=1500",
     );
   });
-<<<<<<< HEAD
-=======
 
   it("passes issue list sort options through to the company issues endpoint", async () => {
     await issuesApi.list("company-1", {
@@ -81,5 +79,4 @@ describe("issuesApi.list", () => {
       },
     );
   });
->>>>>>> upstream/master
 });
