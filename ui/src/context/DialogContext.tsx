@@ -1,8 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-<<<<<<< HEAD
-=======
 import type { IssueWorkMode } from "@paperclipai/shared";
->>>>>>> upstream/master
 
 interface NewIssueDefaults {
   status?: string;
