@@ -467,19 +467,9 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
       if (!selectedCompanyId) {
         throw new Error("Select a company to test adapter environment");
       }
-      const selectedEnvironmentId = isCreate
-        ? val!.defaultEnvironmentId ?? null
-        : eff("identity", "defaultEnvironmentId", props.agent.defaultEnvironmentId ?? null);
       return agentsApi.testEnvironment(selectedCompanyId, adapterType, {
         adapterConfig: buildAdapterConfigForTest(),
-<<<<<<< HEAD
-        environmentId:
-          typeof selectedEnvironmentId === "string" && selectedEnvironmentId.length > 0
-            ? selectedEnvironmentId
-            : null,
-=======
         environmentId: currentDefaultEnvironmentId || null,
->>>>>>> upstream/master
       });
     },
   });
