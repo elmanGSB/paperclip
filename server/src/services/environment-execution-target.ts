@@ -34,6 +34,7 @@ export async function resolveEnvironmentExecutionTarget(input: {
 
   if (input.environment.driver === "sandbox") {
     if (
+      input.adapterType !== "acpx_local" &&
       input.adapterType !== "codex_local" &&
       input.adapterType !== "claude_local" &&
       input.adapterType !== "gemini_local" &&
@@ -45,6 +46,7 @@ export async function resolveEnvironmentExecutionTarget(input: {
     }
 
     const parsed = await resolveEnvironmentDriverConfigForRuntime(input.db, input.companyId, {
+      id: input.environment.id,
       driver: input.environment.driver as "sandbox",
       config: parseObject(input.environment.config),
     });
@@ -57,20 +59,30 @@ export async function resolveEnvironmentExecutionTarget(input: {
         ? input.leaseMetadata.remoteCwd.trim()
         : DEFAULT_SANDBOX_REMOTE_CWD;
     const timeoutMs = "timeoutMs" in parsed.config ? parsed.config.timeoutMs : null;
+<<<<<<< HEAD
     const paperclipApiUrl =
       typeof input.leaseMetadata?.paperclipApiUrl === "string" && input.leaseMetadata.paperclipApiUrl.trim().length > 0
         ? input.leaseMetadata.paperclipApiUrl.trim()
+=======
+    const shellCommand =
+      input.leaseMetadata?.shellCommand === "bash" || input.leaseMetadata?.shellCommand === "sh"
+        ? input.leaseMetadata.shellCommand
+>>>>>>> upstream/master
         : null;
 
     return {
       kind: "remote",
       transport: "sandbox",
       providerKey: parsed.config.provider,
+      shellCommand,
       remoteCwd,
       environmentId: input.environment.id ?? null,
       leaseId: input.leaseId ?? null,
+<<<<<<< HEAD
       paperclipApiUrl,
       paperclipTransport: paperclipApiUrl ? "direct" : "bridge",
+=======
+>>>>>>> upstream/master
       timeoutMs,
       runner: input.environmentRuntime && input.lease
         ? {
@@ -106,6 +118,7 @@ export async function resolveEnvironmentExecutionTarget(input: {
   if (
     (
       input.adapterType !== "codex_local" &&
+      input.adapterType !== "acpx_local" &&
       input.adapterType !== "claude_local" &&
       input.adapterType !== "gemini_local" &&
       input.adapterType !== "opencode_local" &&
@@ -118,6 +131,7 @@ export async function resolveEnvironmentExecutionTarget(input: {
   }
 
   const parsed = await resolveEnvironmentDriverConfigForRuntime(input.db, input.companyId, {
+    id: input.environment.id,
     driver: input.environment.driver as "ssh",
     config: parseObject(input.environment.config),
   });
@@ -136,10 +150,6 @@ export async function resolveEnvironmentExecutionTarget(input: {
     environmentId: input.environment.id ?? null,
     leaseId: input.leaseId ?? null,
     remoteCwd,
-    paperclipApiUrl:
-      typeof input.leaseMetadata?.paperclipApiUrl === "string" && input.leaseMetadata.paperclipApiUrl.trim().length > 0
-        ? input.leaseMetadata.paperclipApiUrl.trim()
-        : null,
     spec: {
       host: parsed.config.host,
       port: parsed.config.port,
@@ -149,10 +159,6 @@ export async function resolveEnvironmentExecutionTarget(input: {
       knownHosts: parsed.config.knownHosts,
       strictHostKeyChecking: parsed.config.strictHostKeyChecking,
       remoteCwd,
-      paperclipApiUrl:
-        typeof input.leaseMetadata?.paperclipApiUrl === "string" && input.leaseMetadata.paperclipApiUrl.trim().length > 0
-          ? input.leaseMetadata.paperclipApiUrl.trim()
-          : null,
     },
   };
 }

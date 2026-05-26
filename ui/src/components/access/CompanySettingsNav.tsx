@@ -5,8 +5,14 @@ import { useLocation, useNavigate } from "@/lib/router";
 const items = [
   { value: "general", label: "General", href: "/company/settings" },
   { value: "environments", label: "Environments", href: "/company/settings/environments" },
+<<<<<<< HEAD
   { value: "access", label: "Access", href: "/company/settings/access" },
+=======
+  { value: "cloud-upstream", label: "Cloud upstream", href: "/company/settings/cloud-upstream" },
+  { value: "members", label: "Members", href: "/company/settings/members" },
+>>>>>>> upstream/master
   { value: "invites", label: "Invites", href: "/company/settings/invites" },
+  { value: "secrets", label: "Secrets", href: "/company/settings/secrets" },
 ] as const;
 
 type CompanySettingsTab = (typeof items)[number]["value"];
@@ -16,12 +22,25 @@ export function getCompanySettingsTab(pathname: string): CompanySettingsTab {
     return "environments";
   }
 
+<<<<<<< HEAD
   if (pathname.includes("/company/settings/access")) {
     return "access";
+=======
+  if (pathname.includes("/company/settings/cloud-upstream")) {
+    return "cloud-upstream";
+  }
+
+  if (pathname.includes("/company/settings/members") || pathname.includes("/company/settings/access")) {
+    return "members";
+>>>>>>> upstream/master
   }
 
   if (pathname.includes("/company/settings/invites")) {
     return "invites";
+  }
+
+  if (pathname.includes("/company/settings/secrets")) {
+    return "secrets";
   }
 
   return "general";

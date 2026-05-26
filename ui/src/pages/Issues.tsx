@@ -145,6 +145,11 @@ export function Issues() {
       includeRoutineExecutions: true,
       limit: issuePageSize,
       offset: pageParam,
+<<<<<<< HEAD
+=======
+      sortField: "updated",
+      sortDir: "desc",
+>>>>>>> upstream/master
     }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) =>
