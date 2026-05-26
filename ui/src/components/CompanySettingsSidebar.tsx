@@ -1,9 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-<<<<<<< HEAD
-import { ChevronLeft, MailPlus, MonitorCog, Settings, Shield, SlidersHorizontal } from "lucide-react";
-=======
 import { ChevronLeft, CloudUpload, KeyRound, MailPlus, MonitorCog, Puzzle, Settings, SlidersHorizontal, Users } from "lucide-react";
->>>>>>> upstream/master
 import { sidebarBadgesApi } from "@/api/sidebarBadges";
 import { instanceSettingsApi } from "@/api/instanceSettings";
 import { ApiError } from "@/api/client";
@@ -76,12 +72,6 @@ export function CompanySettingsSidebar() {
             icon={MonitorCog}
             end
           />
-<<<<<<< HEAD
-          <SidebarNavItem
-            to="/company/settings/access"
-            label="Access"
-            icon={Shield}
-=======
           {showCloudUpstream ? (
             <SidebarNavItem
               to="/company/settings/cloud-upstream"
@@ -94,7 +84,6 @@ export function CompanySettingsSidebar() {
             to="/company/settings/members"
             label="Members"
             icon={Users}
->>>>>>> upstream/master
             badge={badges?.joinRequests ?? 0}
             end
           />
