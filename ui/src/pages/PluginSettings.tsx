@@ -145,11 +145,8 @@ export function PluginSettings() {
   const pluginDescription = plugin.manifestJson.description || "No description provided.";
   const pluginCapabilities = plugin.manifestJson.capabilities ?? [];
   const environmentDrivers = plugin.manifestJson.environmentDrivers ?? [];
-<<<<<<< HEAD
-=======
   const localFolderDeclarations = plugin.manifestJson.localFolders ?? [];
   const hasLocalFolders = localFolderDeclarations.length > 0;
->>>>>>> upstream/master
   const environmentDriverNames = environmentDrivers
     .map((driver) => driver.displayName?.trim() || driver.driverKey)
     .filter((name, index, values) => values.indexOf(name) === index);
@@ -267,11 +264,7 @@ export function PluginSettings() {
                     </Link>
                   </div>
                 </div>
-<<<<<<< HEAD
-              ) : (
-=======
               ) : !hasLocalFolders ? (
->>>>>>> upstream/master
                 <p className="text-sm text-muted-foreground">
                   This plugin does not require any settings.
                 </p>
