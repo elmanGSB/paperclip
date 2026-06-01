@@ -29,6 +29,10 @@ export interface InstanceGeneralSettings {
 export interface InstanceExperimentalSettings {
   enableEnvironments: boolean;
   enableIsolatedWorkspaces: boolean;
+<<<<<<< HEAD
+=======
+  enableIssuePlanDecompositions: boolean;
+>>>>>>> upstream/master
   enableCloudSync: boolean;
   autoRestartDevServerWhenIdle: boolean;
   enableIssueGraphLivenessAutoRecovery: boolean;

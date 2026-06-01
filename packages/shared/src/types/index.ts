@@ -51,6 +51,13 @@ export type {
   CompanySkillUsageAgent,
   CompanySkillDetail,
   CompanySkillUpdateStatus,
+  CompanySkillAuditSeverity,
+  CompanySkillAuditVerdict,
+  CompanySkillUpdateHoldReason,
+  CompanySkillAuditFinding,
+  CompanySkillAuditResult,
+  CompanySkillInstallUpdateRequest,
+  CompanySkillResetRequest,
   CompanySkillImportRequest,
   CompanySkillImportResult,
   CompanySkillProjectScanRequest,
@@ -60,6 +67,14 @@ export type {
   CompanySkillCreateRequest,
   CompanySkillFileDetail,
   CompanySkillFileUpdateRequest,
+  CatalogSkillKind,
+  CatalogSkillFileKind,
+  CatalogSkillFile,
+  CatalogSkill,
+  CatalogSkillListQuery,
+  CatalogSkillFileDetail,
+  CompanySkillInstallCatalogRequest,
+  CompanySkillInstallCatalogResult,
 } from "./company-skill.js";
 export type {
   AgentSkillSyncMode,
@@ -89,6 +104,25 @@ export type {
   AdapterEnvironmentTestResult,
 } from "./agent.js";
 export type { AssetImage } from "./asset.js";
+<<<<<<< HEAD
+=======
+export type {
+  CreateDocumentAnnotationCommentRequest,
+  CreateDocumentAnnotationThreadRequest,
+  DocumentAnnotationAnchorRemapSnapshot,
+  DocumentAnnotationAnchorSelector,
+  DocumentAnnotationAnchorSnapshot,
+  DocumentAnnotationComment,
+  DocumentAnnotationTextPositionSelector,
+  DocumentAnnotationTextQuoteSelector,
+  DocumentAnnotationThread,
+  DocumentAnnotationThreadWithComments,
+  DocumentTextPosition,
+  DocumentTextProjection,
+  DocumentTextRange,
+  UpdateDocumentAnnotationThreadRequest,
+} from "./document-annotation.js";
+>>>>>>> upstream/master
 export type { Project, ProjectCodebase, ProjectCodebaseOrigin, ProjectGoalRef, ProjectManagedByPlugin, ProjectWorkspace } from "./project.js";
 export type {
   CompanySearchHighlight,
@@ -141,6 +175,7 @@ export type {
   IssueWorkProductProvider,
   IssueWorkProductStatus,
   IssueWorkProductReviewState,
+  AttachmentArtifactWorkProductMetadata,
 } from "./work-product.js";
 export type {
   Issue,
@@ -207,6 +242,12 @@ export type {
   RequestConfirmationTarget,
   RequestConfirmationPayload,
   RequestConfirmationResult,
+  AcceptedPlanDecompositionStatus,
+  AcceptedPlanDecompositionChild,
+  AcceptedPlanDecomposition,
+  AcceptedPlanDecompositionResult,
+  AcceptedPlanDecompositionChildIssue,
+  AcceptedPlanDecompositionSummary,
   IssueThreadInteractionBase,
   SuggestTasksInteraction,
   AskUserQuestionsInteraction,
@@ -327,6 +368,14 @@ export type {
 } from "./user-profile.js";
 export type { SidebarBadges } from "./sidebar-badges.js";
 export type { SidebarOrderPreference } from "./sidebar-preferences.js";
+export type {
+  ResourceMembershipResourceType,
+  ResourceMembershipState,
+  ResourceMemberships,
+  ResourceMembershipUpdateResult,
+  UpdateResourceMembership,
+} from "./resource-memberships.js";
+export { RESOURCE_MEMBERSHIP_STATES } from "./resource-memberships.js";
 export type { InboxDismissal } from "./inbox-dismissal.js";
 export type {
   AccessUserProfile,

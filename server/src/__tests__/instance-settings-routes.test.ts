@@ -64,6 +64,10 @@ describe("instance settings routes", () => {
     mockInstanceSettingsService.getExperimental.mockResolvedValue({
       enableEnvironments: false,
       enableIsolatedWorkspaces: false,
+<<<<<<< HEAD
+=======
+      enableIssuePlanDecompositions: false,
+>>>>>>> upstream/master
       enableCloudSync: false,
       autoRestartDevServerWhenIdle: false,
       enableIssueGraphLivenessAutoRecovery: true,
@@ -82,6 +86,10 @@ describe("instance settings routes", () => {
       experimental: {
         enableEnvironments: true,
         enableIsolatedWorkspaces: true,
+<<<<<<< HEAD
+=======
+        enableIssuePlanDecompositions: true,
+>>>>>>> upstream/master
         enableCloudSync: true,
         autoRestartDevServerWhenIdle: false,
         enableIssueGraphLivenessAutoRecovery: true,
@@ -125,6 +133,10 @@ describe("instance settings routes", () => {
     expect(getRes.body).toEqual({
       enableEnvironments: false,
       enableIsolatedWorkspaces: false,
+<<<<<<< HEAD
+=======
+      enableIssuePlanDecompositions: false,
+>>>>>>> upstream/master
       enableCloudSync: false,
       autoRestartDevServerWhenIdle: false,
       enableIssueGraphLivenessAutoRecovery: true,

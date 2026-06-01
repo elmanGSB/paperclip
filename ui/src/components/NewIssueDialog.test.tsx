@@ -699,6 +699,7 @@ describe("NewIssueDialog", () => {
       expect.objectContaining({
         title: "Plan this first",
         workMode: "planning",
+<<<<<<< HEAD
       }),
     );
 
@@ -749,6 +750,8 @@ describe("NewIssueDialog", () => {
       expect.objectContaining({
         title: "Typed issue",
         description: "Typed description",
+=======
+>>>>>>> upstream/master
       }),
     );
 

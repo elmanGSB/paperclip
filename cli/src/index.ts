@@ -20,6 +20,10 @@ import { registerRoutineCommands } from "./commands/routines.js";
 import { registerFeedbackCommands } from "./commands/client/feedback.js";
 import { registerSecretCommands } from "./commands/client/secrets.js";
 import { registerCloudCommands } from "./commands/client/cloud.js";
+<<<<<<< HEAD
+=======
+import { registerSkillsCommands } from "./commands/client/skills.js";
+>>>>>>> upstream/master
 import { applyDataDirOverride, type DataDirOptionLike } from "./config/data-dir.js";
 import { loadPaperclipEnvFile } from "./config/env.js";
 import { initTelemetryFromConfigFile, flushTelemetry } from "./telemetry.js";
@@ -151,6 +155,10 @@ registerRoutineCommands(program);
 registerFeedbackCommands(program);
 registerSecretCommands(program);
 registerCloudCommands(program);
+<<<<<<< HEAD
+=======
+registerSkillsCommands(program);
+>>>>>>> upstream/master
 registerWorktreeCommands(program);
 registerEnvLabCommands(program);
 registerPluginCommands(program);

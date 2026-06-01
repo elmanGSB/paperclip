@@ -17,6 +17,7 @@ permissions:
 jobs:
   check-conflicts:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     timeout-minutes: 2
     steps:
       - name: Checkout
@@ -37,6 +38,8 @@ jobs:
   build-and-push:
     needs: check-conflicts
     runs-on: ubuntu-latest
+=======
+>>>>>>> upstream/master
     timeout-minutes: 60
     concurrency:
       group: docker-${{ github.ref }}

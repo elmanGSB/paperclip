@@ -1,11 +1,20 @@
 // @vitest-environment jsdom
 
+<<<<<<< HEAD
 import { act } from "react";
 import type { ReactNode } from "react";
+=======
+import type { ReactNode } from "react";
+import { flushSync } from "react-dom";
+>>>>>>> upstream/master
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Agent } from "@paperclipai/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+<<<<<<< HEAD
+=======
+import { ToastProvider } from "../context/ToastContext";
+>>>>>>> upstream/master
 import { Agents } from "./Agents";
 
 const mockAgentsApi = vi.hoisted(() => ({
@@ -17,6 +26,14 @@ const mockHeartbeatsApi = vi.hoisted(() => ({
   liveRunsForCompany: vi.fn(),
 }));
 
+<<<<<<< HEAD
+=======
+const mockResourceMembershipsApi = vi.hoisted(() => ({
+  listMine: vi.fn(),
+  updateAgent: vi.fn(),
+}));
+
+>>>>>>> upstream/master
 const mockOpenNewAgent = vi.hoisted(() => vi.fn());
 const mockSetBreadcrumbs = vi.hoisted(() => vi.fn());
 
@@ -52,6 +69,13 @@ vi.mock("../api/heartbeats", () => ({
   heartbeatsApi: mockHeartbeatsApi,
 }));
 
+<<<<<<< HEAD
+=======
+vi.mock("../api/resourceMemberships", () => ({
+  resourceMembershipsApi: mockResourceMembershipsApi,
+}));
+
+>>>>>>> upstream/master
 vi.mock("../adapters/adapter-display-registry", () => ({
   getAdapterLabel: (type: string) => type,
 }));
@@ -59,6 +83,17 @@ vi.mock("../adapters/adapter-display-registry", () => ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
+<<<<<<< HEAD
+=======
+async function act(callback: () => void | Promise<void>) {
+  let result: void | Promise<void> = undefined;
+  flushSync(() => {
+    result = callback();
+  });
+  await result;
+}
+
+>>>>>>> upstream/master
 function makeAgent(overrides: Partial<Agent>): Agent {
   return {
     id: "agent-1",
@@ -120,6 +155,20 @@ describe("Agents", () => {
       },
     ]);
     mockHeartbeatsApi.liveRunsForCompany.mockResolvedValue([]);
+<<<<<<< HEAD
+=======
+    mockResourceMembershipsApi.listMine.mockResolvedValue({
+      projectMemberships: {},
+      agentMemberships: {},
+      updatedAt: null,
+    });
+    mockResourceMembershipsApi.updateAgent.mockResolvedValue({
+      resourceType: "agent",
+      resourceId: "agent-1",
+      state: "left",
+      updatedAt: new Date("2026-01-02T00:00:00Z"),
+    });
+>>>>>>> upstream/master
   });
 
   afterEach(async () => {
@@ -140,7 +189,13 @@ describe("Agents", () => {
     await act(async () => {
       root!.render(
         <QueryClientProvider client={queryClient}>
+<<<<<<< HEAD
           <Agents />
+=======
+          <ToastProvider>
+            <Agents />
+          </ToastProvider>
+>>>>>>> upstream/master
         </QueryClientProvider>,
       );
     });

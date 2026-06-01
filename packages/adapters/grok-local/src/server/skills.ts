@@ -2,10 +2,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type {
   AdapterSkillContext,
+<<<<<<< HEAD
   AdapterSkillEntry,
   AdapterSkillSnapshot,
 } from "@paperclipai/adapter-utils";
 import {
+=======
+  AdapterSkillSnapshot,
+} from "@paperclipai/adapter-utils";
+import {
+  buildRuntimeMountedSkillSnapshot,
+>>>>>>> upstream/master
   readPaperclipRuntimeSkillEntries,
   resolvePaperclipDesiredSkillNames,
 } from "@paperclipai/adapter-utils/server-utils";
@@ -16,6 +23,7 @@ async function buildGrokSkillSnapshot(
   config: Record<string, unknown>,
 ): Promise<AdapterSkillSnapshot> {
   const availableEntries = await readPaperclipRuntimeSkillEntries(config, __moduleDir);
+<<<<<<< HEAD
   const availableByKey = new Map(availableEntries.map((entry) => [entry.key, entry]));
   const desiredSkills = resolvePaperclipDesiredSkillNames(config, availableEntries);
   const desiredSet = new Set(desiredSkills);
@@ -66,6 +74,15 @@ async function buildGrokSkillSnapshot(
     entries,
     warnings,
   };
+=======
+  const desiredSkills = resolvePaperclipDesiredSkillNames(config, availableEntries);
+  return buildRuntimeMountedSkillSnapshot({
+    adapterType: "grok_local",
+    availableEntries,
+    desiredSkills,
+    configuredDetail: "Will be copied into `.claude/skills` in the execution workspace on the next run.",
+  });
+>>>>>>> upstream/master
 }
 
 export async function listGrokSkills(ctx: AdapterSkillContext): Promise<AdapterSkillSnapshot> {

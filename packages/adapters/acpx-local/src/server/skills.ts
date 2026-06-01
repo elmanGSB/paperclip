@@ -2,10 +2,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type {
   AdapterSkillContext,
+<<<<<<< HEAD
   AdapterSkillEntry,
   AdapterSkillSnapshot,
 } from "@paperclipai/adapter-utils";
 import {
+=======
+  AdapterSkillSnapshot,
+} from "@paperclipai/adapter-utils";
+import {
+  buildRuntimeMountedSkillSnapshot,
+>>>>>>> upstream/master
   readPaperclipRuntimeSkillEntries,
   resolvePaperclipDesiredSkillNames,
 } from "@paperclipai/adapter-utils/server-utils";
@@ -35,9 +42,13 @@ function unsupportedDetail(): string {
 async function buildAcpxSkillSnapshot(config: Record<string, unknown>): Promise<AdapterSkillSnapshot> {
   const acpxAgent = normalizeAcpxSkillAgent(config);
   const availableEntries = await readPaperclipRuntimeSkillEntries(config, __moduleDir);
+<<<<<<< HEAD
   const availableByKey = new Map(availableEntries.map((entry) => [entry.key, entry]));
   const desiredSkills = resolvePaperclipDesiredSkillNames(config, availableEntries);
   const desiredSet = new Set(desiredSkills);
+=======
+  const desiredSkills = resolvePaperclipDesiredSkillNames(config, availableEntries);
+>>>>>>> upstream/master
   const supported = acpxAgent !== "custom";
   const warnings: string[] = supported
     ? []
@@ -45,6 +56,7 @@ async function buildAcpxSkillSnapshot(config: Record<string, unknown>): Promise<
         "Custom ACP commands do not expose a Paperclip skill integration contract yet; selected skills are tracked only.",
       ];
 
+<<<<<<< HEAD
   const entries: AdapterSkillEntry[] = availableEntries.map((entry) => {
     const desired = desiredSet.has(entry.key);
     return {
@@ -92,6 +104,18 @@ async function buildAcpxSkillSnapshot(config: Record<string, unknown>): Promise<
     entries,
     warnings,
   };
+=======
+  return buildRuntimeMountedSkillSnapshot({
+    adapterType: "acpx_local",
+    availableEntries,
+    desiredSkills,
+    supported,
+    mode: supported ? "ephemeral" : "unsupported",
+    configuredDetail: configuredDetail(acpxAgent),
+    unsupportedDetail: unsupportedDetail(),
+    warnings,
+  });
+>>>>>>> upstream/master
 }
 
 export async function listAcpxSkills(ctx: AdapterSkillContext): Promise<AdapterSkillSnapshot> {

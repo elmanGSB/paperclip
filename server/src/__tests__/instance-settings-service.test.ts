@@ -6,6 +6,10 @@ describe("instance settings service", () => {
     expect(normalizeExperimentalSettings({
       enableEnvironments: true,
       enableIsolatedWorkspaces: true,
+<<<<<<< HEAD
+=======
+      enableIssuePlanDecompositions: true,
+>>>>>>> upstream/master
       enableCloudSync: true,
       autoRestartDevServerWhenIdle: true,
       enableIssueGraphLivenessAutoRecovery: true,
@@ -14,6 +18,10 @@ describe("instance settings service", () => {
     })).toEqual({
       enableEnvironments: true,
       enableIsolatedWorkspaces: true,
+<<<<<<< HEAD
+=======
+      enableIssuePlanDecompositions: true,
+>>>>>>> upstream/master
       enableCloudSync: true,
       autoRestartDevServerWhenIdle: true,
       enableIssueGraphLivenessAutoRecovery: true,
