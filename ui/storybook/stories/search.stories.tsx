@@ -192,6 +192,10 @@ const fixtureResponse: CompanySearchResponse = {
   results: [...fixtureResults, ...fixtureAgents, ...fixtureProjects],
   countsByType: {
     issue: fixtureResults.length,
+<<<<<<< HEAD
+=======
+    artifact: 0,
+>>>>>>> upstream/master
     agent: fixtureAgents.length,
     project: fixtureProjects.length,
   },
@@ -202,11 +206,19 @@ function ScopeTabsPreview({
   active,
   response,
 }: {
+<<<<<<< HEAD
   active: "all" | "issues" | "comments" | "documents" | "agents" | "projects";
+=======
+  active: "all" | "issues" | "comments" | "documents" | "artifacts" | "agents" | "projects";
+>>>>>>> upstream/master
   response: CompanySearchResponse;
 }) {
   const total =
     (response.countsByType.issue ?? 0) +
+<<<<<<< HEAD
+=======
+    (response.countsByType.artifact ?? 0) +
+>>>>>>> upstream/master
     (response.countsByType.agent ?? 0) +
     (response.countsByType.project ?? 0);
   const items: PageTabItem[] = [
@@ -214,6 +226,10 @@ function ScopeTabsPreview({
     { value: "issues", label: <ScopeTabLabel label="Issues" count={response.countsByType.issue} /> },
     { value: "comments", label: <ScopeTabLabel label="Comments" count={response.results.filter((result) => result.matchedFields.includes("comment")).length} /> },
     { value: "documents", label: <ScopeTabLabel label="Documents" count={response.results.filter((result) => result.matchedFields.includes("document")).length} /> },
+<<<<<<< HEAD
+=======
+    { value: "artifacts", label: <ScopeTabLabel label="Artifacts" count={response.countsByType.artifact} /> },
+>>>>>>> upstream/master
     { value: "agents", label: <ScopeTabLabel label="Agents" count={response.countsByType.agent} /> },
     { value: "projects", label: <ScopeTabLabel label="Projects" count={response.countsByType.project} /> },
   ];
@@ -534,7 +550,11 @@ function SearchStories() {
             <div className="paperclip-story__label">/search</div>
             <h2 className="mt-1 text-lg font-semibold">No results state</h2>
           </div>
+<<<<<<< HEAD
           <SearchPagePreview response={{ ...fixtureResponse, results: [], countsByType: { issue: 0, agent: 0, project: 0 } }} state="empty" query="ghostbuster" />
+=======
+          <SearchPagePreview response={{ ...fixtureResponse, results: [], countsByType: { issue: 0, artifact: 0, agent: 0, project: 0 } }} state="empty" query="ghostbuster" />
+>>>>>>> upstream/master
         </section>
 
         <section className="paperclip-story__frame overflow-hidden p-4">

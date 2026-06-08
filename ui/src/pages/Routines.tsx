@@ -83,9 +83,15 @@ type RoutineGroup = {
 };
 
 const defaultRoutineViewState: RoutineViewState = {
+<<<<<<< HEAD
   sortField: "updated",
   sortDir: "desc",
   groupBy: "none",
+=======
+  sortField: "title",
+  sortDir: "asc",
+  groupBy: "project",
+>>>>>>> upstream/master
   collapsedGroups: [],
 };
 
@@ -417,9 +423,19 @@ export function Routines() {
     [projects],
   );
   const liveIssueIds = useMemo(() => collectLiveIssueIds(liveRuns), [liveRuns]);
+<<<<<<< HEAD
   const sortedRoutines = useMemo(
     () => sortRoutines(routines ?? [], routineViewState.sortField, routineViewState.sortDir),
     [routineViewState.sortDir, routineViewState.sortField, routines],
+=======
+  const visibleRoutines = useMemo(
+    () => (routines ?? []).filter((routine) => routine.status !== "archived"),
+    [routines],
+  );
+  const sortedRoutines = useMemo(
+    () => sortRoutines(visibleRoutines, routineViewState.sortField, routineViewState.sortDir),
+    [routineViewState.sortDir, routineViewState.sortField, visibleRoutines],
+>>>>>>> upstream/master
   );
   const routineGroups = useMemo(
     () => buildRoutineGroups(sortedRoutines, routineViewState.groupBy, projectById, agentById),
@@ -494,7 +510,7 @@ export function Routines() {
             Routines
           </h1>
           <p className="text-sm text-muted-foreground">
-            Recurring work definitions that materialize into auditable execution issues.
+            Recurring work definitions that materialize into auditable execution tasks.
           </p>
         </div>
         <Button onClick={() => setComposerOpen(true)}>
@@ -516,7 +532,7 @@ export function Routines() {
         <TabsContent value="routines" className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              {(routines ?? []).length} routine{(routines ?? []).length === 1 ? "" : "s"}
+              {visibleRoutines.length} routine{visibleRoutines.length === 1 ? "" : "s"}
             </p>
             <div className="flex items-center gap-1">
               <Popover>
@@ -873,11 +889,11 @@ export function Routines() {
 
       {activeTab === "routines" ? (
         <div>
-          {(routines ?? []).length === 0 ? (
+          {visibleRoutines.length === 0 ? (
             <div className="py-12">
               <EmptyState
                 icon={Repeat}
-                message="No routines yet. Use Create routine to define the first recurring workflow."
+                message="No active routines. Use Create routine to define the first recurring workflow."
               />
             </div>
           ) : (

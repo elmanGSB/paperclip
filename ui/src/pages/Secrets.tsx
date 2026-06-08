@@ -1645,7 +1645,11 @@ function SecretsHowToUse() {
         </p>
         <p>
           Paperclip resolves the value server-side when the run starts and injects it as that env var. Project env
+<<<<<<< HEAD
           applies to every issue in the project and overrides agent env on matching keys.
+=======
+          applies to every task in the project and overrides agent env on matching keys.
+>>>>>>> upstream/master
         </p>
       </div>
     </div>

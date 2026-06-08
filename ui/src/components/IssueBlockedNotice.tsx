@@ -17,6 +17,10 @@ import { isAssignedBacklogBlocker } from "../lib/issue-blockers";
 import {
   deriveActiveRecoveryDisplayState,
   RECOVERY_CHIP_DEFAULT_TONE,
+<<<<<<< HEAD
+=======
+  recoveryChipLabel,
+>>>>>>> upstream/master
 } from "../lib/recovery-display";
 
 function BlockerRecoveryIndicator({ action }: { action: IssueRecoveryAction }) {
@@ -24,10 +28,15 @@ function BlockerRecoveryIndicator({ action }: { action: IssueRecoveryAction }) {
   if (!state) return null;
   const tone = RECOVERY_CHIP_DEFAULT_TONE[state];
   const Icon = tone.icon;
+<<<<<<< HEAD
+=======
+  const label = recoveryChipLabel(state, action.kind);
+>>>>>>> upstream/master
   return (
     <span
       data-testid="issue-blocked-notice-recovery-indicator"
       data-recovery-state={state}
+<<<<<<< HEAD
       role="status"
       aria-label={tone.label}
       title={`${tone.label} — open the source issue to act.`}
@@ -35,6 +44,16 @@ function BlockerRecoveryIndicator({ action }: { action: IssueRecoveryAction }) {
     >
       <Icon className="h-2.5 w-2.5" aria-hidden />
       {tone.label}
+=======
+      data-recovery-kind={action.kind}
+      role="status"
+      aria-label={label}
+      title={`${label} — open the source task to act.`}
+      className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${tone.className}`}
+    >
+      <Icon className="h-2.5 w-2.5" aria-hidden />
+      {label}
+>>>>>>> upstream/master
     </span>
   );
 }
@@ -130,7 +149,7 @@ export function IssueBlockedNotice({
       ? { issueId, scheduledRetry }
       : null;
 
-  const blockerLabel = blockers.length === 1 ? "the linked issue" : "the linked issues";
+  const blockerLabel = blockers.length === 1 ? "the linked task" : "the linked tasks";
   const terminalBlockers = blockers
     .flatMap((blocker) => blocker.terminalBlockers ?? [])
     .filter((blocker, index, all) => all.findIndex((candidate) => candidate.id === blocker.id) === index);
@@ -205,9 +224,15 @@ export function IssueBlockedNotice({
         <div className="min-w-0 space-y-1.5">
           {showSuccessfulRunHandoff ? (
             <>
+<<<<<<< HEAD
               <p className="font-medium leading-5">This issue still needs a next step.</p>
               <p className="leading-5">
                 A run finished successfully, but this issue is still open in{" "}
+=======
+              <p className="font-medium leading-5">This task still needs a next step.</p>
+              <p className="leading-5">
+                A run finished successfully, but this task is still open in{" "}
+>>>>>>> upstream/master
                 <code className="rounded bg-amber-100 px-1 py-0.5 text-[12px] dark:bg-amber-400/15">
                   in_progress
                 </code>{" "}
@@ -258,10 +283,17 @@ export function IssueBlockedNotice({
                 {blockers.length > 0
                   ? isStalled
                     ? stalledLeafBlockers.length > 1
+<<<<<<< HEAD
                       ? <>Work on this issue is blocked by {blockerLabel}, but the chain is stalled in review without a clear next step. Resolve the stalled reviews below or remove them as blockers.</>
                       : <>Work on this issue is blocked by {blockerLabel}, but the chain is stalled in review without a clear next step. Resolve the stalled review below or remove it as a blocker.</>
                     : <>Work on this issue is blocked by {blockerLabel} until {blockers.length === 1 ? "it is" : "they are"} complete. Comments still wake the assignee for questions or triage.</>
                   : <>Work on this issue is blocked until it is moved back to todo. Comments still wake the assignee for questions or triage.</>}
+=======
+                      ? <>Work on this task is blocked by {blockerLabel}, but the chain is stalled in review without a clear next step. Resolve the stalled reviews below or remove them as blockers.</>
+                      : <>Work on this task is blocked by {blockerLabel}, but the chain is stalled in review without a clear next step. Resolve the stalled review below or remove it as a blocker.</>
+                    : <>Work on this task is blocked by {blockerLabel} until {blockers.length === 1 ? "it is" : "they are"} complete. Comments still wake the assignee for questions or triage.</>
+                  : <>Work on this task is blocked until it is moved back to todo. Comments still wake the assignee for questions or triage.</>}
+>>>>>>> upstream/master
               </p>
               {blockers.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">

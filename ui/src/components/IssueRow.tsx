@@ -8,7 +8,15 @@ import {
   withIssueDetailHeaderSeed,
 } from "../lib/issueDetailBreadcrumb";
 import { cn } from "../lib/utils";
+<<<<<<< HEAD
 import { deriveActiveRecoveryDisplayState, RECOVERY_CHIP_DEFAULT_TONE } from "../lib/recovery-display";
+=======
+import {
+  deriveActiveRecoveryDisplayState,
+  RECOVERY_CHIP_DEFAULT_TONE,
+  recoveryChipLabel,
+} from "../lib/recovery-display";
+>>>>>>> upstream/master
 import { StatusIcon } from "./StatusIcon";
 import { productivityReviewTriggerLabel } from "./ProductivityReviewBadge";
 import { hasAssignedBacklogBlocker } from "../lib/issue-blockers";
@@ -233,21 +241,38 @@ function renderRecoveryChip(action: IssueRecoveryAction, selected: boolean): Rea
   if (!state) return null;
   const tone = RECOVERY_CHIP_DEFAULT_TONE[state];
   const Icon = tone.icon;
+<<<<<<< HEAD
+=======
+  const label = recoveryChipLabel(state, action.kind);
+>>>>>>> upstream/master
   return (
     <span
       data-testid="issue-row-recovery-indicator"
       data-recovery-state={state}
+<<<<<<< HEAD
       role="status"
       aria-label={tone.label}
+=======
+      data-recovery-kind={action.kind}
+      role="status"
+      aria-label={label}
+>>>>>>> upstream/master
       className={cn(
         "ml-1.5 inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2 py-0.5 text-[10px] font-medium",
         tone.className,
         selected ? "!border-muted-foreground !text-muted-foreground" : null,
       )}
+<<<<<<< HEAD
       title={`${tone.label} — open the source issue to act.`}
     >
       <Icon className="h-2.5 w-2.5" aria-hidden />
       {tone.label}
+=======
+      title={`${label} — open the source task to act.`}
+    >
+      <Icon className="h-2.5 w-2.5" aria-hidden />
+      {label}
+>>>>>>> upstream/master
     </span>
   );
 }

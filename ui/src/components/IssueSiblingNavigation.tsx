@@ -16,7 +16,11 @@ export function IssueSiblingNavigation({ navigation, linkState }: IssueSiblingNa
 
   return (
     <nav
+<<<<<<< HEAD
       aria-label="Sub-issue navigation"
+=======
+      aria-label="Sub-task navigation"
+>>>>>>> upstream/master
       className="mt-4 flex flex-col gap-3 sm:mt-6 sm:grid sm:grid-cols-2"
     >
       {navigation.previous ? (
@@ -47,7 +51,11 @@ function SiblingLink({
 }) {
   const issuePathId = issue.identifier ?? issue.id;
   const label = direction === "previous" ? "Previous" : "Next";
+<<<<<<< HEAD
   const ariaDirection = direction === "previous" ? "Previous sub-issue" : "Next sub-issue";
+=======
+  const ariaDirection = direction === "previous" ? "Previous sub-task" : "Next sub-task";
+>>>>>>> upstream/master
   const identifier = issue.identifier ?? issue.id.slice(0, 8);
   const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
 

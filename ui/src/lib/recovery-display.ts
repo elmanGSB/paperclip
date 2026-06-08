@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import type { IssueRecoveryAction } from "@paperclipai/shared";
+=======
+import type { IssueRecoveryAction, IssueRecoveryActionKind } from "@paperclipai/shared";
+>>>>>>> upstream/master
 import { Eye, OctagonAlert, RefreshCw, TriangleAlert } from "lucide-react";
 
 export type RecoveryDisplayState =
@@ -55,3 +59,16 @@ export function deriveActiveRecoveryDisplayState(
   const state = deriveRecoveryDisplayState(action);
   return state === "resolved" ? null : state;
 }
+<<<<<<< HEAD
+=======
+
+export function recoveryChipLabel(
+  state: ActiveRecoveryDisplayState,
+  kind: IssueRecoveryActionKind,
+): string {
+  if (kind === "workspace_validation" && state === "needed") {
+    return "Workspace recovery needed";
+  }
+  return RECOVERY_CHIP_DEFAULT_TONE[state].label;
+}
+>>>>>>> upstream/master

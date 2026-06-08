@@ -32,13 +32,21 @@ const IDENTIFIER_PATTERN = /^[A-Z]+-\d+$/;
 
 const SCOPE_LABELS: Record<CompanySearchScope, string> = {
   all: "All",
+<<<<<<< HEAD
   issues: "Issues",
   comments: "Comments",
   documents: "Documents",
+=======
+  issues: "Tasks",
+  comments: "Comments",
+  documents: "Documents",
+  artifacts: "Artifacts",
+>>>>>>> upstream/master
   agents: "Agents",
   projects: "Projects",
 };
 
+<<<<<<< HEAD
 type SubGroupKey = "issues" | "comments" | "documents" | "agents" | "projects";
 
 const SUBGROUP_ORDER: SubGroupKey[] = ["issues", "comments", "documents", "agents", "projects"];
@@ -47,11 +55,26 @@ const SUBGROUP_LABELS: Record<SubGroupKey, string> = {
   issues: "Issues",
   comments: "Comments",
   documents: "Documents",
+=======
+type SubGroupKey = "issues" | "comments" | "documents" | "artifacts" | "agents" | "projects";
+
+const SUBGROUP_ORDER: SubGroupKey[] = ["issues", "comments", "documents", "artifacts", "agents", "projects"];
+
+const SUBGROUP_LABELS: Record<SubGroupKey, string> = {
+  issues: "Tasks",
+  comments: "Comments",
+  documents: "Documents",
+  artifacts: "Artifacts",
+>>>>>>> upstream/master
   agents: "Agents",
   projects: "Projects",
 };
 
 function classifyResult(result: CompanySearchResult): SubGroupKey {
+<<<<<<< HEAD
+=======
+  if (result.type === "artifact") return "artifacts";
+>>>>>>> upstream/master
   if (result.type === "agent") return "agents";
   if (result.type === "project") return "projects";
   const matched = new Set(result.matchedFields);
@@ -261,7 +284,11 @@ export function Search() {
     return () => window.removeEventListener("keydown", handler);
   }, [focusInput]);
 
+<<<<<<< HEAD
   const counts = data?.countsByType ?? { issue: 0, agent: 0, project: 0 };
+=======
+  const counts = data?.countsByType ?? { issue: 0, artifact: 0, agent: 0, project: 0 };
+>>>>>>> upstream/master
   const totalResults = data?.results.length ?? 0;
 
   const tabItems = useMemo<PageTabItem[]>(() => {
@@ -276,8 +303,14 @@ export function Search() {
     const issuesTotal = counts.issue ?? 0;
     return COMPANY_SEARCH_SCOPES.map((value) => {
       let count: number | null = null;
+<<<<<<< HEAD
       if (value === "all") count = (counts.issue ?? 0) + (counts.agent ?? 0) + (counts.project ?? 0);
       else if (value === "issues") count = issuesTotal;
+=======
+      if (value === "all") count = (counts.issue ?? 0) + (counts.artifact ?? 0) + (counts.agent ?? 0) + (counts.project ?? 0);
+      else if (value === "issues") count = issuesTotal;
+      else if (value === "artifacts") count = counts.artifact ?? 0;
+>>>>>>> upstream/master
       else if (value === "agents") count = counts.agent ?? 0;
       else if (value === "projects") count = counts.project ?? 0;
       return {
@@ -342,7 +375,11 @@ export function Search() {
                 }
               }
             }}
+<<<<<<< HEAD
             placeholder="Search issues, comments, documents, agents, projects…"
+=======
+            placeholder="Search tasks, comments, documents, artifacts, agents, projects…"
+>>>>>>> upstream/master
             aria-label="Search query"
             className="h-10 pl-9 pr-20 text-sm"
           />
@@ -452,7 +489,11 @@ function SearchTabContent({
         <div>
           <h2 className="text-lg font-semibold">Type to search company memory.</h2>
           <p className="mt-1 text-sm text-muted-foreground">
+<<<<<<< HEAD
             Issues, comments, plan documents, agents, projects — same surface, ranked by relevance.
+=======
+            Tasks, comments, plan documents, artifacts, agents, projects — same surface, ranked by relevance.
+>>>>>>> upstream/master
           </p>
         </div>
         {recentSearches.length > 0 ? (
@@ -479,7 +520,11 @@ function SearchTabContent({
         <ul className="space-y-1 text-xs text-muted-foreground">
           <li>
             <span className="font-medium text-foreground">Identifier lookup:</span> type{" "}
+<<<<<<< HEAD
             <code className="rounded bg-muted px-1 py-0.5 text-[11px]">PAP-123</code> to jump straight to an issue.
+=======
+            <code className="rounded bg-muted px-1 py-0.5 text-[11px]">PAP-123</code> to jump straight to a task.
+>>>>>>> upstream/master
           </li>
           <li>
             <span className="font-medium text-foreground">Quoted phrases:</span> wrap a phrase in quotes to match the
@@ -502,14 +547,22 @@ function SearchTabContent({
         <div className="text-base font-semibold">Couldn’t run that search</div>
         <p className="text-sm text-muted-foreground">
           {status ? `The server returned ${status}.` : "The request failed."} Your input and filters are still here, so
+<<<<<<< HEAD
           you can retry or fall back to the Issues filter.
+=======
+          you can retry or fall back to the Tasks filter.
+>>>>>>> upstream/master
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button onClick={refetch} variant="default" size="sm">
             Retry
           </Button>
           <Button onClick={navigateIssuesFallback} variant="outline" size="sm">
+<<<<<<< HEAD
             Open Issues filter view
+=======
+            Open Tasks filter view
+>>>>>>> upstream/master
           </Button>
         </div>
       </div>
@@ -557,10 +610,17 @@ function SearchTabContent({
           ) : null}
           <Button onClick={openNewIssue} size="sm" variant="default">
             <Plus className="mr-1.5 h-4 w-4" />
+<<<<<<< HEAD
             Create issue from this query
           </Button>
           <Button onClick={navigateIssuesFallback} size="sm" variant="ghost">
             Open Issues filter view
+=======
+            Create task from this query
+          </Button>
+          <Button onClick={navigateIssuesFallback} size="sm" variant="ghost">
+            Open Tasks filter view
+>>>>>>> upstream/master
           </Button>
         </div>
         <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">

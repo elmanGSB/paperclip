@@ -1,9 +1,16 @@
 import type { IssuePriority, IssueStatus } from "../constants.js";
 
+<<<<<<< HEAD
 export const COMPANY_SEARCH_SCOPES = ["all", "issues", "comments", "documents", "agents", "projects"] as const;
 export type CompanySearchScope = (typeof COMPANY_SEARCH_SCOPES)[number];
 
 export type CompanySearchResultType = "issue" | "agent" | "project";
+=======
+export const COMPANY_SEARCH_SCOPES = ["all", "issues", "comments", "documents", "artifacts", "agents", "projects"] as const;
+export type CompanySearchScope = (typeof COMPANY_SEARCH_SCOPES)[number];
+
+export type CompanySearchResultType = "issue" | "artifact" | "agent" | "project";
+>>>>>>> upstream/master
 
 export interface CompanySearchHighlight {
   start: number;
@@ -29,6 +36,21 @@ export interface CompanySearchIssueSummary {
   updatedAt: string;
 }
 
+<<<<<<< HEAD
+=======
+export interface CompanySearchArtifactSummary {
+  id: string;
+  source: "document" | "attachment" | "work_product";
+  mediaKind: "image" | "video" | "text" | "document" | "file" | "empty";
+  issueId: string;
+  issueIdentifier: string;
+  issueTitle: string;
+  projectId: string | null;
+  projectName: string | null;
+  updatedAt: string;
+}
+
+>>>>>>> upstream/master
 export interface CompanySearchResult {
   id: string;
   type: CompanySearchResultType;
@@ -40,6 +62,10 @@ export interface CompanySearchResult {
   snippet: string | null;
   snippets: CompanySearchSnippet[];
   issue?: CompanySearchIssueSummary;
+<<<<<<< HEAD
+=======
+  artifact?: CompanySearchArtifactSummary;
+>>>>>>> upstream/master
   updatedAt: string | null;
   previewImageUrl: string | null;
 }

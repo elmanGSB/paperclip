@@ -11,14 +11,15 @@
  * - Retrieving UI slot contributions for frontend rendering
  * - Discovering and executing plugin-contributed agent tools
  *
- * All routes require board-level authentication, and sensitive instance-wide
+ * Most routes require board-level authentication, and sensitive instance-wide
  * mutations such as install/upgrade require instance-admin privileges.
+ * Plugin tool discovery and execution routes allow both board and agent access.
  *
  * @module server/routes/plugins
  * @see doc/plugins/PLUGIN_SPEC.md for the full plugin specification
  */
 
-import { existsSync } from "node:fs";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -60,6 +61,7 @@ import { JsonRpcCallError, PLUGIN_RPC_ERROR_CODES } from "@paperclipai/plugin-sd
 import {
   assertAuthenticated,
   assertBoard,
+  assertBoardOrAgent,
   assertBoardOrgAccess,
   assertCompanyAccess,
   assertInstanceAdmin,
@@ -114,13 +116,17 @@ interface PluginInstallRequest {
   isLocalPath?: boolean;
 }
 
-interface AvailablePluginExample {
+interface AvailableBundledPlugin {
   packageName: string;
   pluginKey: string;
   displayName: string;
   description: string;
   localPath: string;
   tag: "example" | "first-party";
+<<<<<<< HEAD
+=======
+  experimental: boolean;
+>>>>>>> upstream/master
 }
 
 /** Response body for GET /api/plugins/:pluginId/health */
@@ -150,7 +156,14 @@ const PLUGIN_SCOPED_API_RESPONSE_HEADER_ALLOWLIST = new Set([
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../../..");
+const EXPERIMENTAL_BUNDLED_PLUGIN_PACKAGE_NAMES = new Set([
+  "@paperclipai/plugin-llm-wiki",
+  "@paperclipai/plugin-modal",
+  "@paperclipai/plugin-workspace-diff",
+]);
+let bundledPluginsCache: Promise<AvailableBundledPlugin[]> | null = null;
 
+<<<<<<< HEAD
 const BUNDLED_PLUGIN_EXAMPLES: AvailablePluginExample[] = [
   {
     packageName: "@paperclipai/plugin-workspace-diff",
@@ -193,13 +206,159 @@ const BUNDLED_PLUGIN_EXAMPLES: AvailablePluginExample[] = [
     tag: "example",
   },
 ];
+=======
+function titleCasePluginName(packageName: string): string {
+  const localName = packageName.split("/").pop() ?? packageName;
+  return localName
+    .replace(/^paperclip-plugin-/, "")
+    .replace(/^plugin-/, "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+>>>>>>> upstream/master
 
-function listBundledPluginExamples(): AvailablePluginExample[] {
-  return BUNDLED_PLUGIN_EXAMPLES.flatMap((plugin) => {
-    const absoluteLocalPath = path.resolve(REPO_ROOT, plugin.localPath);
-    if (!existsSync(absoluteLocalPath)) return [];
-    return [{ ...plugin, localPath: absoluteLocalPath }];
+async function fileExists(filePath: string): Promise<boolean> {
+  return access(filePath).then(() => true, () => false);
+}
+
+async function readJsonFile(filePath: string): Promise<Record<string, unknown> | null> {
+  try {
+    return JSON.parse(await readFile(filePath, "utf8")) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+async function findPackageJsonFiles(root: string, maxDepth = 4): Promise<string[]> {
+  if (!(await fileExists(root))) return [];
+
+  const packageJsonFiles: string[] = [];
+  const walk = async (dir: string, depth: number): Promise<void> => {
+    if (depth > maxDepth) return;
+
+    const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries) {
+      if (entry.name === "node_modules" || entry.name === "dist") continue;
+      const entryPath = path.join(dir, entry.name);
+
+      if (entry.isFile() && entry.name === "package.json") {
+        packageJsonFiles.push(entryPath);
+      } else if (entry.isDirectory()) {
+        await walk(entryPath, depth + 1);
+      }
+    }
+  };
+
+  await walk(root, 0);
+  return packageJsonFiles;
+}
+
+function manifestSourcePath(packageRoot: string, pkgJson: Record<string, unknown>): string | null {
+  const paperclipPlugin = pkgJson.paperclipPlugin;
+  if (
+    !paperclipPlugin
+    || typeof paperclipPlugin !== "object"
+    || Array.isArray(paperclipPlugin)
+  ) {
+    return null;
+  }
+
+  const manifestPath = (paperclipPlugin as Record<string, unknown>).manifest;
+  if (typeof manifestPath !== "string") return null;
+
+  const sourcePath = manifestPath
+    .replace(/^\.\/dist\//, "./src/")
+    .replace(/\.js$/, ".ts");
+  return path.resolve(packageRoot, sourcePath);
+}
+
+function firstStringLiteral(source: string, key: string): string | null {
+  const match = source.match(
+    new RegExp(`${key}:\\s*(?:"([^"]*)"|'([^']*)'|\`([^\`]*)\`)`, "s"),
+  );
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? null;
+}
+
+async function bundledPluginMetadata(
+  packageRoot: string,
+  pkgJson: Record<string, unknown>,
+): Promise<{ pluginKey?: string; displayName?: string; description?: string }> {
+  const sourcePath = manifestSourcePath(packageRoot, pkgJson);
+  if (!sourcePath || !(await fileExists(sourcePath))) return {};
+
+  try {
+    const source = await readFile(sourcePath, "utf8");
+    const pluginId = source
+      .match(/(?:export\s+)?const\s+PLUGIN_ID\s*=\s*(?:"([^"]*)"|'([^']*)'|`([^`]*)`)/)
+      ?.slice(1)
+      .find(Boolean)
+      ?? firstStringLiteral(source, "id")
+      ?? null;
+    return {
+      pluginKey: pluginId ?? undefined,
+      displayName: firstStringLiteral(source, "displayName") ?? undefined,
+      description: firstStringLiteral(source, "description") ?? undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function isExperimentalBundledPlugin(packageRoot: string, packageName: string): boolean {
+  return (
+    EXPERIMENTAL_BUNDLED_PLUGIN_PACKAGE_NAMES.has(packageName)
+    || packageRoot.includes(`${path.sep}sandbox-providers${path.sep}`)
+    || packageName.includes("sandbox")
+  );
+}
+
+async function discoverBundledPlugins(): Promise<AvailableBundledPlugin[]> {
+  const pluginRoot = path.resolve(REPO_ROOT, "packages/plugins");
+  const bundledPlugins: AvailableBundledPlugin[] = [];
+  for (const packageJsonPath of await findPackageJsonFiles(pluginRoot)) {
+    const packageRoot = path.dirname(packageJsonPath);
+    const pkgJson = await readJsonFile(packageJsonPath);
+    const paperclipPlugin = pkgJson?.paperclipPlugin;
+    if (
+      !pkgJson
+      || !paperclipPlugin
+      || typeof paperclipPlugin !== "object"
+      || Array.isArray(paperclipPlugin)
+    ) {
+      continue;
+    }
+
+    const packageName = pkgJson.name;
+    if (typeof packageName !== "string" || packageName.length === 0) continue;
+
+    const metadata = await bundledPluginMetadata(packageRoot, pkgJson);
+    const tag = packageRoot.includes(`${path.sep}examples${path.sep}`) ? "example" : "first-party";
+    bundledPlugins.push({
+      packageName,
+      pluginKey: metadata.pluginKey ?? packageName,
+      displayName: metadata.displayName ?? titleCasePluginName(packageName),
+      description: metadata.description
+        ?? `Bundled Paperclip plugin from ${path.relative(REPO_ROOT, packageRoot)}.`,
+      localPath: packageRoot,
+      tag,
+      experimental: isExperimentalBundledPlugin(packageRoot, packageName),
+    });
+  }
+
+  return bundledPlugins.sort((left, right) => {
+    if (left.tag !== right.tag) return left.tag === "first-party" ? -1 : 1;
+    return left.displayName.localeCompare(right.displayName);
   });
+}
+
+async function listBundledPlugins(): Promise<AvailableBundledPlugin[]> {
+  bundledPluginsCache ??= discoverBundledPlugins().catch((error: unknown) => {
+    bundledPluginsCache = null;
+    throw error;
+  });
+  return bundledPluginsCache;
 }
 
 /**
@@ -677,12 +836,12 @@ export function pluginRoutes(
   /**
    * GET /api/plugins/examples
    *
-   * Return first-party example plugins bundled in this repo, if present.
+   * Return plugin packages bundled in this repo, if present.
    * These can be installed through the normal local-path install flow.
    */
   router.get("/plugins/examples", async (req, res) => {
     assertBoardOrgAccess(req);
-    res.json(listBundledPluginExamples());
+    res.json(await listBundledPlugins());
   });
 
   // IMPORTANT: Static routes must come before parameterized routes
@@ -769,7 +928,7 @@ export function pluginRoutes(
    * Errors: 501 if tool dispatcher is not configured
    */
   router.get("/plugins/tools", async (req, res) => {
-    assertBoardOrgAccess(req);
+    assertBoardOrAgent(req);
 
     if (!toolDeps) {
       res.status(501).json({ error: "Plugin tool dispatch is not enabled" });
@@ -803,7 +962,7 @@ export function pluginRoutes(
    * - 502 if the plugin worker is unavailable or the RPC call fails
    */
   router.post("/plugins/tools/execute", async (req, res) => {
-    assertBoardOrgAccess(req);
+    assertBoardOrAgent(req);
 
     if (!toolDeps) {
       res.status(501).json({ error: "Plugin tool dispatch is not enabled" });

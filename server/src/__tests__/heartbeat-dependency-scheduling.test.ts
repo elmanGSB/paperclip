@@ -13,6 +13,10 @@ import {
   documents,
   environmentLeases,
   environments,
+<<<<<<< HEAD
+=======
+  executionWorkspaces,
+>>>>>>> upstream/master
   heartbeatRunEvents,
   heartbeatRuns,
   issueComments,
@@ -20,6 +24,7 @@ import {
   issueRelations,
   issueTreeHolds,
   issues,
+  workspaceOperations,
 } from "@paperclipai/db";
 import {
   getEmbeddedPostgresTestSupport,
@@ -142,6 +147,11 @@ describeEmbeddedPostgres("heartbeat dependency-aware queued run selection", () =
     await db.delete(agents);
     await db.delete(companySkills);
     await db.delete(environments);
+<<<<<<< HEAD
+=======
+    await db.delete(workspaceOperations);
+    await db.delete(executionWorkspaces);
+>>>>>>> upstream/master
     await db.delete(companies);
   });
 

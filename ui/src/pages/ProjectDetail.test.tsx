@@ -2,7 +2,12 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Project } from "@paperclipai/shared";
+<<<<<<< HEAD
 import { act, type ReactNode } from "react";
+=======
+import type { ReactNode } from "react";
+import { flushSync } from "react-dom";
+>>>>>>> upstream/master
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProjectDetail } from "./ProjectDetail";
@@ -24,6 +29,13 @@ const mockBudgetsApi = vi.hoisted(() => ({ overview: vi.fn(), upsertPolicy: vi.f
 const mockExecutionWorkspacesApi = vi.hoisted(() => ({ list: vi.fn() }));
 const mockInstanceSettingsApi = vi.hoisted(() => ({ getExperimental: vi.fn() }));
 const mockAssetsApi = vi.hoisted(() => ({ uploadImage: vi.fn() }));
+<<<<<<< HEAD
+=======
+const mockResourceMembershipsApi = vi.hoisted(() => ({
+  listMine: vi.fn(),
+  updateProject: vi.fn(),
+}));
+>>>>>>> upstream/master
 const mockNavigate = vi.hoisted(() => vi.fn());
 const mockSetBreadcrumbs = vi.hoisted(() => vi.fn());
 const mockIssuesList = vi.hoisted(() => vi.fn());
@@ -36,6 +48,10 @@ vi.mock("../api/budgets", () => ({ budgetsApi: mockBudgetsApi }));
 vi.mock("../api/execution-workspaces", () => ({ executionWorkspacesApi: mockExecutionWorkspacesApi }));
 vi.mock("../api/instanceSettings", () => ({ instanceSettingsApi: mockInstanceSettingsApi }));
 vi.mock("../api/assets", () => ({ assetsApi: mockAssetsApi }));
+<<<<<<< HEAD
+=======
+vi.mock("../api/resourceMemberships", () => ({ resourceMembershipsApi: mockResourceMembershipsApi }));
+>>>>>>> upstream/master
 
 vi.mock("@/lib/router", () => ({
   Link: ({ children, to }: { children?: ReactNode; to: string }) => <a href={to}>{children}</a>,
@@ -87,6 +103,17 @@ vi.mock("../components/IssuesList", () => ({
   },
 }));
 
+<<<<<<< HEAD
+=======
+async function act(callback: () => void | Promise<void>) {
+  let result: void | Promise<void> = undefined;
+  flushSync(() => {
+    result = callback();
+  });
+  await result;
+}
+
+>>>>>>> upstream/master
 function project(overrides: Partial<Project> = {}): Project {
   const now = new Date("2026-05-01T00:00:00Z");
   return {
@@ -102,6 +129,10 @@ function project(overrides: Partial<Project> = {}): Project {
     leadAgentId: null,
     targetDate: null,
     color: "#14b8a6",
+<<<<<<< HEAD
+=======
+    icon: null,
+>>>>>>> upstream/master
     env: null,
     pauseReason: null,
     pausedAt: null,
@@ -152,10 +183,28 @@ describe("ProjectDetail", () => {
     mockBudgetsApi.overview.mockResolvedValue({ policies: [] });
     mockInstanceSettingsApi.getExperimental.mockResolvedValue({ enableIsolatedWorkspaces: false });
     mockExecutionWorkspacesApi.list.mockResolvedValue([]);
+<<<<<<< HEAD
   });
 
   afterEach(() => {
     act(() => root?.unmount());
+=======
+    mockResourceMembershipsApi.listMine.mockResolvedValue({
+      projectMemberships: {},
+      agentMemberships: {},
+      updatedAt: null,
+    });
+    mockResourceMembershipsApi.updateProject.mockResolvedValue({
+      resourceType: "project",
+      resourceId: "project-1",
+      state: "left",
+      updatedAt: new Date("2026-05-01T00:00:00Z"),
+    });
+  });
+
+  afterEach(async () => {
+    await act(() => root?.unmount());
+>>>>>>> upstream/master
     root = null;
     container.remove();
     vi.clearAllMocks();

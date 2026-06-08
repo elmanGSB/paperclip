@@ -520,10 +520,25 @@ describeEmbeddedPostgres("plugin database namespaces", () => {
     const staleManifest = manifest("paperclip.refresh");
     const refreshedManifest: PaperclipPluginManifestV1 = {
       ...staleManifest,
+<<<<<<< HEAD
+=======
+      capabilities: [...staleManifest.capabilities, "agent.tools.register"],
+>>>>>>> upstream/master
       database: {
         ...staleManifest.database!,
         coreReadTables: ["companies"],
       },
+<<<<<<< HEAD
+=======
+      tools: [
+        {
+          name: "db-smoke",
+          displayName: "DB Smoke",
+          description: "Exercises plugin tool registration worker lookup.",
+          parametersSchema: { type: "object", properties: {} },
+        },
+      ],
+>>>>>>> upstream/master
     };
     const namespace = derivePluginDatabaseNamespace(refreshedManifest.id);
     const packageRoot = await createInstallablePluginPackage(
@@ -548,6 +563,12 @@ describeEmbeddedPostgres("plugin database namespaces", () => {
       startWorker: vi.fn().mockResolvedValue(undefined),
       stopAll: vi.fn().mockResolvedValue(undefined),
     };
+<<<<<<< HEAD
+=======
+    const toolDispatcher = {
+      registerPluginTools: vi.fn(),
+    };
+>>>>>>> upstream/master
     const loader = pluginLoader(db, {
       enableLocalFilesystem: false,
       enableNpmDiscovery: false,
@@ -564,9 +585,13 @@ describeEmbeddedPostgres("plugin database namespaces", () => {
       jobStore: {
         syncJobDeclarations: vi.fn().mockResolvedValue(undefined),
       },
+<<<<<<< HEAD
       toolDispatcher: {
         registerPluginTools: vi.fn(),
       },
+=======
+      toolDispatcher,
+>>>>>>> upstream/master
       lifecycleManager: {
         markError: vi.fn().mockResolvedValue(undefined),
       },
@@ -595,6 +620,16 @@ describeEmbeddedPostgres("plugin database namespaces", () => {
         }),
       }),
     );
+<<<<<<< HEAD
+=======
+    expect(toolDispatcher.registerPluginTools).toHaveBeenCalledWith(
+      refreshedManifest.id,
+      expect.objectContaining({
+        tools: refreshedManifest.tools,
+      }),
+      pluginId,
+    );
+>>>>>>> upstream/master
     const [plugin] = await db
       .select()
       .from(plugins)

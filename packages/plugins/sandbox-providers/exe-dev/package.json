@@ -1,6 +1,10 @@
 {
   "name": "@paperclipai/plugin-exe-dev",
+<<<<<<< HEAD
   "version": "0.1.0",
+=======
+  "version": "0.1.1",
+>>>>>>> upstream/master
   "description": "exe.dev sandbox provider plugin for Paperclip environments",
   "license": "MIT",
   "homepage": "https://github.com/paperclipai/paperclip",
@@ -53,6 +57,10 @@
   "devDependencies": {
     "@types/node": "^24.6.0",
     "typescript": "^5.7.3",
+<<<<<<< HEAD
     "vitest": "^3.2.4"
+=======
+    "vitest": "^4.1.8"
+>>>>>>> upstream/master
   }
 }

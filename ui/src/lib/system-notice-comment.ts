@@ -37,11 +37,19 @@ function mapMetadataRow(
     case "issue_link": {
       const identifier = row.identifier ?? null;
       if (!identifier) {
+<<<<<<< HEAD
         return { kind: "text", label: metadataRowText(row, "Issue"), value: row.title ?? "unknown" };
       }
       return {
         kind: "issue",
         label: metadataRowText(row, "Issue"),
+=======
+        return { kind: "text", label: metadataRowText(row, "Task"), value: row.title ?? "unknown" };
+      }
+      return {
+        kind: "issue",
+        label: metadataRowText(row, "Task"),
+>>>>>>> upstream/master
         identifier,
         href: `/issues/${identifier}`,
         title: row.title ?? undefined,

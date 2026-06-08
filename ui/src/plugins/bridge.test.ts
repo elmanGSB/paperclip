@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+<<<<<<< HEAD
 import { act } from "react";
+=======
+import { flushSync } from "react-dom";
+>>>>>>> upstream/master
 import { createRoot } from "react-dom/client";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -46,6 +50,13 @@ afterEach(() => {
   delete globalThis.__paperclipPluginBridge__;
 });
 
+<<<<<<< HEAD
+=======
+function act(callback: () => void) {
+  flushSync(callback);
+}
+
+>>>>>>> upstream/master
 describe("plugin host navigation", () => {
   it("resolves plugin page routes into the active company prefix", () => {
     expect(resolveHostNavigationHref("/wiki", "PAP")).toBe("/PAP/wiki");
@@ -57,8 +68,19 @@ describe("plugin host navigation", () => {
   it("does not double-prefix active company paths or global host paths", () => {
     expect(resolveHostNavigationHref("/PAP/wiki", "PAP")).toBe("/PAP/wiki");
     expect(resolveHostNavigationHref("/pap/wiki", "PAP")).toBe("/pap/wiki");
+<<<<<<< HEAD
     expect(resolveHostNavigationHref("/instance/settings/plugins", "PAP")).toBe(
       "/instance/settings/plugins",
+=======
+  });
+
+  it("rewrites legacy instance settings paths into the active company settings scope", () => {
+    expect(resolveHostNavigationHref("/instance/settings/plugins", "PAP")).toBe(
+      "/PAP/company/settings/instance/plugins",
+    );
+    expect(resolveHostNavigationHref("/settings/experimental?x=1#auto", "pap")).toBe(
+      "/PAP/company/settings/instance/experimental?x=1#auto",
+>>>>>>> upstream/master
     );
   });
 

@@ -13,6 +13,10 @@ import type {
 } from "@paperclipai/shared";
 import {
   addCommonClientOptions,
+<<<<<<< HEAD
+=======
+  apiPath,
+>>>>>>> upstream/master
   formatInlineRecord,
   handleCommandError,
   printOutput,
@@ -40,6 +44,23 @@ interface SecretCreateOptions extends BaseClientOptions {
   description?: string;
 }
 
+<<<<<<< HEAD
+=======
+interface SecretUpdateOptions extends BaseClientOptions {
+  payloadJson?: string;
+}
+
+interface SecretRotateOptions extends BaseClientOptions {
+  value?: string;
+  valueEnv?: string;
+}
+
+interface SecretDeleteOptions extends BaseClientOptions {
+  yes?: boolean;
+  confirm?: string;
+}
+
+>>>>>>> upstream/master
 interface SecretLinkOptions extends BaseClientOptions {
   companyId?: string;
   name?: string;
@@ -59,6 +80,14 @@ interface SecretMigrateInlineEnvOptions extends BaseClientOptions {
   apply?: boolean;
 }
 
+<<<<<<< HEAD
+=======
+interface SecretJsonOptions extends BaseClientOptions {
+  companyId?: string;
+  payloadJson?: string;
+}
+
+>>>>>>> upstream/master
 interface SecretProviderHealth {
   provider: SecretProvider;
   status: "ok" | "warn" | "error";
@@ -171,7 +200,11 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
+<<<<<<< HEAD
 function readValueFromOptions(opts: SecretCreateOptions): string {
+=======
+function readValueFromOptions(opts: { value?: string; valueEnv?: string }): string {
+>>>>>>> upstream/master
   if (opts.value !== undefined && opts.valueEnv !== undefined) {
     throw new Error("Use only one of --value or --value-env.");
   }
@@ -263,8 +296,13 @@ function asStringArray(value: unknown): string[] {
 async function migrateInlineEnv(opts: SecretMigrateInlineEnvOptions): Promise<void> {
   const ctx = resolveCommandContext(opts, { requireCompany: true });
   const companyId = ctx.companyId!;
+<<<<<<< HEAD
   const agents = (await ctx.api.get<Agent[]>(`/api/companies/${companyId}/agents`)) ?? [];
   const secrets = (await ctx.api.get<CompanySecret[]>(`/api/companies/${companyId}/secrets`)) ?? [];
+=======
+  const agents = (await ctx.api.get<Agent[]>(apiPath`/api/companies/${companyId}/agents`)) ?? [];
+  const secrets = (await ctx.api.get<CompanySecret[]>(apiPath`/api/companies/${companyId}/secrets`)) ?? [];
+>>>>>>> upstream/master
   const candidates = collectInlineSecretMigrationCandidates(agents, secrets);
 
   if (!opts.apply) {
@@ -295,13 +333,21 @@ async function migrateInlineEnv(opts: SecretMigrateInlineEnvOptions): Promise<vo
     if (!value) continue;
 
     if (candidate.existingSecretId) {
+<<<<<<< HEAD
       await ctx.api.post(`/api/secrets/${candidate.existingSecretId}/rotate`, { value });
+=======
+      await ctx.api.post(apiPath`/api/secrets/${candidate.existingSecretId}/rotate`, { value });
+>>>>>>> upstream/master
       createdOrRotated.set(`${candidate.agentId}:${candidate.envKey}`, candidate.existingSecretId);
       rotatedSecrets += 1;
       continue;
     }
 
+<<<<<<< HEAD
     const created = await ctx.api.post<CompanySecret>(`/api/companies/${companyId}/secrets`, {
+=======
+    const created = await ctx.api.post<CompanySecret>(apiPath`/api/companies/${companyId}/secrets`, {
+>>>>>>> upstream/master
       name: candidate.secretName,
       provider: "local_encrypted",
       value,
@@ -326,7 +372,11 @@ async function migrateInlineEnv(opts: SecretMigrateInlineEnvOptions): Promise<vo
       ...agent.adapterConfig,
       env: buildMigratedAgentEnv(env, secretIdByEnvKey),
     };
+<<<<<<< HEAD
     await ctx.api.patch(`/api/agents/${agent.id}`, {
+=======
+    await ctx.api.patch(apiPath`/api/agents/${agent.id}`, {
+>>>>>>> upstream/master
       adapterConfig,
       replaceAdapterConfig: true,
     });
@@ -355,7 +405,11 @@ export function registerSecretCommands(program: Command): void {
       .action(async (opts: SecretListOptions) => {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });
+<<<<<<< HEAD
           const rows = (await ctx.api.get<CompanySecret[]>(`/api/companies/${ctx.companyId}/secrets`)) ?? [];
+=======
+          const rows = (await ctx.api.get<CompanySecret[]>(apiPath`/api/companies/${ctx.companyId}/secrets`)) ?? [];
+>>>>>>> upstream/master
           printOutput(ctx.json ? rows : rows.map(renderSecret), { json: ctx.json });
         } catch (err) {
           handleCommandError(err);
@@ -378,7 +432,11 @@ export function registerSecretCommands(program: Command): void {
             throw new Error("Invalid --kind value. Use: all, secret, plain");
           }
           const preview = await ctx.api.post<CompanyPortabilityExportPreviewResult>(
+<<<<<<< HEAD
             `/api/companies/${ctx.companyId}/exports/preview`,
+=======
+            apiPath`/api/companies/${ctx.companyId}/exports/preview`,
+>>>>>>> upstream/master
             { include: parseSecretsInclude(opts.include) },
           );
           const declarations = (preview?.manifest.envInputs ?? [])
@@ -404,7 +462,11 @@ export function registerSecretCommands(program: Command): void {
       .action(async (opts: SecretCreateOptions) => {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });
+<<<<<<< HEAD
           const created = await ctx.api.post<CompanySecret>(`/api/companies/${ctx.companyId}/secrets`, {
+=======
+          const created = await ctx.api.post<CompanySecret>(apiPath`/api/companies/${ctx.companyId}/secrets`, {
+>>>>>>> upstream/master
             name: opts.name,
             key: opts.key,
             provider: opts.provider,
@@ -432,7 +494,11 @@ export function registerSecretCommands(program: Command): void {
       .action(async (opts: SecretLinkOptions) => {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });
+<<<<<<< HEAD
           const created = await ctx.api.post<CompanySecret>(`/api/companies/${ctx.companyId}/secrets`, {
+=======
+          const created = await ctx.api.post<CompanySecret>(apiPath`/api/companies/${ctx.companyId}/secrets`, {
+>>>>>>> upstream/master
             name: opts.name,
             key: opts.key,
             provider: opts.provider,
@@ -450,6 +516,93 @@ export function registerSecretCommands(program: Command): void {
 
   addCommonClientOptions(
     secrets
+<<<<<<< HEAD
+=======
+      .command("update")
+      .description("Update secret metadata")
+      .argument("<secretId>", "Secret ID")
+      .requiredOption("--payload-json <json>", "UpdateSecret JSON payload")
+      .action(async (secretId: string, opts: SecretUpdateOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.patch(apiPath`/api/secrets/${secretId}`, parseJson(opts.payloadJson ?? "{}")), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    secrets
+      .command("rotate")
+      .description("Rotate a Paperclip-managed secret value")
+      .argument("<secretId>", "Secret ID")
+      .option("--value <value>", "New secret value")
+      .option("--value-env <name>", "Read new secret value from an environment variable")
+      .action(async (secretId: string, opts: SecretRotateOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.post(apiPath`/api/secrets/${secretId}/rotate`, { value: readValueFromOptions(opts) }), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    secrets
+      .command("usage")
+      .description("Show where a secret is referenced")
+      .argument("<secretId>", "Secret ID")
+      .action(async (secretId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.get(apiPath`/api/secrets/${secretId}/usage`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    secrets
+      .command("access-events")
+      .description("List secret access events")
+      .argument("<secretId>", "Secret ID")
+      .action(async (secretId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.get(apiPath`/api/secrets/${secretId}/access-events`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    secrets
+      .command("delete")
+      .description("Delete a secret")
+      .argument("<secretId>", "Secret ID")
+      .option("--yes", "Required safety flag to confirm destructive action", false)
+      .option("--confirm <secretId>", "Repeat the secret ID to confirm deletion")
+      .action(async (secretId: string, opts: SecretDeleteOptions) => {
+        try {
+          if (!opts.yes) throw new Error("Deletion requires --yes.");
+          if (opts.confirm !== secretId) {
+            throw new Error("Deletion requires --confirm <secretId> matching the secret ID.");
+          }
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.delete(apiPath`/api/secrets/${secretId}`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCommonClientOptions(
+    secrets
+>>>>>>> upstream/master
       .command("doctor")
       .description("Run secret provider health checks through the Paperclip API")
       .requiredOption("-C, --company-id <id>", "Company ID")
@@ -457,7 +610,11 @@ export function registerSecretCommands(program: Command): void {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });
           const health = await ctx.api.get<SecretProviderHealthResponse>(
+<<<<<<< HEAD
             `/api/companies/${ctx.companyId}/secret-providers/health`,
+=======
+            apiPath`/api/companies/${ctx.companyId}/secret-providers/health`,
+>>>>>>> upstream/master
           );
           printProviderHealth(health?.providers ?? [], ctx.json);
         } catch (err) {
@@ -475,7 +632,11 @@ export function registerSecretCommands(program: Command): void {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });
           const rows = (await ctx.api.get<SecretProviderDescriptor[]>(
+<<<<<<< HEAD
             `/api/companies/${ctx.companyId}/secret-providers`,
+=======
+            apiPath`/api/companies/${ctx.companyId}/secret-providers`,
+>>>>>>> upstream/master
           )) ?? [];
           printOutput(rows, { json: ctx.json });
         } catch (err) {
@@ -486,6 +647,39 @@ export function registerSecretCommands(program: Command): void {
 
   addCommonClientOptions(
     secrets
+<<<<<<< HEAD
+=======
+      .command("provider-configs")
+      .description("List company secret provider vault configs")
+      .requiredOption("-C, --company-id <id>", "Company ID")
+      .action(async (opts: SecretDoctorOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts, { requireCompany: true });
+          printOutput(await ctx.api.get(apiPath`/api/companies/${ctx.companyId}/secret-provider-configs`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+
+  addCompanySecretJsonPost(secrets, "provider-config:create", "Create a secret provider vault config", "secret-provider-configs");
+  addCompanySecretJsonPost(
+    secrets,
+    "provider-config:discovery-preview",
+    "Preview provider vault secret discovery",
+    "secret-provider-configs/discovery/preview",
+  );
+  addSecretProviderConfigGet(secrets, "provider-config:get", "Get a secret provider vault config", "");
+  addSecretProviderConfigPatch(secrets, "provider-config:update", "Update a secret provider vault config", "");
+  addSecretProviderConfigPost(secrets, "provider-config:default", "Set the default provider vault config", "default");
+  addSecretProviderConfigPost(secrets, "provider-config:health", "Check provider vault health", "health");
+  addSecretProviderConfigDelete(secrets, "provider-config:delete", "Delete a secret provider vault config");
+  addCompanySecretJsonPost(secrets, "remote-import:preview", "Preview remote secret import", "secrets/remote-import/preview");
+  addCompanySecretJsonPost(secrets, "remote-import", "Import selected remote secrets", "secrets/remote-import");
+
+  addCommonClientOptions(
+    secrets
+>>>>>>> upstream/master
       .command("migrate-inline-env")
       .description("Migrate inline sensitive agent env values into secret references")
       .requiredOption("-C, --company-id <id>", "Company ID")
@@ -499,3 +693,97 @@ export function registerSecretCommands(program: Command): void {
       }),
   );
 }
+<<<<<<< HEAD
+=======
+
+function addCompanySecretJsonPost(parent: Command, name: string, description: string, path: string): void {
+  addCommonClientOptions(
+    parent
+      .command(name)
+      .description(description)
+      .requiredOption("-C, --company-id <id>", "Company ID")
+      .requiredOption("--payload-json <json>", "JSON payload")
+      .action(async (opts: SecretJsonOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts, { requireCompany: true });
+          printOutput(await ctx.api.post(`${apiPath`/api/companies/${ctx.companyId}`}/${path}`, parseJson(opts.payloadJson ?? "{}")), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+}
+
+function addSecretProviderConfigGet(parent: Command, name: string, description: string, suffix: string): void {
+  addCommonClientOptions(
+    parent
+      .command(name)
+      .description(description)
+      .argument("<configId>", "Provider config ID")
+      .action(async (configId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.get(`${apiPath`/api/secret-provider-configs/${configId}`}${suffix ? `/${suffix}` : ""}`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+}
+
+function addSecretProviderConfigPatch(parent: Command, name: string, description: string, suffix: string): void {
+  addCommonClientOptions(
+    parent
+      .command(name)
+      .description(description)
+      .argument("<configId>", "Provider config ID")
+      .requiredOption("--payload-json <json>", "JSON payload")
+      .action(async (configId: string, opts: SecretJsonOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.patch(`${apiPath`/api/secret-provider-configs/${configId}`}${suffix ? `/${suffix}` : ""}`, parseJson(opts.payloadJson ?? "{}")), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+}
+
+function addSecretProviderConfigPost(parent: Command, name: string, description: string, suffix: string): void {
+  addCommonClientOptions(
+    parent
+      .command(name)
+      .description(description)
+      .argument("<configId>", "Provider config ID")
+      .action(async (configId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.post(`${apiPath`/api/secret-provider-configs/${configId}`}/${suffix}`, {}), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+}
+
+function addSecretProviderConfigDelete(parent: Command, name: string, description: string): void {
+  addCommonClientOptions(
+    parent
+      .command(name)
+      .description(description)
+      .argument("<configId>", "Provider config ID")
+      .action(async (configId: string, opts: BaseClientOptions) => {
+        try {
+          const ctx = resolveCommandContext(opts);
+          printOutput(await ctx.api.delete(apiPath`/api/secret-provider-configs/${configId}`), { json: ctx.json });
+        } catch (err) {
+          handleCommandError(err);
+        }
+      }),
+  );
+}
+
+function parseJson(value: string): unknown {
+  return JSON.parse(value) as unknown;
+}
+>>>>>>> upstream/master

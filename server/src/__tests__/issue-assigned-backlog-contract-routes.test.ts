@@ -32,10 +32,26 @@ vi.mock("../services/index.js", () => ({
   }),
   agentService: () => ({
     getById: vi.fn(async () => null),
+<<<<<<< HEAD
+=======
+    resolveByReference: vi.fn(async (_companyId: string, reference: string) => ({
+      ambiguous: false,
+      agent: {
+        id: reference,
+        companyId: "company-1",
+        status: "active",
+        orgChainHealth: { status: "healthy" },
+      },
+    })),
+>>>>>>> upstream/master
   }),
   companyService: () => ({
     getById: vi.fn(async () => ({ id: "company-1", attachmentMaxBytes: 10 * 1024 * 1024 })),
   }),
+<<<<<<< HEAD
+=======
+  documentAnnotationService: () => ({ remapOpenThreadsForDocument: async () => [] }),
+>>>>>>> upstream/master
   documentService: () => ({
     getIssueDocumentPayload: vi.fn(async () => ({})),
   }),

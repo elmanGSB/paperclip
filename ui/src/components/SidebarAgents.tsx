@@ -3,11 +3,17 @@ import { Link, NavLink, useLocation } from "@/lib/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MoreHorizontal,
+  Loader2,
+  LogOut,
   PauseCircle,
   Pencil,
   PlayCircle,
   Plus,
   Users,
+<<<<<<< HEAD
+=======
+  AlertTriangle,
+>>>>>>> upstream/master
 } from "lucide-react";
 import { useCompany } from "../context/CompanyContext";
 import { useDialogActions } from "../context/DialogContext";
@@ -20,6 +26,10 @@ import { SIDEBAR_SCROLL_RESET_STATE } from "../lib/navigation-scroll";
 import { queryKeys } from "../lib/queryKeys";
 import { cn, agentRouteRef, agentUrl } from "../lib/utils";
 import { useAgentOrder } from "../hooks/useAgentOrder";
+<<<<<<< HEAD
+=======
+import { resourceMembershipState, useResourceMembershipMutation, useResourceMemberships } from "../hooks/useResourceMemberships";
+>>>>>>> upstream/master
 import {
   AGENT_SORT_MODE_UPDATED_EVENT,
   getAgentSortModeStorageKey,
@@ -41,6 +51,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Agent } from "@paperclipai/shared";
 
+<<<<<<< HEAD
+=======
+/**
+ * When no agent is running, the sidebar falls back to showing at most this many
+ * recently-active agents plus a "See all agents" link (IA Phase 5).
+ */
+const RECENT_AGENT_LIMIT = 5;
+
+>>>>>>> upstream/master
 const AGENT_SORT_CHOICES: SidebarSectionRadioChoice[] = [
   { value: "top", label: "Top" },
   { value: "alphabetical", label: "Alphabetical" },
@@ -82,6 +101,8 @@ function SidebarAgentItem({
   agent,
   disabled,
   isMobile,
+  leaving,
+  onLeaveAgent,
   onPauseResume,
   runCount,
   setSidebarOpen,
@@ -91,6 +112,8 @@ function SidebarAgentItem({
   agent: Agent;
   disabled: boolean;
   isMobile: boolean;
+  leaving: boolean;
+  onLeaveAgent: (agent: Agent) => void;
   onPauseResume: (agent: Agent, action: "pause" | "resume") => void;
   runCount: number;
   setSidebarOpen: (open: boolean) => void;
@@ -101,12 +124,15 @@ function SidebarAgentItem({
   const isActive = activeAgentId === routeRef;
   const isPaused = agent.status === "paused";
   const isBudgetPaused = isPaused && agent.pauseReason === "budget";
+  const hasInvalidOrgChain = agent.orgChainHealth?.status === "invalid_org_chain";
   const pauseResumeLabel = isPaused ? "Resume agent" : "Pause agent";
-  const pauseResumeDisabled = disabled || agent.status === "pending_approval" || isBudgetPaused;
+  const pauseResumeDisabled = disabled || agent.status === "pending_approval" || isBudgetPaused || (isPaused && hasInvalidOrgChain);
   const pauseResumeDisabledLabel = disabled
     ? "Updating..."
     : isBudgetPaused
       ? "Budget paused"
+      : isPaused && hasInvalidOrgChain
+        ? "Invalid org chain"
       : pauseResumeLabel;
 
   return (
@@ -126,6 +152,9 @@ function SidebarAgentItem({
       >
         <AgentIcon icon={agent.icon} className="shrink-0 h-3.5 w-3.5 text-muted-foreground" />
         <span className="flex-1 truncate">{agent.name}</span>
+        {hasInvalidOrgChain ? (
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" aria-label="Invalid reporting chain" />
+        ) : null}
         {(agent.pauseReason === "budget" || runCount > 0) && (
           <span className="ml-auto flex items-center gap-1.5 shrink-0">
             {agent.pauseReason === "budget" ? (
@@ -186,13 +215,24 @@ function SidebarAgentItem({
             {isPaused ? <PlayCircle className="size-4" /> : <PauseCircle className="size-4" />}
             <span>{pauseResumeDisabledLabel}</span>
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => {
+              if (leaving) return;
+              onLeaveAgent(agent);
+            }}
+            disabled={leaving}
+          >
+            {leaving ? <Loader2 className="size-4 motion-safe:animate-spin" /> : <LogOut className="size-4" />}
+            <span>{leaving ? "Leaving..." : "Leave agent"}</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 }
 
-export function SidebarAgents() {
+export function SidebarAgents({ streamlined = false }: { streamlined?: boolean } = {}) {
   const [open, setOpen] = useState(true);
   const [pendingAgentIds, setPendingAgentIds] = useState<Set<string>>(() => new Set());
   const queryClient = useQueryClient();
@@ -211,6 +251,8 @@ export function SidebarAgents() {
     queryKey: queryKeys.auth.session,
     queryFn: () => authApi.getSession(),
   });
+  const membershipsQuery = useResourceMemberships(selectedCompanyId);
+  const membershipMutation = useResourceMembershipMutation(selectedCompanyId);
 
   const { data: liveRuns } = useQuery({
     queryKey: queryKeys.liveRuns(selectedCompanyId!),
@@ -229,10 +271,15 @@ export function SidebarAgents() {
 
   const visibleAgents = useMemo(() => {
     const filtered = (agents ?? []).filter(
-      (a: Agent) => a.status !== "terminated"
+      (a: Agent) =>
+        a.status !== "terminated" &&
+        (
+          !membershipsQuery.isSuccess ||
+          resourceMembershipState(membershipsQuery.data, "agent", a.id) !== "left"
+        )
     );
     return filtered;
-  }, [agents]);
+  }, [agents, membershipsQuery.data, membershipsQuery.isSuccess]);
   const currentUserId = session?.user?.id ?? session?.session?.userId ?? null;
   const sortModeStorageKey = useMemo(() => {
     if (!selectedCompanyId) return null;
@@ -251,6 +298,28 @@ export function SidebarAgents() {
     () => sortAgents(orderedAgents, sortMode),
     [orderedAgents, sortMode],
   );
+<<<<<<< HEAD
+=======
+
+  // IA Phase 5 (streamlined): if any agent has a live run, show only those
+  // active agents. Otherwise fall back to up to RECENT_AGENT_LIMIT agents. Either
+  // way a "See all agents" link is shown so the full list is always reachable.
+  // Classic mode (PAP-89, flag OFF) restores the show-all behavior.
+  const runningAgents = useMemo(
+    () => sortedAgents.filter((agent: Agent) => (liveCountByAgent.get(agent.id) ?? 0) > 0),
+    [sortedAgents, liveCountByAgent],
+  );
+  const hasActiveAgents = runningAgents.length > 0;
+  const displayedAgents = !streamlined
+    ? sortedAgents
+    : hasActiveAgents
+      ? runningAgents
+      : sortedAgents.slice(0, RECENT_AGENT_LIMIT);
+  // Always expose "See all agents" whenever the displayed list is a subset of all
+  // agents, so users never lose the entry point to the full list. In classic mode
+  // every agent is already shown, so the link is unnecessary.
+  const showSeeAllLink = streamlined && sortedAgents.length > 0;
+>>>>>>> upstream/master
 
   const agentMatch = location.pathname.match(/^\/(?:[^/]+\/)?agents\/([^/]+)(?:\/([^/]+))?/);
   const activeAgentId = agentMatch?.[1] ?? null;
@@ -343,6 +412,26 @@ export function SidebarAgents() {
     },
   });
 
+<<<<<<< HEAD
+=======
+  const leaveAgent = useCallback(
+    (agent: Agent) => membershipMutation.mutate({
+      resourceType: "agent",
+      resourceId: agent.id,
+      resourceName: agent.name,
+      state: "left",
+    }),
+    [membershipMutation],
+  );
+  const agentLeaving = useCallback(
+    (agent: Agent) =>
+      membershipMutation.isPending &&
+      membershipMutation.variables?.resourceType === "agent" &&
+      membershipMutation.variables.resourceId === agent.id,
+    [membershipMutation.isPending, membershipMutation.variables],
+  );
+
+>>>>>>> upstream/master
   return (
     <SidebarSection
       label="Agents"
@@ -364,7 +453,11 @@ export function SidebarAgents() {
         onRadioValueChange: persistSortMode,
       }}
     >
+<<<<<<< HEAD
       {sortedAgents.map((agent: Agent) => {
+=======
+      {displayedAgents.map((agent: Agent) => {
+>>>>>>> upstream/master
         const runCount = liveCountByAgent.get(agent.id) ?? 0;
         return (
           <SidebarAgentItem
@@ -374,12 +467,33 @@ export function SidebarAgents() {
             agent={agent}
             disabled={pendingAgentIds.has(agent.id)}
             isMobile={isMobile}
+<<<<<<< HEAD
+=======
+            leaving={agentLeaving(agent)}
+            onLeaveAgent={leaveAgent}
+>>>>>>> upstream/master
             onPauseResume={(targetAgent, action) => pauseResumeAgent.mutate({ agent: targetAgent, action })}
             runCount={runCount}
             setSidebarOpen={setSidebarOpen}
           />
         );
       })}
+<<<<<<< HEAD
+=======
+      {showSeeAllLink && (
+        <Link
+          to="/agents/all"
+          state={SIDEBAR_SCROLL_RESET_STATE}
+          onClick={() => {
+            if (isMobile) setSidebarOpen(false);
+          }}
+          className="flex items-center gap-2.5 px-3 py-1.5 pointer-coarse:py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
+        >
+          <Users className="shrink-0 h-3.5 w-3.5" />
+          <span>See all agents</span>
+        </Link>
+      )}
+>>>>>>> upstream/master
     </SidebarSection>
   );
 }

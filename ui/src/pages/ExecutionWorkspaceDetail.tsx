@@ -67,7 +67,11 @@ type OrderedExecutionWorkspaceTabItem = {
 
 const DEFAULT_PLUGIN_DETAIL_TAB_ORDER = 100;
 const EXECUTION_WORKSPACE_BASE_TAB_ITEMS: OrderedExecutionWorkspaceTabItem[] = [
+<<<<<<< HEAD
   { value: "issues", label: "Issues", order: 10 },
+=======
+  { value: "issues", label: "Tasks", order: 10 },
+>>>>>>> upstream/master
   { value: "services", label: "Services", order: 20 },
   { value: "configuration", label: "Configuration", order: 30 },
   { value: "runtime_logs", label: "Runtime logs", order: 40 },
@@ -1077,7 +1081,7 @@ export function ExecutionWorkspaceDetail() {
                   "None"
                 )}
               </DetailRow>
-              <DetailRow label="Source issue">
+              <DetailRow label="Source task">
                 {sourceIssue ? (
                   <Link to={issueUrl(sourceIssue)} className="hover:underline">
                     {sourceIssue.identifier ?? sourceIssue.id} · {sourceIssue.title}
@@ -1218,7 +1222,11 @@ export function ExecutionWorkspaceDetail() {
         ) : isExecutionWorkspacePluginTab(activeTab) ? (
           <MissingPluginTabPlaceholder
             defaultTabHref={executionWorkspaceTabPath(workspace.id, "issues")}
+<<<<<<< HEAD
             defaultTabLabel="Back to issues"
+=======
+            defaultTabLabel="Back to tasks"
+>>>>>>> upstream/master
           />
         ) : activeTab === "routines" ? (
           <ExecutionWorkspaceRoutinesList

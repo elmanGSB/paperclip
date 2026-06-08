@@ -60,6 +60,19 @@
     "publishFromCi": true
   },
   {
+<<<<<<< HEAD
+=======
+    "dir": "packages/skills-catalog",
+    "name": "@paperclipai/skills-catalog",
+    "publishFromCi": false
+  },
+  {
+    "dir": "packages/teams-catalog",
+    "name": "@paperclipai/teams-catalog",
+    "publishFromCi": false
+  },
+  {
+>>>>>>> upstream/master
     "dir": "packages/db",
     "name": "@paperclipai/db",
     "publishFromCi": true

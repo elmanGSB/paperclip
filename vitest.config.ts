@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     projects: [
       "packages/shared",
+      "packages/skills-catalog",
       "packages/db",
       "packages/adapter-utils",
       "packages/adapters/acpx-local",
@@ -16,6 +17,10 @@ export default defineConfig({
       "packages/adapters/opencode-local",
       "packages/adapters/pi-local",
       "packages/plugins/sdk",
+<<<<<<< HEAD
+=======
+      "packages/plugins/create-paperclip-plugin",
+>>>>>>> upstream/master
       "server",
       "ui",
       "cli",

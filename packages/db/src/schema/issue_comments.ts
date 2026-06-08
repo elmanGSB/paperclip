@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 import type { IssueCommentAuthorType, IssueCommentMetadata, IssueCommentPresentation } from "@paperclipai/shared";
+=======
+import type {
+  IssueCommentAuthorType,
+  IssueCommentMetadata,
+  IssueCommentPresentation,
+  SourceTrustMetadata,
+} from "@paperclipai/shared";
+>>>>>>> upstream/master
 import { pgTable, uuid, text, timestamp, index, jsonb } from "drizzle-orm/pg-core";
 import { companies } from "./companies.js";
 import { issues } from "./issues.js";
@@ -18,6 +27,15 @@ export const issueComments = pgTable(
     body: text("body").notNull(),
     presentation: jsonb("presentation").$type<IssueCommentPresentation | null>(),
     metadata: jsonb("metadata").$type<IssueCommentMetadata | null>(),
+<<<<<<< HEAD
+=======
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    deletedByType: text("deleted_by_type").$type<"agent" | "user">(),
+    deletedByAgentId: uuid("deleted_by_agent_id").references(() => agents.id, { onDelete: "set null" }),
+    deletedByUserId: text("deleted_by_user_id"),
+    deletedByRunId: uuid("deleted_by_run_id").references(() => heartbeatRuns.id, { onDelete: "set null" }),
+    sourceTrust: jsonb("source_trust").$type<SourceTrustMetadata | null>(),
+>>>>>>> upstream/master
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

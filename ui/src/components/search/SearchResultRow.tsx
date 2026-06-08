@@ -1,5 +1,9 @@
 import { memo, type ComponentType, type SVGProps } from "react";
+<<<<<<< HEAD
 import { Bot, FileText, Hexagon, MessageSquare, Quote } from "lucide-react";
+=======
+import { Bot, FileText, Hexagon, MessageSquare, Paperclip, Quote } from "lucide-react";
+>>>>>>> upstream/master
 import type { Agent, CompanySearchResult } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
@@ -15,6 +19,10 @@ type SnippetStyle = {
 const SNIPPET_STYLES: Record<string, SnippetStyle> = {
   comment: { Icon: MessageSquare, label: "Comment" },
   document: { Icon: FileText, label: "Doc" },
+<<<<<<< HEAD
+=======
+  artifact: { Icon: Paperclip, label: "Artifact" },
+>>>>>>> upstream/master
   description: { Icon: Quote, label: "Description" },
 };
 
@@ -109,6 +117,58 @@ function SearchResultRowImpl({
     );
   }
 
+<<<<<<< HEAD
+=======
+  if (result.type === "artifact") {
+    const artifact = result.artifact;
+    if (!artifact) return null;
+    const updated = formatRelativeTime(result.updatedAt ?? artifact.updatedAt);
+    return (
+      <Link
+        to={result.href}
+        disableIssueQuicklook
+        className={cn(ROW_BASE, "py-4", isActive && "bg-muted/40", className)}
+        data-result-type="artifact"
+      >
+        <Paperclip className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <span className="truncate text-sm font-medium text-foreground">{result.title}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              {artifact.issueIdentifier}
+            </span>
+          </div>
+          {result.snippet ? (
+            <SnippetLine
+              text={result.snippets[0]?.text ?? result.snippet}
+              highlights={result.snippets[0]?.highlights}
+              field="artifact"
+              fallbackLabel={result.sourceLabel ?? "Artifact"}
+              multiline
+            />
+          ) : null}
+          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground sm:hidden">
+            <span className="truncate">{artifact.issueTitle}</span>
+            {updated ? <span className="ml-auto shrink-0 tabular-nums">{updated}</span> : null}
+          </div>
+        </div>
+        <div className="ml-2 hidden shrink-0 flex-col items-end gap-2 sm:flex">
+          {updated ? <span className="text-xs tabular-nums text-muted-foreground">{updated}</span> : null}
+          {result.previewImageUrl ? (
+            <img
+              src={result.previewImageUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-[88px] w-[88px] shrink-0 rounded-md border border-border bg-muted object-cover"
+            />
+          ) : null}
+        </div>
+      </Link>
+    );
+  }
+
+>>>>>>> upstream/master
   const issue = result.issue;
   if (!issue) return null;
   const assigneeName = issue.assigneeAgentId

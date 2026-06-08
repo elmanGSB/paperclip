@@ -303,7 +303,11 @@ function PluginSdkIssuesList({
   });
 
   if (!companyId) {
+<<<<<<< HEAD
     return createElement("div", { className: "text-sm text-muted-foreground" }, "Select a company to view issues.");
+=======
+    return createElement("div", { className: "text-sm text-muted-foreground" }, "Select a company to view tasks.");
+>>>>>>> upstream/master
   }
 
   return createElement(HostIssuesList, {

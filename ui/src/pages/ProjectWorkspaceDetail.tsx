@@ -376,9 +376,15 @@ export function ProjectWorkspaceDetail() {
         request.action === "run"
           ? "Workspace job completed."
           : request.action === "stop"
+<<<<<<< HEAD
             ? "Workspace service stopped. Issue execution is not paused."
             : request.action === "restart"
               ? "Workspace service restarted. Issue execution is not paused."
+=======
+            ? "Workspace service stopped. Task execution is not paused."
+            : request.action === "restart"
+              ? "Workspace service restarted. Task execution is not paused."
+>>>>>>> upstream/master
               : "Workspace service started.",
       );
     },

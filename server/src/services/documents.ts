@@ -57,6 +57,10 @@ function mapIssueDocumentRow(
     lockedAt: Date | null;
     lockedByAgentId: string | null;
     lockedByUserId: string | null;
+<<<<<<< HEAD
+=======
+    sourceTrust: typeof documents.$inferSelect.sourceTrust;
+>>>>>>> upstream/master
     createdAt: Date;
     updatedAt: Date;
   },
@@ -79,6 +83,10 @@ function mapIssueDocumentRow(
     lockedAt: row.lockedAt,
     lockedByAgentId: row.lockedByAgentId,
     lockedByUserId: row.lockedByUserId,
+<<<<<<< HEAD
+=======
+    sourceTrust: row.sourceTrust ?? null,
+>>>>>>> upstream/master
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -101,6 +109,10 @@ const issueDocumentSelect = {
   lockedAt: documents.lockedAt,
   lockedByAgentId: documents.lockedByAgentId,
   lockedByUserId: documents.lockedByUserId,
+<<<<<<< HEAD
+=======
+  sourceTrust: documents.sourceTrust,
+>>>>>>> upstream/master
   createdAt: documents.createdAt,
   updatedAt: documents.updatedAt,
 };
@@ -202,6 +214,10 @@ export function documentService(db: Db) {
       createdByAgentId?: string | null;
       createdByUserId?: string | null;
       createdByRunId?: string | null;
+<<<<<<< HEAD
+=======
+      sourceTrust?: typeof documents.$inferInsert.sourceTrust;
+>>>>>>> upstream/master
       lockedDocumentStrategy?: "conflict" | "create_new_document";
     }) => {
       const key = normalizeDocumentKey(input.key);
@@ -235,6 +251,10 @@ export function documentService(db: Db) {
               lockedAt: documents.lockedAt,
               lockedByAgentId: documents.lockedByAgentId,
               lockedByUserId: documents.lockedByUserId,
+<<<<<<< HEAD
+=======
+              sourceTrust: documents.sourceTrust,
+>>>>>>> upstream/master
               createdAt: documents.createdAt,
               updatedAt: documents.updatedAt,
             })
@@ -268,6 +288,10 @@ export function documentService(db: Db) {
                     lockedAt: null,
                     lockedByAgentId: null,
                     lockedByUserId: null,
+<<<<<<< HEAD
+=======
+                    sourceTrust: input.sourceTrust ?? null,
+>>>>>>> upstream/master
                     createdAt: now,
                     updatedAt: now,
                   })
@@ -327,6 +351,10 @@ export function documentService(db: Db) {
                     lockedAt: null,
                     lockedByAgentId: null,
                     lockedByUserId: null,
+<<<<<<< HEAD
+=======
+                    sourceTrust: document.sourceTrust ?? null,
+>>>>>>> upstream/master
                     createdAt: document.createdAt,
                     updatedAt: document.updatedAt,
                   },
@@ -379,6 +407,7 @@ export function documentService(db: Db) {
                 latestRevisionNumber: nextRevisionNumber,
                 updatedByAgentId: input.createdByAgentId ?? null,
                 updatedByUserId: input.createdByUserId ?? null,
+                sourceTrust: input.sourceTrust ?? null,
                 updatedAt: now,
               })
               .where(eq(documents.id, existing.id));
@@ -402,6 +431,10 @@ export function documentService(db: Db) {
                 lockedAt: existing.lockedAt,
                 lockedByAgentId: existing.lockedByAgentId,
                 lockedByUserId: existing.lockedByUserId,
+<<<<<<< HEAD
+=======
+                sourceTrust: input.sourceTrust ?? null,
+>>>>>>> upstream/master
                 updatedAt: now,
               },
             };
@@ -427,6 +460,10 @@ export function documentService(db: Db) {
               lockedAt: null,
               lockedByAgentId: null,
               lockedByUserId: null,
+<<<<<<< HEAD
+=======
+              sourceTrust: input.sourceTrust ?? null,
+>>>>>>> upstream/master
               createdAt: now,
               updatedAt: now,
             })
@@ -482,6 +519,10 @@ export function documentService(db: Db) {
               lockedAt: document.lockedAt,
               lockedByAgentId: document.lockedByAgentId,
               lockedByUserId: document.lockedByUserId,
+<<<<<<< HEAD
+=======
+              sourceTrust: document.sourceTrust ?? null,
+>>>>>>> upstream/master
               createdAt: document.createdAt,
               updatedAt: document.updatedAt,
             },

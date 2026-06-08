@@ -1,10 +1,18 @@
 // @vitest-environment jsdom
 
+<<<<<<< HEAD
 import { act } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Project } from "@paperclipai/shared";
+=======
+import type { ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { Project, ResourceMemberships } from "@paperclipai/shared";
+>>>>>>> upstream/master
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SidebarProjects } from "./SidebarProjects";
 
@@ -16,7 +24,17 @@ const mockAuthApi = vi.hoisted(() => ({
   getSession: vi.fn(),
 }));
 
+<<<<<<< HEAD
 const mockOpenNewProject = vi.hoisted(() => vi.fn());
+=======
+const mockResourceMembershipsApi = vi.hoisted(() => ({
+  listMine: vi.fn(),
+  updateProject: vi.fn(),
+}));
+
+const mockOpenNewProject = vi.hoisted(() => vi.fn());
+const mockPushToast = vi.hoisted(() => vi.fn());
+>>>>>>> upstream/master
 const mockSetSidebarOpen = vi.hoisted(() => vi.fn());
 const mockPersistOrder = vi.hoisted(() => vi.fn());
 const mockSidebarState = vi.hoisted(() => ({ isMobile: false }));
@@ -70,6 +88,15 @@ vi.mock("../context/SidebarContext", () => ({
   }),
 }));
 
+<<<<<<< HEAD
+=======
+vi.mock("../context/ToastContext", () => ({
+  useToastActions: () => ({
+    pushToast: mockPushToast,
+  }),
+}));
+
+>>>>>>> upstream/master
 vi.mock("../api/projects", () => ({
   projectsApi: mockProjectsApi,
 }));
@@ -78,6 +105,13 @@ vi.mock("../api/auth", () => ({
   authApi: mockAuthApi,
 }));
 
+<<<<<<< HEAD
+=======
+vi.mock("../api/resourceMemberships", () => ({
+  resourceMembershipsApi: mockResourceMembershipsApi,
+}));
+
+>>>>>>> upstream/master
 vi.mock("../hooks/useProjectOrder", () => ({
   useProjectOrder: ({ projects }: { projects: Project[] }) => {
     const curatedOrder = ["project-b", "project-a", "project-c"];
@@ -107,6 +141,17 @@ if (!globalThis.PointerEvent) {
   (globalThis as any).PointerEvent = MouseEvent;
 }
 
+<<<<<<< HEAD
+=======
+async function act(callback: () => void | Promise<void>) {
+  let result: void | Promise<void> = undefined;
+  flushSync(() => {
+    result = callback();
+  });
+  await result;
+}
+
+>>>>>>> upstream/master
 function makeProject(overrides: Partial<Project>): Project {
   return {
     id: "project-a",
@@ -121,6 +166,10 @@ function makeProject(overrides: Partial<Project>): Project {
     leadAgentId: null,
     targetDate: null,
     color: "#ef4444",
+<<<<<<< HEAD
+=======
+    icon: null,
+>>>>>>> upstream/master
     env: null,
     pauseReason: null,
     pausedAt: null,
@@ -170,6 +219,20 @@ async function openProjectsMenu(container: HTMLElement) {
   await flushReact();
 }
 
+<<<<<<< HEAD
+=======
+async function openProjectMenu(label = "Open actions for Alpha") {
+  const trigger = document.body.querySelector(`button[aria-label="${label}"]`);
+  expect(trigger).not.toBeNull();
+
+  await act(async () => {
+    trigger?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 0 }));
+    trigger?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+  await flushReact();
+}
+
+>>>>>>> upstream/master
 async function chooseSortMode(label: string) {
   const item = Array.from(document.body.querySelectorAll('[data-slot="dropdown-menu-radio-item"]'))
     .find((element) => element.textContent?.includes(label));
@@ -185,6 +248,10 @@ describe("SidebarProjects", () => {
   let container: HTMLDivElement;
   let root: ReturnType<typeof createRoot> | null;
   let queryClient: QueryClient;
+<<<<<<< HEAD
+=======
+  let memberships: ResourceMemberships;
+>>>>>>> upstream/master
 
   beforeEach(() => {
     container = document.createElement("div");
@@ -238,6 +305,30 @@ describe("SidebarProjects", () => {
       session: { id: "session-1", userId: "user-1" },
       user: { id: "user-1" },
     });
+<<<<<<< HEAD
+=======
+    memberships = {
+      projectMemberships: {},
+      agentMemberships: {},
+      updatedAt: null,
+    };
+    mockResourceMembershipsApi.listMine.mockImplementation(() => Promise.resolve(memberships));
+    mockResourceMembershipsApi.updateProject.mockImplementation((_companyId, projectId, data) => {
+      memberships = {
+        ...memberships,
+        projectMemberships: {
+          ...memberships.projectMemberships,
+          [projectId]: data.state,
+        },
+        updatedAt: new Date(),
+      };
+      return Promise.resolve({
+        resourceType: "project",
+        resourceId: projectId,
+        state: data.state,
+      });
+    });
+>>>>>>> upstream/master
   });
 
   afterEach(async () => {
@@ -334,4 +425,49 @@ describe("SidebarProjects", () => {
 
     expect(projectLinkLabels(container)).toEqual(["Charlie", "Bravo", "Alpha"]);
   });
+<<<<<<< HEAD
+=======
+
+  it("filters left projects only after membership state loads", async () => {
+    let resolveMemberships!: (value: unknown) => void;
+    mockResourceMembershipsApi.listMine.mockReturnValue(new Promise((resolve) => {
+      resolveMemberships = resolve;
+    }));
+
+    await renderSidebarProjects();
+    expect(projectLinkLabels(container)).toEqual(["Bravo", "Alpha", "Charlie"]);
+
+    await act(async () => {
+      resolveMemberships({
+        projectMemberships: { "project-a": "left" },
+        agentMemberships: {},
+        updatedAt: null,
+      });
+    });
+    await flushReact();
+
+    expect(projectLinkLabels(container)).toEqual(["Bravo", "Charlie"]);
+  });
+
+  it("offers leave project from each sidebar project menu", async () => {
+    await renderSidebarProjects();
+    await openProjectMenu();
+
+    const leaveItem = Array.from(document.body.querySelectorAll('[data-slot="dropdown-menu-item"]'))
+      .find((element) => element.textContent?.includes("Leave project"));
+    expect(leaveItem).toBeTruthy();
+
+    await act(async () => {
+      leaveItem?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await flushReact();
+
+    expect(mockResourceMembershipsApi.updateProject).toHaveBeenCalledWith(
+      "company-1",
+      "project-a",
+      { state: "left" },
+    );
+    expect(projectLinkLabels(container)).toEqual(["Bravo", "Charlie"]);
+  });
+>>>>>>> upstream/master
 });

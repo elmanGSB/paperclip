@@ -59,6 +59,7 @@ import type {
   AskUserQuestionsAnswer,
   AskUserQuestionsInteraction,
   IssueThreadInteraction,
+  RequestCheckboxConfirmationInteraction,
   RequestConfirmationInteraction,
   SuggestTasksInteraction,
 } from "../lib/issue-thread-interactions";
@@ -119,6 +120,10 @@ import {
 import type {
   IssueCommentMetadata,
   IssueCommentPresentation,
+<<<<<<< HEAD
+=======
+  SourceTrustMetadata,
+>>>>>>> upstream/master
 } from "@paperclipai/shared";
 import {
   describeToolInput,
@@ -133,10 +138,18 @@ import { cn, formatDateTime, formatShortDate } from "../lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+<<<<<<< HEAD
 import { AlertTriangle, ArrowRight, Brain, Check, ChevronDown, ClipboardList, Copy, Hammer, Loader2, MoreHorizontal, Paperclip, PauseCircle, Search, Square, ThumbsDown, ThumbsUp } from "lucide-react";
 import { IssueBlockedNotice } from "./IssueBlockedNotice";
 import { IssueAssignedBacklogNotice } from "./IssueAssignedBacklogNotice";
 import { IssueRecoveryActionCard, type RecoveryResolveOutcome } from "./IssueRecoveryActionCard";
+=======
+import { AlertTriangle, ArrowRight, Brain, Check, ChevronDown, ClipboardList, Copy, Hammer, Loader2, MoreHorizontal, Paperclip, PauseCircle, Search, Square, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { IssueBlockedNotice } from "./IssueBlockedNotice";
+import { IssueAssignedBacklogNotice } from "./IssueAssignedBacklogNotice";
+import { IssueRecoveryActionCard, type RecoveryResolveOutcome } from "./IssueRecoveryActionCard";
+import { SourceTrustBadge } from "./SourceTrustBadge";
+>>>>>>> upstream/master
 
 interface IssueChatMessageContext {
   feedbackDataSharingPreference: FeedbackDataSharingPreference;
@@ -154,15 +167,29 @@ interface IssueChatMessageContext {
   stopRunLabel?: string;
   stoppingRunLabel?: string;
   stopRunVariant?: "stop" | "pause";
+<<<<<<< HEAD
   onInterruptQueued?: (runId: string) => Promise<void>;
   onCancelQueued?: (commentId: string) => void;
+=======
+  runFinalizationActions?: readonly IssueChatRunFinalizationAction[];
+  onInterruptQueued?: (runId: string) => Promise<void>;
+  onCancelQueued?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => Promise<void> | void;
+>>>>>>> upstream/master
   onImageClick?: (src: string) => void;
   onAcceptInteraction?: (
-    interaction: SuggestTasksInteraction | RequestConfirmationInteraction,
+    interaction:
+      | SuggestTasksInteraction
+      | RequestConfirmationInteraction
+      | RequestCheckboxConfirmationInteraction,
     selectedClientKeys?: string[],
+    selectedOptionIds?: string[],
   ) => Promise<void> | void;
   onRejectInteraction?: (
-    interaction: SuggestTasksInteraction | RequestConfirmationInteraction,
+    interaction:
+      | SuggestTasksInteraction
+      | RequestConfirmationInteraction
+      | RequestCheckboxConfirmationInteraction,
     reason?: string,
   ) => Promise<void> | void;
   onSubmitInteractionAnswers?: (
@@ -182,6 +209,15 @@ const IssueChatCtx = createContext<IssueChatMessageContext>({
   issueStatus: undefined,
   successfulRunHandoff: null,
 });
+
+export type IssueChatRunFinalizationAction = {
+  id: "cancel" | "done";
+  label: string;
+  pendingLabel: string;
+  onSelect: (runId: string) => Promise<void> | void;
+  isPending?: boolean;
+  disabled?: boolean;
+};
 
 export function resolveAssistantMessageFoldedState(args: {
   messageId: string;
@@ -331,6 +367,10 @@ interface IssueChatThreadProps {
   stopRunLabel?: string;
   stoppingRunLabel?: string;
   stopRunVariant?: "stop" | "pause";
+<<<<<<< HEAD
+=======
+  runFinalizationActions?: readonly IssueChatRunFinalizationAction[];
+>>>>>>> upstream/master
   imageUploadHandler?: (file: File) => Promise<string>;
   onAttachImage?: (file: File) => Promise<IssueAttachment | void>;
   draftKey?: string;
@@ -353,15 +393,23 @@ interface IssueChatThreadProps {
   includeSucceededRunsWithoutOutput?: boolean;
   onInterruptQueued?: (runId: string) => Promise<void>;
   onCancelQueued?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => Promise<void> | void;
   interruptingQueuedRunId?: string | null;
   stoppingRunId?: string | null;
   onImageClick?: (src: string) => void;
   onAcceptInteraction?: (
-    interaction: SuggestTasksInteraction | RequestConfirmationInteraction,
+    interaction:
+      | SuggestTasksInteraction
+      | RequestConfirmationInteraction
+      | RequestCheckboxConfirmationInteraction,
     selectedClientKeys?: string[],
+    selectedOptionIds?: string[],
   ) => Promise<void> | void;
   onRejectInteraction?: (
-    interaction: SuggestTasksInteraction | RequestConfirmationInteraction,
+    interaction:
+      | SuggestTasksInteraction
+      | RequestConfirmationInteraction
+      | RequestCheckboxConfirmationInteraction,
     reason?: string,
   ) => Promise<void> | void;
   onSubmitInteractionAnswers?: (
@@ -497,7 +545,7 @@ function IssueChatFallbackThread({
           <div className="space-y-1">
             <p className="font-medium">Chat renderer hit an internal state error.</p>
             <p className="text-xs opacity-80">
-              Showing a safe fallback transcript instead of crashing the issues page.
+              Showing a safe fallback transcript instead of crashing the tasks page.
             </p>
           </div>
         </div>
@@ -1271,6 +1319,10 @@ function IssueChatUserMessage({
   const {
     onInterruptQueued,
     onCancelQueued,
+<<<<<<< HEAD
+=======
+    onDeleteComment,
+>>>>>>> upstream/master
     currentUserId,
     userProfileMap,
   } = useContext(IssueChatCtx);
@@ -1280,12 +1332,15 @@ function IssueChatUserMessage({
   const authorName = typeof custom.authorName === "string" ? custom.authorName : null;
   const authorUserId = typeof custom.authorUserId === "string" ? custom.authorUserId : null;
   const queued = custom.queueState === "queued" || custom.clientStatus === "queued";
+  const sourceTrust = isSourceTrustMetadata(custom.sourceTrust) ? custom.sourceTrust : null;
   const followUpRequested = custom.followUpRequested === true;
   const queueReason = typeof custom.queueReason === "string" ? custom.queueReason : null;
   const queueBadgeLabel = queueReason === "hold" ? "\u23f8 Deferred wake" : "Queued";
   const pending = custom.clientStatus === "pending";
+  const deleted = Boolean(custom.deletedAt);
   const queueTargetRunId = typeof custom.queueTargetRunId === "string" ? custom.queueTargetRunId : null;
   const [copied, setCopied] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const {
     isCurrentUser,
     authorName: resolvedAuthorName,
@@ -1302,10 +1357,21 @@ function IssueChatUserMessage({
       <AvatarFallback>{initialsForName(resolvedAuthorName)}</AvatarFallback>
     </Avatar>
   );
+  const canDeleteComment = Boolean(onDeleteComment && isCurrentUser && !queued && !pending && !deleted);
+  const handleDeleteComment = () => {
+    if (!canDeleteComment) return;
+    setDeleteDialogOpen(true);
+  };
+  const confirmDeleteComment = () => {
+    if (!canDeleteComment) return;
+    setDeleteDialogOpen(false);
+    void onDeleteComment?.(commentId);
+  };
   const messageBody = (
     <div className={cn("flex min-w-0 max-w-[85%] flex-col", isCurrentUser && "items-end")}>
       <div className={cn("mb-1 flex items-center gap-2 px-1", isCurrentUser ? "justify-end" : "justify-start")}>
         <span className="text-sm font-medium text-foreground">{resolvedAuthorName}</span>
+        <SourceTrustBadge sourceTrust={sourceTrust} artifactLabel="comment" />
         {followUpRequested ? (
           <Badge variant="outline" className="text-[10px] uppercase tracking-[0.14em]">
             Follow-up
@@ -1317,6 +1383,8 @@ function IssueChatUserMessage({
           "min-w-0 max-w-full overflow-hidden break-all rounded-2xl px-4 py-2.5",
           queued
             ? "bg-amber-50/80 dark:bg-amber-500/10"
+            : deleted
+              ? "bg-muted/50 text-muted-foreground"
             : "bg-muted",
           pending && "opacity-80",
         )}
@@ -1349,9 +1417,13 @@ function IssueChatUserMessage({
             ) : null}
           </div>
         ) : null}
-        <div className="min-w-0 max-w-full space-y-3">
-          <IssueChatTextParts message={message} />
-        </div>
+        {deleted ? (
+          <div className="text-sm italic text-muted-foreground">Comment deleted</div>
+        ) : (
+          <div className="min-w-0 max-w-full space-y-3">
+            <IssueChatTextParts message={message} />
+          </div>
+        )}
       </div>
 
       {pending ? (
@@ -1378,45 +1450,78 @@ function IssueChatUserMessage({
               {message.createdAt ? formatDateTime(message.createdAt) : ""}
             </TooltipContent>
           </Tooltip>
-          <button
-            type="button"
-            className="inline-flex h-6 w-6 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-            title="Copy message"
-            aria-label="Copy message"
-            onClick={() => {
-              const text = message.content
-                .filter((p): p is { type: "text"; text: string } => p.type === "text")
-                .map((p) => p.text)
-                .join("\n\n");
-              void navigator.clipboard.writeText(text).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              });
-            }}
-          >
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-          </button>
+          {!deleted ? (
+            <button
+              type="button"
+              className="inline-flex h-6 w-6 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+              title="Copy message"
+              aria-label="Copy message"
+              onClick={() => {
+                const text = message.content
+                  .filter((p): p is { type: "text"; text: string } => p.type === "text")
+                  .map((p) => p.text)
+                  .join("\n\n");
+                void navigator.clipboard.writeText(text).then(() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                });
+              }}
+            >
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            </button>
+          ) : null}
+          {canDeleteComment ? (
+            <button
+              type="button"
+              className="inline-flex h-6 w-6 items-center justify-center text-muted-foreground transition-colors hover:text-destructive"
+              title="Delete comment"
+              aria-label="Delete comment"
+              onClick={handleDeleteComment}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
         </div>
       )}
     </div>
   );
 
   return (
-    <div id={anchorId}>
-      <div className={cn("group flex items-start gap-2.5", isCurrentUser && "justify-end")}>
-        {isCurrentUser ? (
-          <>
-            {messageBody}
-            {authorAvatar}
-          </>
-        ) : (
-          <>
-            {authorAvatar}
-            {messageBody}
-          </>
-        )}
+    <>
+      <div id={anchorId}>
+        <div className={cn("group flex items-start gap-2.5", isCurrentUser && "justify-end")}>
+          {isCurrentUser ? (
+            <>
+              {messageBody}
+              {authorAvatar}
+            </>
+          ) : (
+            <>
+              {authorAvatar}
+              {messageBody}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete comment?</DialogTitle>
+            <DialogDescription>
+              This will replace the comment with a deleted-comment marker.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteComment}>
+              Delete comment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -1440,6 +1545,10 @@ function IssueChatAssistantMessage({
     stopRunLabel = "Stop run",
     stoppingRunLabel = "Stopping...",
     stopRunVariant = "stop",
+<<<<<<< HEAD
+=======
+    runFinalizationActions = [],
+>>>>>>> upstream/master
   } = useContext(IssueChatCtx);
   const custom = message.metadata.custom as Record<string, unknown>;
   const anchorId = typeof custom.anchorId === "string" ? custom.anchorId : undefined;
@@ -1455,6 +1564,7 @@ function IssueChatAssistantMessage({
   const agentId = authorAgentId ?? runAgentId;
   const agentIcon = agentId ? agentMap?.get(agentId)?.icon : undefined;
   const commentId = typeof custom.commentId === "string" ? custom.commentId : null;
+  const sourceTrust = isSourceTrustMetadata(custom.sourceTrust) ? custom.sourceTrust : null;
   const notices = Array.isArray(custom.notices)
     ? custom.notices.filter((notice): notice is string => typeof notice === "string" && notice.length > 0)
     : [];
@@ -1464,11 +1574,12 @@ function IssueChatAssistantMessage({
   const canStopRun = Boolean(runId) && (isRunActive || runStatus === "queued" || runStatus === "running");
   const chainOfThoughtLabel = typeof custom.chainOfThoughtLabel === "string" ? custom.chainOfThoughtLabel : null;
   const hasCoT = message.content.some((p) => p.type === "reasoning" || p.type === "tool-call");
+  const deleted = Boolean(custom.deletedAt);
   const isFoldable = !isRunning && !!chainOfThoughtLabel;
   const [folded, setFolded] = useState(isFoldable);
   const [prevFoldKey, setPrevFoldKey] = useState({ messageId: message.id, isFoldable });
   const [copied, setCopied] = useState(false);
-  const copyText = getThreadMessageCopyText(message);
+  const copyText = deleted ? "" : getThreadMessageCopyText(message);
 
   // Derive fold state synchronously during render (not in useEffect) so the
   // browser never paints the un-folded intermediate state — prevents the
@@ -1516,6 +1627,7 @@ function IssueChatAssistantMessage({
               onClick={() => setFolded((v) => !v)}
             >
               <span className="text-sm font-medium text-foreground">{authorName}</span>
+              <SourceTrustBadge sourceTrust={sourceTrust} artifactLabel="comment" />
               <span className="text-xs text-muted-foreground/60">{chainOfThoughtLabel?.toLowerCase()}</span>
               <span className="ml-auto flex items-center gap-1.5">
                 {message.createdAt ? (
@@ -1529,6 +1641,7 @@ function IssueChatAssistantMessage({
           ) : (
             <div className="mb-1.5 flex items-center gap-2">
               <span className="text-sm font-medium text-foreground">{authorName}</span>
+              <SourceTrustBadge sourceTrust={sourceTrust} artifactLabel="comment" />
               {followUpRequested ? (
                 <Badge variant="outline" className="text-[10px] uppercase tracking-[0.14em]">
                   Follow-up
@@ -1543,7 +1656,11 @@ function IssueChatAssistantMessage({
             </div>
           )}
 
-          {!folded ? (
+          {deleted ? (
+            <div className="rounded-sm bg-muted/40 px-3 py-2 text-sm italic text-muted-foreground">
+              Comment deleted
+            </div>
+          ) : !folded ? (
             <>
               <div className="space-y-3">
                 <IssueChatAssistantParts message={message} hasCoT={hasCoT} />
@@ -1650,6 +1767,29 @@ function IssueChatAssistantMessage({
                         {isStoppingRun ? stoppingRunLabel : stopRunLabel}
                       </DropdownMenuItem>
                     ) : null}
+                    {canStopRun && runId
+                      ? runFinalizationActions.map((action) => (
+                        <DropdownMenuItem
+                          key={action.id}
+                          disabled={isStoppingRun || action.isPending || action.disabled}
+                          className={cn(
+                            action.id === "cancel"
+                              ? "text-red-700 focus:text-red-800 dark:text-red-300 dark:focus:text-red-200"
+                              : "text-green-700 focus:text-green-800 dark:text-green-300 dark:focus:text-green-200",
+                          )}
+                          onSelect={() => {
+                            void action.onSelect(runId);
+                          }}
+                        >
+                          {action.id === "cancel" ? (
+                            <Square className="mr-2 h-3.5 w-3.5 fill-current" />
+                          ) : (
+                            <Check className="mr-2 h-3.5 w-3.5" />
+                          )}
+                          {action.isPending ? action.pendingLabel : action.label}
+                        </DropdownMenuItem>
+                      ))
+                      : null}
                     {runHref ? (
                       <DropdownMenuItem asChild>
                         <Link to={runHref} target="_blank" rel="noreferrer noopener">
@@ -2003,6 +2143,18 @@ function isIssueCommentMetadata(value: unknown): value is IssueCommentMetadata {
   return v.version === 1 && Array.isArray(v.sections);
 }
 
+<<<<<<< HEAD
+=======
+function isSourceTrustMetadata(value: unknown): value is SourceTrustMetadata {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return v.preset === "low_trust_review" && (
+    v.disposition === "quarantined" ||
+    v.disposition === "promoted"
+  );
+}
+
+>>>>>>> upstream/master
 function issueStatusIsTerminalDisposition(issueStatus: string | undefined) {
   return issueStatus === "done" || issueStatus === "cancelled";
 }
@@ -2614,6 +2766,19 @@ function issueChatMessageQueuedRunIsInterrupting(
   return Boolean(queueTargetRunId && interruptingQueuedRunId === queueTargetRunId);
 }
 
+<<<<<<< HEAD
+=======
+function issueChatMessageIsDeleted(message: ThreadMessage): boolean {
+  const custom = issueChatMessageCustom(message);
+  return Boolean(custom.deletedAt);
+}
+
+function issueChatMessageDeletedAt(message: ThreadMessage): string | null {
+  const custom = issueChatMessageCustom(message);
+  return typeof custom.deletedAt === "string" ? custom.deletedAt : null;
+}
+
+>>>>>>> upstream/master
 // Above ~150 merged rows the direct render path forces React to mount and
 // re-render hundreds of Markdown bodies, feedback controls, and avatars on
 // unrelated parent updates. Above this threshold we switch to a windowed
@@ -3045,6 +3210,36 @@ interface IssueChatMessageRowProps {
   interruptingQueuedRunId?: string | null;
 }
 
+<<<<<<< HEAD
+=======
+function IssueChatDeletedComment({
+  message,
+  deletedAt,
+}: {
+  message: ThreadMessage;
+  deletedAt: string;
+}) {
+  const custom = issueChatMessageCustom(message);
+  const anchorId = typeof custom.anchorId === "string" ? custom.anchorId : undefined;
+  const authorName = typeof custom.authorName === "string" ? custom.authorName : "Comment";
+  const deletedDate = new Date(deletedAt);
+  const deletedDateLabel = Number.isNaN(deletedDate.getTime()) ? "" : formatDateTime(deletedDate);
+
+  return (
+    <div id={anchorId} className="flex items-start gap-2.5 py-1.5">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground">
+        <Trash2 className="h-3.5 w-3.5" />
+      </div>
+      <div className="min-w-0 rounded-md border border-dashed border-border bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground/80">{authorName}</span>
+        <span> deleted this comment</span>
+        {deletedDateLabel ? <span className="text-xs"> · {deletedDateLabel}</span> : null}
+      </div>
+    </div>
+  );
+}
+
+>>>>>>> upstream/master
 const IssueChatMessageRow = memo(function IssueChatMessageRow({
   message,
   feedbackVoteByTargetId,
@@ -3053,11 +3248,21 @@ const IssueChatMessageRow = memo(function IssueChatMessageRow({
   interruptingQueuedRunId,
 }: IssueChatMessageRowProps) {
   const kind = issueChatMessageKind(message);
+<<<<<<< HEAD
+=======
+  const deletedAt = issueChatMessageDeletedAt(message);
+>>>>>>> upstream/master
   const activeVote = issueChatMessageActiveVote(message, feedbackVoteByTargetId);
   const isRunActive = issueChatMessageRunIsActive(message, activeRunIds);
   const isStoppingRun = issueChatMessageRunIsStopping(message, stoppingRunId);
   const isInterruptingQueuedRun = issueChatMessageQueuedRunIsInterrupting(message, interruptingQueuedRunId);
+<<<<<<< HEAD
   const renderedMessage = message.role === "user"
+=======
+  const renderedMessage = deletedAt
+    ? <IssueChatDeletedComment message={message} deletedAt={deletedAt} />
+    : message.role === "user"
+>>>>>>> upstream/master
     ? (
       <IssueChatUserMessage
         message={message}
@@ -3419,7 +3624,7 @@ const IssueChatComposer = forwardRef<IssueChatComposerHandle, IssueChatComposerP
             <div className="min-w-0">
               <div className="text-sm font-medium text-foreground">Drop to upload</div>
               <div className="mt-0.5 text-xs leading-5 text-muted-foreground">
-                Images insert into the reply. Other files are added to this issue.
+                Images insert into the reply. Other files are added to this task.
               </div>
             </div>
           </div>
@@ -3454,12 +3659,12 @@ const IssueChatComposer = forwardRef<IssueChatComposerHandle, IssueChatComposerP
             const sizeLabel = formatAttachmentSize(attachment.size);
             const statusLabel =
               attachment.status === "uploading"
-                ? "Uploading to issue"
+                ? "Uploading to task"
                 : attachment.status === "error"
                   ? attachment.error ?? "Upload failed"
                   : attachment.inline
                     ? "Inserted inline"
-                    : "Attached to issue";
+                    : "Attached to task";
             return (
               <div
                 key={attachment.id}
@@ -3643,6 +3848,10 @@ export function IssueChatThread({
   stopRunLabel,
   stoppingRunLabel,
   stopRunVariant,
+<<<<<<< HEAD
+=======
+  runFinalizationActions,
+>>>>>>> upstream/master
   imageUploadHandler,
   onAttachImage,
   draftKey,
@@ -3664,6 +3873,7 @@ export function IssueChatThread({
   includeSucceededRunsWithoutOutput = false,
   onInterruptQueued,
   onCancelQueued,
+  onDeleteComment,
   interruptingQueuedRunId = null,
   stoppingRunId = null,
   onImageClick,
@@ -3937,6 +4147,19 @@ export function IssueChatThread({
     ) return;
     if (messages.length === 0 || lastScrolledHashRef.current === hash) return;
     const targetId = hash.slice(1);
+<<<<<<< HEAD
+=======
+    if (targetId.startsWith("comment-")) {
+      const targetMessage = messages.find((message) => issueChatMessageAnchorId(message) === targetId);
+      if (targetMessage && issueChatMessageIsDeleted(targetMessage)) {
+        lastScrolledHashRef.current = hash;
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `${location.pathname}${location.search}`);
+        }
+        return;
+      }
+    }
+>>>>>>> upstream/master
     let cancelled = false;
     const attemptScroll = (finalAttempt = false) => {
       if (cancelled || lastScrolledHashRef.current === hash) return;
@@ -4129,6 +4352,10 @@ export function IssueChatThread({
   const stableOnStopRun = useStableEvent(onStopRun);
   const stableOnInterruptQueued = useStableEvent(onInterruptQueued);
   const stableOnCancelQueued = useStableEvent(onCancelQueued);
+<<<<<<< HEAD
+=======
+  const stableOnDeleteComment = useStableEvent(onDeleteComment);
+>>>>>>> upstream/master
   const stableOnImageClick = useStableEvent(onImageClick);
   const stableOnAcceptInteraction = useStableEvent(onAcceptInteraction);
   const stableOnRejectInteraction = useStableEvent(onRejectInteraction);
@@ -4148,8 +4375,15 @@ export function IssueChatThread({
       stopRunLabel,
       stoppingRunLabel,
       stopRunVariant,
+<<<<<<< HEAD
       onInterruptQueued: stableOnInterruptQueued,
       onCancelQueued: stableOnCancelQueued,
+=======
+      runFinalizationActions,
+      onInterruptQueued: stableOnInterruptQueued,
+      onCancelQueued: stableOnCancelQueued,
+      onDeleteComment: stableOnDeleteComment,
+>>>>>>> upstream/master
       onImageClick: stableOnImageClick,
       onAcceptInteraction: stableOnAcceptInteraction,
       onRejectInteraction: stableOnRejectInteraction,
@@ -4170,8 +4404,15 @@ export function IssueChatThread({
       stopRunLabel,
       stoppingRunLabel,
       stopRunVariant,
+<<<<<<< HEAD
       stableOnInterruptQueued,
       stableOnCancelQueued,
+=======
+      runFinalizationActions,
+      stableOnInterruptQueued,
+      stableOnCancelQueued,
+      stableOnDeleteComment,
+>>>>>>> upstream/master
       stableOnImageClick,
       stableOnAcceptInteraction,
       stableOnRejectInteraction,
@@ -4186,7 +4427,11 @@ export function IssueChatThread({
   const resolvedEmptyMessage = emptyMessage
     ?? (variant === "embedded"
       ? "No run output yet."
+<<<<<<< HEAD
       : "This issue conversation is empty. Start with a message below.");
+=======
+      : "This task conversation is empty. Start with a message below.");
+>>>>>>> upstream/master
   const previousErrorBoundaryMessagesRef = useRef<readonly ThreadMessage[] | null>(null);
   const errorBoundaryResetVersionRef = useRef(0);
   if (previousErrorBoundaryMessagesRef.current !== messages) {
@@ -4276,10 +4521,17 @@ export function IssueChatThread({
                   {legacyRecoverySourceIssue ? (
                     <SystemNotice
                       tone="info"
+<<<<<<< HEAD
                       label="Legacy recovery issue"
                       body={
                         <span>
                           Legacy recovery issue. Newer recovery actions live on the source issue
+=======
+                      label="Legacy recovery task"
+                      body={
+                        <span>
+                          Legacy recovery task. Newer recovery actions live on the source task
+>>>>>>> upstream/master
                           {legacyRecoverySourceIssue.identifier ? (
                             <>
                               {" — "}

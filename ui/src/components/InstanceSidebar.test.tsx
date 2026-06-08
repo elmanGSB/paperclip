@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 
+<<<<<<< HEAD
 import { act, type ReactNode } from "react";
+=======
+import type { ReactNode } from "react";
+>>>>>>> upstream/master
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -47,6 +51,15 @@ vi.mock("../context/SidebarContext", () => ({
 
 import { InstanceSidebar } from "./InstanceSidebar";
 
+<<<<<<< HEAD
+=======
+async function act(callback: () => void | Promise<void>) {
+  await callback();
+  await Promise.resolve();
+  await new Promise((resolve) => window.setTimeout(resolve, 0));
+}
+
+>>>>>>> upstream/master
 function makePlugin(overrides: Partial<PluginRecord> & { manifestJson: PluginRecord["manifestJson"] }): PluginRecord {
   return {
     id: overrides.id ?? "plugin-id",
@@ -75,10 +88,17 @@ async function flushReact() {
 async function findPluginLinks(container: HTMLElement, expectedCount: number) {
   await act(async () => {
     await vi.waitFor(() => {
+<<<<<<< HEAD
       expect(container.querySelectorAll('a[href^="/instance/settings/plugins/"]')).toHaveLength(expectedCount);
     });
   });
   return Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href^="/instance/settings/plugins/"]'));
+=======
+      expect(container.querySelectorAll('a[href^="/company/settings/instance/plugins/"]')).toHaveLength(expectedCount);
+    });
+  });
+  return Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href^="/company/settings/instance/plugins/"]'));
+>>>>>>> upstream/master
 }
 
 function renderSidebar(container: HTMLElement) {
@@ -161,7 +181,11 @@ describe("InstanceSidebar", () => {
     await flushReact();
 
     const pluginLinks = await findPluginLinks(container, 1);
+<<<<<<< HEAD
     expect(pluginLinks[0]?.getAttribute("href")).toBe("/instance/settings/plugins/linear");
+=======
+    expect(pluginLinks[0]?.getAttribute("href")).toBe("/company/settings/instance/plugins/linear");
+>>>>>>> upstream/master
     expect(pluginLinks[0]?.textContent).toBe("Linear");
   });
 
@@ -199,7 +223,11 @@ describe("InstanceSidebar", () => {
     await flushReact();
 
     const pluginLinks = await findPluginLinks(container, 1);
+<<<<<<< HEAD
     expect(pluginLinks[0]?.getAttribute("href")).toBe("/instance/settings/plugins/hybrid");
+=======
+    expect(pluginLinks[0]?.getAttribute("href")).toBe("/company/settings/instance/plugins/hybrid");
+>>>>>>> upstream/master
   });
 
   it("renders the indented plugin list between the Plugins and Adapters rows", async () => {
@@ -225,6 +253,7 @@ describe("InstanceSidebar", () => {
 
     await vi.waitFor(() => {
       const links = Array.from(
+<<<<<<< HEAD
         container.querySelectorAll<HTMLAnchorElement>('a[href^="/instance/settings/"]'),
       );
       expect(links.some((a) => a.getAttribute("href") === "/instance/settings/plugins/linear")).toBe(true);
@@ -236,6 +265,19 @@ describe("InstanceSidebar", () => {
     const pluginsIndex = hrefs.indexOf("/instance/settings/plugins");
     const adaptersIndex = hrefs.indexOf("/instance/settings/adapters");
     const linearIndex = hrefs.indexOf("/instance/settings/plugins/linear");
+=======
+        container.querySelectorAll<HTMLAnchorElement>('a[href^="/company/settings/instance/"]'),
+      );
+      expect(links.some((a) => a.getAttribute("href") === "/company/settings/instance/plugins/linear")).toBe(true);
+    });
+
+    const topLevelLinks = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href^="/company/settings/instance/"]'));
+    const hrefs = topLevelLinks.map((a) => a.getAttribute("href"));
+
+    const pluginsIndex = hrefs.indexOf("/company/settings/instance/plugins");
+    const adaptersIndex = hrefs.indexOf("/company/settings/instance/adapters");
+    const linearIndex = hrefs.indexOf("/company/settings/instance/plugins/linear");
+>>>>>>> upstream/master
 
     expect(pluginsIndex).toBeGreaterThanOrEqual(0);
     expect(adaptersIndex).toBeGreaterThan(pluginsIndex);
@@ -274,7 +316,11 @@ describe("InstanceSidebar", () => {
     await vi.waitFor(() => {
       expect(mockPluginsApi.list).toHaveBeenCalled();
     });
+<<<<<<< HEAD
     const pluginLinks = Array.from(container.querySelectorAll('a[href^="/instance/settings/plugins/"]'));
+=======
+    const pluginLinks = Array.from(container.querySelectorAll('a[href^="/company/settings/instance/plugins/"]'));
+>>>>>>> upstream/master
     expect(pluginLinks).toHaveLength(0);
   });
 });

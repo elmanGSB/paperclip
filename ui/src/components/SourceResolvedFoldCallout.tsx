@@ -107,7 +107,11 @@ export function SourceResolvedFoldCallout({
           "[&>*]:border-emerald-300/40 dark:[&>*]:border-emerald-500/20",
         )}
       >
+<<<<<<< HEAD
         <MetaRow label="Source issue">
+=======
+        <MetaRow label="Source task">
+>>>>>>> upstream/master
           <span className="inline-flex flex-wrap items-center gap-1.5">
             <Link
               to={issueLink(fold.sourceIssueId, fold.sourceIssueIdentifier)}
@@ -160,7 +164,11 @@ export function SourceResolvedFoldCallout({
           </span>
         </MetaRow>
         {fold.evaluationIssueId ? (
+<<<<<<< HEAD
           <MetaRow label="Evaluation issue">
+=======
+          <MetaRow label="Evaluation task">
+>>>>>>> upstream/master
             <Link
               to={issueLink(fold.evaluationIssueId, fold.evaluationIssueIdentifier)}
               className="rounded-sm font-medium underline-offset-2 hover:underline"

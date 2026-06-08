@@ -20,6 +20,7 @@ const mockIssueService = vi.hoisted(() => ({
   getById: vi.fn(),
   getRelationSummaries: vi.fn(),
   getWakeableParentAfterChildCompletion: vi.fn(),
+  list: vi.fn(),
   listAttachments: vi.fn(),
   listWakeableBlockedDependents: vi.fn(),
   remove: vi.fn(),
@@ -68,6 +69,10 @@ const mockIssueThreadInteractionService = vi.hoisted(() => ({
 }));
 const mockIssueRecoveryActionService = vi.hoisted(() => ({
   getActiveForIssue: vi.fn(async () => null),
+<<<<<<< HEAD
+=======
+  listActiveForIssues: vi.fn(async () => new Map()),
+>>>>>>> upstream/master
   resolveActiveForIssue: vi.fn(async () => null),
 }));
 const mockHeartbeatService = vi.hoisted(() => ({
@@ -97,6 +102,7 @@ function registerRouteMocks() {
   }));
 
   vi.doMock("../services/documents.js", () => ({
+    documentAnnotationService: () => ({ remapOpenThreadsForDocument: async () => [] }),
     documentService: () => mockDocumentService,
   }));
 
@@ -113,9 +119,17 @@ function registerRouteMocks() {
   }));
 
   vi.doMock("../services/index.js", () => ({
+    ISSUE_LIST_DEFAULT_LIMIT: 100,
+    ISSUE_LIST_MAX_LIMIT: 500,
     accessService: () => mockAccessService,
     agentService: () => mockAgentService,
+<<<<<<< HEAD
     companyService: () => mockCompanyService,
+=======
+    clampIssueListLimit: (value: number) => Math.min(Math.max(value, 1), 500),
+    companyService: () => mockCompanyService,
+    documentAnnotationService: () => ({ remapOpenThreadsForDocument: async () => [] }),
+>>>>>>> upstream/master
     documentService: () => mockDocumentService,
     executionWorkspaceService: () => ({}),
     feedbackService: () => ({
@@ -192,6 +206,7 @@ function makeAgent(id: string, overrides: Record<string, unknown> = {}) {
   };
 }
 
+<<<<<<< HEAD
 function createRunContextDb(contextSnapshot: Record<string, unknown> = {}) {
   return {
     transaction: async (callback: (tx: Record<string, never>) => Promise<unknown>) => callback({}),
@@ -207,11 +222,61 @@ function createRunContextDb(contextSnapshot: Record<string, unknown> = {}) {
             }]),
         })),
       })),
+=======
+function createRunContextDb(
+  contextSnapshot: Record<string, unknown> = {},
+  runAgentOrRows: string | Record<string, unknown>[] = ownerAgentId,
+  runId: string = ownerRunId,
+) {
+  const runRows = Array.isArray(runAgentOrRows)
+    ? runAgentOrRows
+    : [{
+        id: runId,
+        companyId,
+        agentId: runAgentOrRows,
+        agentCompanyId: companyId,
+        contextSnapshot,
+      }];
+  const firstRun = runRows[0] ?? {};
+  const runAgentId = typeof firstRun.agentId === "string" ? firstRun.agentId : ownerAgentId;
+  const runAgentCompanyId = typeof firstRun.agentCompanyId === "string" ? firstRun.agentCompanyId : companyId;
+  const rowsForSelection = (selection: Record<string, unknown>) => {
+    const keys = Object.keys(selection);
+    if (keys.includes("entityId")) return [];
+    if (keys.includes("contextSnapshot")) return runRows;
+    if (keys.includes("agentCompanyId")) return runRows;
+    return [{ id: runAgentId, companyId: runAgentCompanyId, permissions: {}, role: "engineer", reportsTo: null }];
+  };
+  const buildQuery = (selection: Record<string, unknown>) => {
+    const whereResult = {
+      orderBy: vi.fn(async () => []),
+      then: async (resolve: (rows: unknown[]) => unknown) => resolve(rowsForSelection(selection)),
+    };
+    const query = {
+      innerJoin: vi.fn(() => query),
+      where: vi.fn(() => whereResult),
+    };
+    return query;
+  };
+  return {
+    transaction: async (callback: (tx: Record<string, never>) => Promise<unknown>) => callback({}),
+    select: vi.fn((selection: Record<string, unknown> = {}) => ({
+      from: vi.fn(() => buildQuery(selection)),
+>>>>>>> upstream/master
     })),
   };
 }
 
+<<<<<<< HEAD
 async function createApp(actor: Record<string, unknown>, db: unknown = createRunContextDb()) {
+=======
+async function createApp(actor: Record<string, unknown>, db?: unknown) {
+  const routeDb = db ?? createRunContextDb(
+    {},
+    typeof actor.agentId === "string" ? actor.agentId : ownerAgentId,
+    typeof actor.runId === "string" ? actor.runId : ownerRunId,
+  );
+>>>>>>> upstream/master
   const [{ errorHandler }, { issueRoutes }] = await Promise.all([
     vi.importActual<typeof import("../middleware/index.js")>("../middleware/index.js"),
     vi.importActual<typeof import("../routes/issues.js")>("../routes/issues.js"),
@@ -222,7 +287,11 @@ async function createApp(actor: Record<string, unknown>, db: unknown = createRun
     (req as any).actor = actor;
     next();
   });
+<<<<<<< HEAD
   app.use("/api", issueRoutes(db as any, mockStorageService as any));
+=======
+  app.use("/api", issueRoutes(routeDb as any, mockStorageService as any));
+>>>>>>> upstream/master
   app.use(errorHandler);
   return app;
 }
@@ -278,10 +347,33 @@ describe("agent issue mutation checkout ownership", () => {
     mockAccessService.canUser.mockReset();
     mockAccessService.decide.mockReset();
     mockAccessService.decide.mockImplementation(async (input: { action: string }) => ({
+<<<<<<< HEAD
       allowed: input.action === "tasks:assign",
       action: input.action,
       reason: input.action === "tasks:assign" ? "allow_explicit_grant" : "deny_missing_grant",
       explanation: input.action === "tasks:assign" ? "Allowed by test assignment default." : "Missing permission.",
+=======
+      allowed:
+        input.action === "tasks:assign" ||
+        input.action === "issue:read" ||
+        input.action === "issue:mutate" ||
+        input.action === "company_scope:read",
+      action: input.action,
+      reason:
+        input.action === "tasks:assign" ||
+          input.action === "issue:read" ||
+          input.action === "issue:mutate" ||
+          input.action === "company_scope:read"
+          ? "allow_explicit_grant"
+          : "deny_missing_grant",
+      explanation:
+        input.action === "tasks:assign" ||
+          input.action === "issue:read" ||
+          input.action === "issue:mutate" ||
+          input.action === "company_scope:read"
+          ? "Allowed by test default."
+          : "Missing permission.",
+>>>>>>> upstream/master
     }));
     mockAccessService.hasPermission.mockReset();
     mockAgentService.getById.mockReset();
@@ -297,10 +389,16 @@ describe("agent issue mutation checkout ownership", () => {
     mockIssueService.getById.mockReset();
     mockIssueService.getRelationSummaries.mockReset();
     mockIssueService.getWakeableParentAfterChildCompletion.mockReset();
+    mockIssueService.list.mockReset();
     mockIssueService.listAttachments.mockReset();
     mockIssueService.listWakeableBlockedDependents.mockReset();
     mockIssueRecoveryActionService.getActiveForIssue.mockReset();
     mockIssueRecoveryActionService.getActiveForIssue.mockResolvedValue(null);
+<<<<<<< HEAD
+=======
+    mockIssueRecoveryActionService.listActiveForIssues.mockReset();
+    mockIssueRecoveryActionService.listActiveForIssues.mockResolvedValue(new Map());
+>>>>>>> upstream/master
     mockIssueRecoveryActionService.resolveActiveForIssue.mockReset();
     mockIssueRecoveryActionService.resolveActiveForIssue.mockResolvedValue({
       id: recoveryActionId,
@@ -368,6 +466,7 @@ describe("agent issue mutation checkout ownership", () => {
     mockCompanyService.getById.mockResolvedValue({ id: companyId, issuePrefix: "PAP" });
     mockIssueService.getById.mockResolvedValue(makeIssue());
     mockIssueService.getByIdentifier.mockResolvedValue(null);
+    mockIssueService.list.mockResolvedValue([makeIssue()]);
     mockIssueService.assertCheckoutOwner.mockResolvedValue({ adoptedFromRunId: null });
     mockIssueService.create.mockImplementation(async (_companyId: string, input: Record<string, unknown>) => ({
       ...makeIssue({
@@ -474,6 +573,41 @@ describe("agent issue mutation checkout ownership", () => {
     mockStorageService.deleteObject.mockResolvedValue(undefined);
   });
 
+  it("uses the company-scope fast path on the issue list route", async () => {
+    mockAccessService.decide.mockImplementation(async (input: { action: string }) => {
+      if (input.action === "company_scope:read") {
+        return {
+          allowed: true,
+          action: input.action,
+          reason: "allow_explicit_grant",
+          explanation: "Allowed by test company scope.",
+        };
+      }
+      if (input.action === "issue:read") {
+        throw new Error("issue:read should not be evaluated for company-scope readers");
+      }
+      return {
+        allowed: true,
+        action: input.action,
+        reason: "allow_test_default",
+        explanation: "Allowed by test default.",
+      };
+    });
+
+    const app = await createApp(boardActor());
+    const res = await request(app).get(`/api/companies/${companyId}/issues`);
+
+    expect(res.status, JSON.stringify(res.body)).toBe(200);
+    expect(res.body).toEqual([expect.objectContaining({ id: issueId })]);
+    expect(mockAccessService.decide).toHaveBeenCalledWith(expect.objectContaining({
+      action: "company_scope:read",
+      resource: { type: "company", companyId },
+    }));
+    expect(mockAccessService.decide).not.toHaveBeenCalledWith(expect.objectContaining({
+      action: "issue:read",
+    }));
+  });
+
   it.each([
     ["patch", (app: express.Express) => request(app).patch(`/api/issues/${issueId}`).send({ title: "Blocked" })],
     ["delete", (app: express.Express) => request(app).delete(`/api/issues/${issueId}`)],
@@ -484,6 +618,16 @@ describe("agent issue mutation checkout ownership", () => {
         request(app).put(`/api/issues/${issueId}/documents/plan`).send({ format: "markdown", body: "# blocked" }),
     ],
     ["work product update", (app: express.Express) => request(app).patch("/api/work-products/product-1").send({ title: "Blocked" })],
+    [
+      "low-trust promotion",
+      (app: express.Express) =>
+        request(app).post(`/api/issues/${issueId}/low-trust/promotions`).send({
+          sourceArtifactKind: "comment",
+          sourceArtifactId: recoveryActionId,
+          title: "Promoted artifact",
+          summary: "Sanitized output",
+        }),
+    ],
     [
       "attachment upload",
       (app: express.Express) =>
@@ -501,9 +645,31 @@ describe("agent issue mutation checkout ownership", () => {
     expect(mockIssueService.update).not.toHaveBeenCalled();
     expect(mockIssueService.addComment).not.toHaveBeenCalled();
     expect(mockDocumentService.upsertIssueDocument).not.toHaveBeenCalled();
+    expect(mockWorkProductService.createForIssue).not.toHaveBeenCalled();
     expect(mockWorkProductService.update).not.toHaveBeenCalled();
     expect(mockStorageService.putFile).not.toHaveBeenCalled();
     expect(mockStorageService.deleteObject).not.toHaveBeenCalled();
+  });
+
+  it("rejects the checked-out owner without a run id on attachment upload (401)", async () => {
+    // Regression: an agent-authenticated client (e.g. the CLI's attachment:upload)
+    // that fails to send X-Paperclip-Run-Id must be rejected — mutating your own
+    // in-progress checkout requires proving run ownership.
+    const app = await createApp({
+      type: "agent",
+      agentId: ownerAgentId,
+      companyId,
+      source: "agent_key",
+      // intentionally no runId
+    });
+
+    const res = await request(app)
+      .post(`/api/companies/${companyId}/issues/${issueId}/attachments`)
+      .attach("file", Buffer.from("report"), { filename: "report.html", contentType: "text/html" });
+
+    expect(res.status, JSON.stringify(res.body)).toBe(401);
+    expect(res.body.error).toBe("Agent run id required");
+    expect(mockStorageService.putFile).not.toHaveBeenCalled();
   });
 
   it("allows the checked-out owner with the matching run id to patch and update documents", async () => {
@@ -528,6 +694,76 @@ describe("agent issue mutation checkout ownership", () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  it("stores the authenticated agent run id when creating work products", async () => {
+    const app = await createApp(ownerActor());
+
+    await request(app).post(`/api/issues/${issueId}/work-products`).send({
+      type: "artifact",
+      provider: "test",
+      title: "Artifact",
+    }).expect(201);
+
+    expect(mockWorkProductService.createForIssue).toHaveBeenCalledWith(
+      issueId,
+      companyId,
+      expect.objectContaining({ createdByRunId: ownerRunId }),
+    );
+  });
+
+  it("rejects agent-created work products with a forged run id", async () => {
+    const app = await createApp(ownerActor());
+
+    const res = await request(app).post(`/api/issues/${issueId}/work-products`).send({
+      type: "artifact",
+      provider: "test",
+      title: "Artifact",
+      createdByRunId: "66666666-6666-4666-8666-666666666666",
+    });
+
+    expect(res.status, JSON.stringify(res.body)).toBe(403);
+    expect(res.body.error).toBe("createdByRunId must match the authenticated agent run");
+    expect(mockWorkProductService.createForIssue).not.toHaveBeenCalled();
+  });
+
+  it("rejects work product updates with a forged agent run id", async () => {
+    const app = await createApp(ownerActor());
+
+    const res = await request(app).patch("/api/work-products/product-1").send({
+      createdByRunId: "66666666-6666-4666-8666-666666666666",
+    });
+
+    expect(res.status, JSON.stringify(res.body)).toBe(403);
+    expect(res.body.error).toBe("createdByRunId must match the authenticated agent run");
+    expect(mockWorkProductService.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects board-created work products with a foreign-company run id", async () => {
+    const app = await createApp(
+      boardActor(),
+      createRunContextDb({}, [{
+        id: "66666666-6666-4666-8666-666666666666",
+        companyId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        agentId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        agentCompanyId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        contextSnapshot: {},
+      }]),
+    );
+
+    const res = await request(app).post(`/api/issues/${issueId}/work-products`).send({
+      type: "artifact",
+      provider: "test",
+      title: "Artifact",
+      createdByRunId: "66666666-6666-4666-8666-666666666666",
+    });
+
+    expect(res.status, JSON.stringify(res.body)).toBe(403);
+    expect(res.body.error).toBe("createdByRunId is not valid for this company");
+    expect(mockWorkProductService.createForIssue).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/master
   it.each([
     [
       "work product create",
@@ -541,6 +777,19 @@ describe("agent issue mutation checkout ownership", () => {
     ["work product update", (app: express.Express) => request(app).patch("/api/work-products/product-1").send({ title: "Blocked" })],
     ["work product delete", (app: express.Express) => request(app).delete("/api/work-products/product-1")],
     [
+<<<<<<< HEAD
+=======
+      "low-trust promotion",
+      (app: express.Express) =>
+        request(app).post(`/api/issues/${issueId}/low-trust/promotions`).send({
+          sourceArtifactKind: "comment",
+          sourceArtifactId: recoveryActionId,
+          title: "Promoted artifact",
+          summary: "Sanitized output",
+        }),
+    ],
+    [
+>>>>>>> upstream/master
       "attachment upload",
       (app: express.Express) =>
         request(app)
@@ -691,10 +940,25 @@ describe("agent issue mutation checkout ownership", () => {
 
   it("allows agents with the active-checkout management grant to mutate active checkouts", async () => {
     mockAccessService.decide.mockImplementation(async (input: { action: string }) => ({
+<<<<<<< HEAD
       allowed: input.action === "tasks:manage_active_checkouts",
       action: input.action,
       reason: input.action === "tasks:manage_active_checkouts" ? "allow_explicit_grant" : "deny_missing_grant",
       explanation: input.action === "tasks:manage_active_checkouts" ? "Allowed by checkout management grant." : "Missing permission.",
+=======
+      allowed: input.action === "issue:mutate" || input.action === "tasks:manage_active_checkouts",
+      action: input.action,
+      reason:
+        input.action === "issue:mutate" || input.action === "tasks:manage_active_checkouts"
+          ? "allow_explicit_grant"
+          : "deny_missing_grant",
+      explanation:
+        input.action === "tasks:manage_active_checkouts"
+          ? "Allowed by checkout management grant."
+          : input.action === "issue:mutate"
+            ? "Allowed by test boundary default."
+            : "Missing permission.",
+>>>>>>> upstream/master
     }));
 
     const res = await request(await createApp(peerActor())).patch(`/api/issues/${issueId}`).send({ title: "Managed update" });
@@ -844,6 +1108,18 @@ describe("agent issue mutation checkout ownership", () => {
       reason: "deny_policy_restricted",
       explanation: "Target agent requires approval before task assignment.",
     }));
+<<<<<<< HEAD
+=======
+    decide.mockImplementation(async (input: { action: string }) => ({
+      allowed: input.action === "issue:mutate",
+      action: input.action,
+      reason: input.action === "issue:mutate" ? "allow_self" : "deny_policy_restricted",
+      explanation:
+        input.action === "issue:mutate"
+          ? "Allowed because the actor owns the assigned issue."
+          : "Target agent requires approval before task assignment.",
+    }));
+>>>>>>> upstream/master
     (mockAccessService as any).decide = decide;
     mockIssueService.getById.mockResolvedValue(makeIssue({ assigneeAgentId: ownerAgentId }));
     mockAgentService.resolveByReference.mockResolvedValue({

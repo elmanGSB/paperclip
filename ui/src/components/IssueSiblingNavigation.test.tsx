@@ -84,7 +84,11 @@ describe("IssueSiblingNavigation", () => {
     );
 
     const nav = node.querySelector("nav");
+<<<<<<< HEAD
     expect(nav?.getAttribute("aria-label")).toBe("Sub-issue navigation");
+=======
+    expect(nav?.getAttribute("aria-label")).toBe("Sub-task navigation");
+>>>>>>> upstream/master
     expect(nav?.className).toContain("sm:grid-cols-2");
     expect(nav?.className).not.toContain("border-t");
 
@@ -93,13 +97,21 @@ describe("IssueSiblingNavigation", () => {
     expect(links[0].textContent).toContain("Previous");
     expect(links[0].textContent).toContain("PAP-1");
     expect(links[0].textContent).toContain("Previous sibling title");
+<<<<<<< HEAD
     expect(links[0].getAttribute("aria-label")).toBe("Previous sub-issue: PAP-1 - Previous sibling title");
+=======
+    expect(links[0].getAttribute("aria-label")).toBe("Previous sub-task: PAP-1 - Previous sibling title");
+>>>>>>> upstream/master
     expect(links[0].getAttribute("data-quicklook-align")).toBe("start");
 
     expect(links[1].textContent).toContain("Next");
     expect(links[1].textContent).toContain("PAP-3");
     expect(links[1].textContent).toContain("Next sibling title");
+<<<<<<< HEAD
     expect(links[1].getAttribute("aria-label")).toBe("Next sub-issue: PAP-3 - Next sibling title");
+=======
+    expect(links[1].getAttribute("aria-label")).toBe("Next sub-task: PAP-3 - Next sibling title");
+>>>>>>> upstream/master
     expect(links[1].getAttribute("data-quicklook-align")).toBe("end");
     expect(links[1].className).toContain("sm:text-right");
 

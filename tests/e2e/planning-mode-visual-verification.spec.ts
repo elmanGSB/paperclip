@@ -61,7 +61,11 @@ test("captures planning mode UI for desktop and mobile", async ({ page }) => {
   await page.getByRole("button", { name: "Next" }).click();
 
   await expect(page.locator("h3", { hasText: "Ready to launch" })).toBeVisible({ timeout: 30_000 });
+<<<<<<< HEAD
   await page.getByRole("button", { name: "Create & Open Issue" }).click();
+=======
+  await page.getByRole("button", { name: "Create & Open Task" }).click();
+>>>>>>> upstream/master
   await expect(page).toHaveURL(/\/issues\//, { timeout: 30_000 });
 
   const openedIssueUrl = page.url();
